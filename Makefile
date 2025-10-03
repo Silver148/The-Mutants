@@ -15,4 +15,4 @@ obj/%.o: src/%.c
 all: $(NAME)
 
 clean:
-	rm -f obj $(NAME)
+	rm -rf obj $(NAME)
