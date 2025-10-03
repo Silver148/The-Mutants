@@ -23,7 +23,7 @@ int main()
     }
 
     /*Create window*/
-    window = SDL_CreateWindow("The Mutant´s", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640, 480, SDL_WINDOW_SHOWN);
+    window = SDL_CreateWindow("The Mutant's", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640, 480, SDL_WINDOW_SHOWN);
     if(window == NULL)
         printf("Window could not be created! SDL Error: %s\n", SDL_GetError());
 
