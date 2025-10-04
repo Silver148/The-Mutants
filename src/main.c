@@ -37,6 +37,9 @@ int main()
     if(renderer == NULL)
         printf("Renderer could not be created! SDL Error: %s\n", SDL_GetError());
 
+    SDL_ShowCursor(SDL_DISABLE); /*Hide cursor(I'll be using this in the game soon, 
+                                 * I'll remove it from here and move it when I add a main menu :) )
+                                 */
     while(1) //Main loop
     {
         SDL_Event e;
