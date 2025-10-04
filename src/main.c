@@ -14,6 +14,7 @@ group and will be considered a real gay.
 int main()
 {   
     SDL_Window* window = NULL;
+    SDL_Renderer* renderer = NULL;
 
     /*Initialize SDL*/
     if(SDL_Init(SDL_INIT_VIDEO) && SDL_Init(SDL_INIT_AUDIO) < 0)
@@ -27,7 +28,12 @@ int main()
     if(window == NULL)
         printf("Window could not be created! SDL Error: %s\n", SDL_GetError());
 
-    while(1)
+    /*Create renderer for window*/
+    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    if(renderer == NULL)
+        printf("Renderer could not be created! SDL Error: %s\n", SDL_GetError());
+
+    while(1) //Main loop
     {
         SDL_Event e;
         if(SDL_PollEvent(&e))
@@ -35,7 +41,14 @@ int main()
             if(e.type == SDL_QUIT) /*EXIT*/
                 break;
         }
+
+        /*TESTING*/
+        SDL_SetRenderDrawColor(renderer, 0xFF, 0x00, 0x00, 0xFF); //Black
+        SDL_RenderClear(renderer);
+        SDL_RenderPresent(renderer);
     }
 
     return 0;
 }
+
+// End func main
