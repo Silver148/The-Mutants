@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
     }
 
     /*Create window*/
-    window = SDL_CreateWindow("The Mutant's", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640, 480, SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN); //Window 640x480 fullscreen
+    window = SDL_CreateWindow("The Mutant's", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640, 480, SDL_WINDOW_SHOWN); //Window 640x480
     if(window == NULL)
         printf("Window could not be created! SDL Error: %s\n", SDL_GetError());
 
@@ -60,6 +60,11 @@ int main(int argc, char* argv[])
 
                         break;
                     }
+                    break;
+
+                case SDL_QUIT: /*EXIT*/
+                    SDL_Quit();
+                    return 0;
                     break;
             }
         }
