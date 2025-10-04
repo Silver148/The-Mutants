@@ -28,7 +28,7 @@ int main()
     }
 
     /*Create window*/
-    window = SDL_CreateWindow("The Mutant's", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640, 480, SDL_WINDOW_SHOWN);
+    window = SDL_CreateWindow("The Mutant's", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640, 480, SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN); //Window 640x480 fullscreen
     if(window == NULL)
         printf("Window could not be created! SDL Error: %s\n", SDL_GetError());
 
@@ -42,8 +42,19 @@ int main()
         SDL_Event e;
         if(SDL_PollEvent(&e))
         {
-            if(e.type == SDL_QUIT) /*EXIT*/
-                break;
+            switch(e.type)
+            {
+                case SDL_KEYDOWN: //Key pressed
+                    switch(e.key.keysym.sym)
+                    {
+                        case SDLK_ESCAPE: /*EXIT*/
+                        SDL_Quit();
+                        return 0;
+
+                        break;
+                    }
+                    break;
+            }
         }
 
         /*TESTING*/
