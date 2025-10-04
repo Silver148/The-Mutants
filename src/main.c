@@ -43,7 +43,7 @@ int main()
         }
 
         /*TESTING*/
-        SDL_SetRenderDrawColor(renderer, 0xFF, 0x00, 0x00, 0xFF); //Black
+        SDL_SetRenderDrawColor(renderer, 0xFF, 0x00, 0x00, 0xFF); //Red
         SDL_RenderClear(renderer);
         SDL_RenderPresent(renderer);
     }
