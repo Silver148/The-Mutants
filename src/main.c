@@ -14,8 +14,12 @@ Copyright 2024
 #include <stdio.h>
 #include <SDL2/SDL.h>
 
+#ifdef __MINGW32__
+#define main SDL_main 
+#endif
+
 //Func Main
-int main()
+int main(int argc, char* argv[])
 {   
     SDL_Window* window = NULL;
     SDL_Renderer* renderer = NULL;
