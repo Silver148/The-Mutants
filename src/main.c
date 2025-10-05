@@ -1,5 +1,5 @@
 /*
-THE MUTANTS
+THE MUTANT'S
 
 Authors: Abel Ferrer(aka The_Light), Juan Yaguaro(aka silverhacker), Sebastián Colina(aka Montana-call)
 File: main.c
