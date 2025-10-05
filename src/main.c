@@ -8,7 +8,7 @@ THIS CODE WILL REMAIN CONFIDENTIAL UNTIL THE PROJECT IS COMPLETED.
 Anyone who leaks this code will be automatically kicked out of the 
 group and will be considered a real gay.
 
-Copyright 2024
+Copyright 2025
 */
 
 #include <stdio.h>
