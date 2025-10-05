@@ -93,7 +93,7 @@ int main(int argc, char* argv[])
         //SDL_SetRenderDrawColor(renderer, 0xFF, 0x00, 0x00, 0xFF);
         SDL_RenderClear(renderer);
 
-        SDL_RenderCopy(renderer, backgroundTexture, NULL, &backgroundRect);
+        SDL_RenderCopy(renderer, backgroundTexture, NULL, &backgroundRect); /*TEXTURE TEST :)*/
 
         SDL_RenderPresent(renderer);
     }
