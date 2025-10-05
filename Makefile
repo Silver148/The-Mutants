@@ -1,7 +1,7 @@
 NAME = The_Mutants
 CC = gcc
 CFLAGS = -Wall -Iinclude
-LIBS = -lSDL2
+LIBS = -lSDL2 -lSDL2_image
 SOURCES = src/main.c
 OBJECTS = $(SOURCES:src/%.c=obj/%.o)
 

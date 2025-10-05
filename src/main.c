@@ -13,6 +13,7 @@ Copyright 2024
 
 #include <stdio.h>
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 
 #ifdef __MINGW32__
 #define main SDL_main 
@@ -31,6 +32,12 @@ int main(int argc, char* argv[])
         return 1;
     }
 
+    if(IMG_Init(IMG_INIT_PNG) < 0)
+    {
+        printf("SDL_image could not initialize! SDL_image Error: %s\n", IMG_GetError());
+        return 1;
+    }
+
     /*Create window*/
     window = SDL_CreateWindow("The Mutant's", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640, 480, SDL_WINDOW_SHOWN); //Window 640x480
     if(window == NULL)
@@ -40,7 +47,7 @@ int main(int argc, char* argv[])
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     if(renderer == NULL)
         printf("Renderer could not be created! SDL Error: %s\n", SDL_GetError());
-
+    
     while(1) //Main loop
     {
         SDL_Event e;
@@ -67,7 +74,7 @@ int main(int argc, char* argv[])
         }
 
         /*TESTING*/
-        SDL_SetRenderDrawColor(renderer, 0xFF, 0x00, 0x00, 0xFF); //Red
+        SDL_SetRenderDrawColor(renderer, 0xFF, 0x00, 0x00, 0xFF);
         SDL_RenderClear(renderer);
         SDL_RenderPresent(renderer);
     }
