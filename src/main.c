@@ -51,21 +51,37 @@ int main(int argc, char* argv[])
     if(renderer == NULL)
         printf("Renderer could not be created! SDL Error: %s\n", SDL_GetError());
 
-    /*Load PNG texture main menu test*/
-    SDL_Surface* loadedSurface = IMG_Load("sprites/CHIP8-PS2-BACKGROUND.png");
+    /*Load BACKGROUND test main menu test*/
+    SDL_Surface* background_surface = IMG_Load("sprites/CHIP8-PS2-BACKGROUND.png");
 
-    if(loadedSurface == NULL)
+    /*Load player sprite*/
+    SDL_Surface* player_sprite = IMG_Load("sprites/player_shoot_frame-0.png");
+
+    if(background_surface == NULL)
         printf("Unable to load image %s! SDL_image Error: %s\n", "sprites/CHIP8-PS2-BACKGROUND.png", IMG_GetError());
 
-    SDL_Texture* backgroundTexture = SDL_CreateTextureFromSurface(renderer, loadedSurface); //Convert surface to texture
-    SDL_FreeSurface(loadedSurface); //Free loaded surface
+    if(player_sprite == NULL)
+        printf("Unable to load image %s! SDL_image Error: %s\n", "sprites/player_shoot_frame-0.png", IMG_GetError());
 
-    //Texture properties
+    SDL_Texture* backgroundTexture = SDL_CreateTextureFromSurface(renderer, background_surface); //Convert surface to texture
+    SDL_FreeSurface(background_surface); //Free loaded surface
+
+    SDL_Texture* playerTexture = SDL_CreateTextureFromSurface(renderer, player_sprite); //Convert surface to texture
+    SDL_FreeSurface(player_sprite); //Free loaded surface
+
+    //Background texture properties
     SDL_Rect backgroundRect;
     backgroundRect.x = 0;
     backgroundRect.y = 0;
     backgroundRect.w = 640;
     backgroundRect.h = 480;
+
+    //Player texture properties
+    SDL_Rect playerRect;
+    playerRect.x = 288; //Center of the screen
+    playerRect.y = 208; //Center of the screen
+    playerRect.w = 64; //Width of the sprite
+    playerRect.h = 64; //Height of the sprite
 
     while(1) //Main loop(TESTING)
     {
@@ -97,6 +113,7 @@ int main(int argc, char* argv[])
         SDL_RenderClear(renderer);
 
         SDL_RenderCopy(renderer, backgroundTexture, NULL, &backgroundRect); /*TEXTURE TEST :)*/
+        SDL_RenderCopy(renderer, playerTexture, NULL, &playerRect); /*PLAYER TEST :)*/
 
         SDL_RenderPresent(renderer);
     }
