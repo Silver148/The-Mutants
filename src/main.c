@@ -50,7 +50,6 @@ int main(int argc, char* argv[])
         printf("Renderer could not be created! SDL Error: %s\n", SDL_GetError());
 
     /*Load PNG texture main menu test*/
-
     SDL_Surface* loadedSurface = IMG_Load("sprites/CHIP8-PS2-BACKGROUND.png");
 
     if(loadedSurface == NULL)
@@ -58,13 +57,14 @@ int main(int argc, char* argv[])
 
     SDL_Texture* backgroundTexture = SDL_CreateTextureFromSurface(renderer, loadedSurface);
 
+    //Texture properties
     SDL_Rect backgroundRect;
     backgroundRect.x = 0;
     backgroundRect.y = 0;
     backgroundRect.w = 640;
     backgroundRect.h = 480;
 
-    while(1) //Main loop
+    while(1) //Main loop(TESTING)
     {
         SDL_Event e;
         if(SDL_PollEvent(&e))
