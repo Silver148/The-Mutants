@@ -32,6 +32,7 @@ int main(int argc, char* argv[])
         return 1;
     }
 
+    /*Initialize SDL_image*/
     if(IMG_Init(IMG_INIT_PNG) < 0)
     {
         printf("SDL_image could not initialize! SDL_image Error: %s\n", IMG_GetError());
@@ -47,7 +48,22 @@ int main(int argc, char* argv[])
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     if(renderer == NULL)
         printf("Renderer could not be created! SDL Error: %s\n", SDL_GetError());
-    
+
+    /*Load PNG texture main menu test*/
+
+    SDL_Surface* loadedSurface = IMG_Load("sprites/CHIP8-PS2-BACKGROUND.png");
+
+    if(loadedSurface == NULL)
+        printf("Unable to load image %s! SDL_image Error: %s\n", "sprites/CHIP8-PS2-BACKGROUND.png", IMG_GetError());
+
+    SDL_Texture* backgroundTexture = SDL_CreateTextureFromSurface(renderer, loadedSurface);
+
+    SDL_Rect backgroundRect;
+    backgroundRect.x = 0;
+    backgroundRect.y = 0;
+    backgroundRect.w = 640;
+    backgroundRect.h = 480;
+
     while(1) //Main loop
     {
         SDL_Event e;
@@ -74,8 +90,11 @@ int main(int argc, char* argv[])
         }
 
         /*TESTING*/
-        SDL_SetRenderDrawColor(renderer, 0xFF, 0x00, 0x00, 0xFF);
+        //SDL_SetRenderDrawColor(renderer, 0xFF, 0x00, 0x00, 0xFF);
         SDL_RenderClear(renderer);
+
+        SDL_RenderCopy(renderer, backgroundTexture, NULL, &backgroundRect);
+
         SDL_RenderPresent(renderer);
     }
 
