@@ -9,12 +9,12 @@ OBJECTS = $(SOURCES:src/%.c=obj/%.o)
 WIN_NAME = The_Mutants.exe
 WIN_CC = x86_64-w64-mingw32-gcc
 WIN_CFLAGS = -Iinclude -LSDL2-Mingw/x86_64-w64-mingw32/lib -ISDL2-Mingw/x86_64-w64-mingw32/include
-WIN_LIBS = -lmingw32 -lSDL2main -lSDL2 -mwindows  -Wl,--dynamicbase -Wl,--nxcompat -Wl,--high-entropy-va -lm -ldinput8 -ldxguid -ldxerr8 -luser32 -lgdi32 -lwinmm -limm32 -lole32 -loleaut32 -lshell32 -lsetupapi -lversion -luuid
+WIN_LIBS = -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -mwindows  -Wl,--dynamicbase -Wl,--nxcompat -Wl,--high-entropy-va -lm -ldinput8 -ldxguid -ldxerr8 -luser32 -lgdi32 -lwinmm -limm32 -lole32 -loleaut32 -lshell32 -lsetupapi -lversion -luuid
 
 WIN32_NAME = The_Mutants_32.exe
 WIN32_CC = i686-w64-mingw32-gcc
 WIN32_CFLAGS = -Iinclude -LSDL2-Mingw/i686-w64-mingw32/lib -ISDL2-Mingw/i686-w64-mingw32/include
-WIN32_LIBS = -lmingw32 -lSDL2main -lSDL2 -mwindows -Wl,--dynamicbase -Wl,--nxcompat -Wl,-lm -ldinput8 -ldxguid -ldxerr8 -luser32 -lgdi32 -lwinmm -limm32 -lole32 -loleaut32 -lshell32 -lsetupapi -lversion -luuid
+WIN32_LIBS = -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -mwindows -Wl,--dynamicbase -Wl,--nxcompat -Wl,-lm -ldinput8 -ldxguid -ldxerr8 -luser32 -lgdi32 -lwinmm -limm32 -lole32 -loleaut32 -lshell32 -lsetupapi -lversion -luuid
 
 #RULE LINUX
 $(NAME): $(OBJECTS)
@@ -43,16 +43,26 @@ all: $(NAME)
 windows: 
 	make $(WIN_NAME) CC=$(WIN_CC)
 	cp SDL2-Mingw/x86_64-w64-mingw32/bin/SDL2.dll SDL2.dll
-	zip -r The_Mutants.zip $(WIN_NAME) SDL2.dll
-	rm -f SDL2.dll
+	cp SDL2-Mingw/x86_64-w64-mingw32/bin/libpng16-16.dll libpng16-16.dll
+	cp SDL2-Mingw/x86_64-w64-mingw32/bin/zlib1.dll zlib1.dll
+	cp SDL2-Mingw/x86_64-w64-mingw32/bin/libjpeg-9.dll libjpeg-9.dll
+	cp SDL2-Mingw/x86_64-w64-mingw32/bin/SDL2_image.dll SDL2_image.dll
+	cp SDL2-Mingw/x86_64-w64-mingw32/bin/libtiff-5.dll libtiff-5.dll
+	zip -r The_Mutants.zip $(WIN_NAME) SDL2.dll libpng16-16.dll zlib1.dll libjpeg-9.dll SDL2_image.dll libtiff-5.dll
+	rm -f *.dll
 	rm -f $(WIN_NAME)
 
 windows32:
 	make $(WIN32_NAME) CC=$(WIN32_CC)
 	cp SDL2-Mingw/i686-w64-mingw32/bin/SDL2.dll SDL2.dll
-	zip -r The_Mutants_32.zip $(WIN32_NAME) SDL2.dll
-	rm -f SDL2.dll
+	cp SDL2-Mingw/i686-w64-mingw32/bin/libpng16-16.dll libpng16-16.dll
+	cp SDL2-Mingw/i686-w64-mingw32/bin/zlib1.dll libzlib1.dll
+	cp SDL2-Mingw/i686-w64-mingw32/bin/libjpeg-9.dll libjpeg-9.dll
+	cp SDL2-Mingw/i686-w64-mingw32/bin/SDL2_image.dll SDL2_image.dll
+	cp SDL2-Mingw/i686-w64-mingw32/bin/libtiff-5.dll libtiff-5.dll
+	zip -r The_Mutants_32.zip $(WIN32_NAME) SDL2.dll libpng16-16.dll zlib1.dll libjpeg-9.dll SDL2_image.dll libtiff-5.dll
+	rm -f *.dll
 	rm -f $(WIN32_NAME)
-
+	
 clean:
 	rm -rf obj $(NAME) $(WIN_NAME) *.zip
