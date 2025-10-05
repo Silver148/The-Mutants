@@ -28,8 +28,6 @@ $(WIN_NAME): $(OBJECTS)
 $(WIN32_NAME): $(OBJECTS)
 	$(WIN32_CC) $(WIN32_CFLAGS) $(OBJECTS) -o $(WIN32_NAME) $(WIN32_LIBS)
 
-windows32:
-
 obj/%.o: src/%.c
 	mkdir -p obj
 ifeq ($(CC), x86_64-w64-mingw32-gcc)
