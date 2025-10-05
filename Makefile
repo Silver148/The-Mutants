@@ -56,11 +56,13 @@ windows32:
 	make $(WIN32_NAME) CC=$(WIN32_CC)
 	cp SDL2-Mingw/i686-w64-mingw32/bin/SDL2.dll SDL2.dll
 	cp SDL2-Mingw/i686-w64-mingw32/bin/libpng16-16.dll libpng16-16.dll
-	cp SDL2-Mingw/i686-w64-mingw32/bin/zlib1.dll libzlib1.dll
+	cp SDL2-Mingw/i686-w64-mingw32/bin/zlib1.dll zlib1.dll
 	cp SDL2-Mingw/i686-w64-mingw32/bin/libjpeg-9.dll libjpeg-9.dll
 	cp SDL2-Mingw/i686-w64-mingw32/bin/SDL2_image.dll SDL2_image.dll
 	cp SDL2-Mingw/i686-w64-mingw32/bin/libtiff-5.dll libtiff-5.dll
-	zip -rf The_Mutants.zip $(WIN_NAME) SDL2.dll libpng16-16.dll zlib1.dll libjpeg-9.dll SDL2_image.dll libtiff-5.dll sprites
+	zip -r The_Mutants_32.zip $(WIN32_NAME) SDL2.dll libpng16-16.dll zlib1.dll libjpeg-9.dll SDL2_image.dll libtiff-5.dll sprites
+	rm -f *.dll
+	rm -f $(WIN32_NAME)
 	
 clean:
-	rm -rf obj $(NAME) $(WIN_NAME) *.zip
+	rm -rf obj $(NAME) $(WIN_NAME) $(WIN32_NAME) *.zip
