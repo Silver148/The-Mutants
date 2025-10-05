@@ -57,7 +57,8 @@ int main(int argc, char* argv[])
     if(loadedSurface == NULL)
         printf("Unable to load image %s! SDL_image Error: %s\n", "sprites/CHIP8-PS2-BACKGROUND.png", IMG_GetError());
 
-    SDL_Texture* backgroundTexture = SDL_CreateTextureFromSurface(renderer, loadedSurface);
+    SDL_Texture* backgroundTexture = SDL_CreateTextureFromSurface(renderer, loadedSurface); //Convert surface to texture
+    SDL_FreeSurface(loadedSurface); //Free loaded surface
 
     //Texture properties
     SDL_Rect backgroundRect;
