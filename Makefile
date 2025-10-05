@@ -11,6 +11,7 @@ WIN_CC = x86_64-w64-mingw32-gcc
 WIN_CFLAGS = -Iinclude -LSDL2-Mingw/x86_64-w64-mingw32/lib -ISDL2-Mingw/x86_64-w64-mingw32/include
 WIN_LIBS = -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -mwindows  -Wl,--dynamicbase -Wl,--nxcompat -Wl,--high-entropy-va -lm -ldinput8 -ldxguid -ldxerr8 -luser32 -lgdi32 -lwinmm -limm32 -lole32 -loleaut32 -lshell32 -lsetupapi -lversion -luuid
 
+# Windows x32 build settings
 WIN32_NAME = The_Mutants_32.exe
 WIN32_CC = i686-w64-mingw32-gcc
 WIN32_CFLAGS = -Iinclude -LSDL2-Mingw/i686-w64-mingw32/lib -ISDL2-Mingw/i686-w64-mingw32/include
@@ -63,6 +64,6 @@ windows32:
 	zip -r The_Mutants_32.zip $(WIN32_NAME) SDL2.dll libpng16-16.dll zlib1.dll libjpeg-9.dll SDL2_image.dll libtiff-5.dll sprites
 	rm -f *.dll
 	rm -f $(WIN32_NAME)
-	
+
 clean:
 	rm -rf obj $(NAME) $(WIN_NAME) $(WIN32_NAME) *.zip
