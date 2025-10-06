@@ -16,6 +16,7 @@ Copyright 2025
 #include <stdio.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <stdbool.h>
 #include "player.h"
 
 #ifdef __MINGW32__
@@ -78,12 +79,18 @@ int main(int argc, char* argv[])
             switch(e.type)
             {
                 case SDL_KEYDOWN: //Key pressed
-                    switch(e.key.keysym.sym)
+                    switch(e.key.keysym.sym) /*TEST CONTROLLER :D*/
                     {
                         case SDLK_ESCAPE: /*EXIT*/
-                        SDL_Quit();
-                        return 0;
+                            SDL_Quit();
+                        break;
 
+                        case SDLK_RIGHT: /*MOVE PLAYER RIGHT*/
+                            PlayerForward();
+                        break;
+
+                        case SDLK_LEFT: /*MOVE PLAYER LEFT*/
+                            PlayerBackward();
                         break;
                     }
                     break;

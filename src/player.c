@@ -29,6 +29,7 @@ SDL_Texture* player_shoot_frames_texture[PLAYER_SHOOT_FRAMES_COUNT];
 SDL_Rect playerRect = { 288, 208, 64, 64 }; //Player propierties
 extern SDL_Renderer* renderer;
 extern SDL_Window* window;
+const int moveDelay = 6;
 
 void LoadSpritesPlayer()
 {   
@@ -74,4 +75,14 @@ void AnimatePlayerShoot()
 
     //Draw animation shoot player :)
     SDL_RenderCopy(renderer, player_shoot_frames_texture[frame], NULL, &playerRect);
+}
+
+void PlayerForward()
+{
+    playerRect.x += 10;
+}
+
+void PlayerBackward()
+{
+    playerRect.x -= 10;
 }
