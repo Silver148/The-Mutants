@@ -86,3 +86,5 @@ void PlayerBackward()
 {
     playerRect.x -= 10;
 }
+
+/*The_Light por favor manda el sprite de idle del playe a GitHub :)*/
