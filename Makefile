@@ -2,7 +2,7 @@ NAME = The_Mutants
 CC = gcc
 CFLAGS = -Wall -Iinclude
 LIBS = -lSDL2 -lSDL2_image
-SOURCES = src/main.c
+SOURCES = src/main.c src/player.c
 OBJECTS = $(SOURCES:src/%.c=obj/%.o)
 
 # Windows x64 build settings
