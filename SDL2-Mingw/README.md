@@ -15,3 +15,5 @@ with README.md
 Enjoy!
 
 Sam Lantinga (slouken@libsdl.org)
+
+SDL2 for Windows :D
