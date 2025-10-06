@@ -26,12 +26,13 @@ Copyright 2025
 int player_shoot_frames_counts = PLAYER_SHOOT_FRAMES_COUNT; //Number of frames in the shooting animation
 SDL_Surface* player_shoot_frames[PLAYER_SHOOT_FRAMES_COUNT]; //Array to hold the shooting frames
 SDL_Texture* player_shoot_frames_texture[PLAYER_SHOOT_FRAMES_COUNT];
-SDL_Rect playerRect = { 288, 208, 64, 64 }; // Posición y tamaño del jugador
+SDL_Rect playerRect = { 288, 208, 64, 64 }; //Player propierties
 extern SDL_Renderer* renderer;
 extern SDL_Window* window;
 
 void LoadSpritesPlayer()
-{
+{   
+    /*LOAD SHOOT FRAMES*/
     player_shoot_frames[0] = IMG_Load("sprites/player_shoot_frame-0.png");
     player_shoot_frames[1] = IMG_Load("sprites/player_shoot_frame-1.png");
     player_shoot_frames[2] = IMG_Load("sprites/player_shoot_frame-2.png");
@@ -59,18 +60,18 @@ void LoadSpritesPlayer()
 
 void AnimatePlayerShoot()
 {
-    static int frame = 0; // Cuadro actual (declarado como estático para mantener su valor entre llamadas)
-    static Uint32 lastFrameTime = 0; // Tiempo del último cuadro (estático para persistencia)
+    static int frame = 0; // actual frame
+    static Uint32 lastFrameTime = 0; // last frame time
 
-    // Obtener el tiempo actual
+    // Get current time
     Uint32 currentTime = SDL_GetTicks();
 
-    // Cambiar al siguiente cuadro si ha pasado suficiente tiempo
+    //Change frame every FRAME_DELAY milliseconds
     if (currentTime > lastFrameTime + FRAME_DELAY) {
-        frame = (frame + 1) % PLAYER_SHOOT_FRAMES_COUNT; // Cambiar al siguiente cuadro
-        lastFrameTime = currentTime; // Actualizar el tiempo del último cuadro
+        frame = (frame + 1) % PLAYER_SHOOT_FRAMES_COUNT; //Change frame
+        lastFrameTime = currentTime; //Update last frame time
     }
 
-    // Dibujar el cuadro actual
+    //Draw animation shoot player :)
     SDL_RenderCopy(renderer, player_shoot_frames_texture[frame], NULL, &playerRect);
 }
