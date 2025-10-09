@@ -83,6 +83,7 @@ int main(int argc, char* argv[])
                     {
                         case SDLK_ESCAPE: /*EXIT*/
                             SDL_Quit();
+                            return 0; //Exit main loop
                         break;
 
                         case SDLK_RIGHT: /*MOVE PLAYER RIGHT*/
