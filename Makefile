@@ -2,7 +2,7 @@ NAME = The_Mutants
 CC = gcc
 CFLAGS = -Wall -Iinclude
 LIBS = -lSDL2 -lSDL2_image
-SOURCES = src/main.c src/player.c
+SOURCES = src/main.c src/player.c src/states/state_menu.c
 OBJECTS = $(SOURCES:src/%.c=obj/%.o)
 
 # Windows x64 build settings
@@ -31,6 +31,7 @@ $(WIN32_NAME): $(OBJECTS)
 
 obj/%.o: src/%.c
 	mkdir -p obj
+	mkdir -p obj/states
 ifeq ($(CC), x86_64-w64-mingw32-gcc)
 	$(CC) $(WIN_CFLAGS) -c $< -o $@
 else ifeq ($(CC), i686-w64-mingw32-gcc)
