@@ -20,7 +20,12 @@ State Menu :D
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 
-int Init_State_Menu() //Pasaré el codigo del menú del background aquí
+int Init_State_Menu()
+{
+    return 0;
+}
+
+int Update_State_Menu()
 {
     return 0;
 }

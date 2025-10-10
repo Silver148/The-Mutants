@@ -15,7 +15,7 @@ Copyright 2025
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <stdbool.h>
-#include "player.h"
+#include "states.h"
 
 #ifdef __MINGW32__
 #define main SDL_main 
@@ -51,66 +51,9 @@ int main(int argc, char* argv[])
     if(renderer == NULL)
         printf("Renderer could not be created! SDL Error: %s\n", SDL_GetError());
 
-    /*Load BACKGROUND test main menu test*/
-    SDL_Surface* background_surface = IMG_Load("sprites/CHIP8-PS2-BACKGROUND.png");
+    Init_State_Game(); //Initialize game state
 
-    if(background_surface == NULL)
-        printf("Unable to load image %s! SDL_image Error: %s\n", "sprites/CHIP8-PS2-BACKGROUND.png", IMG_GetError());
-
-    SDL_Texture* backgroundTexture = SDL_CreateTextureFromSurface(renderer, background_surface); //Convert surface to texture
-    SDL_FreeSurface(background_surface); //Free loaded surface
-
-    LoadSpritesPlayer(); //Load player sprites
-
-    //Background texture properties
-    SDL_Rect backgroundRect;
-    backgroundRect.x = 0;
-    backgroundRect.y = 0;
-    backgroundRect.w = 640;
-    backgroundRect.h = 480;
-
-    while(1) //Main loop(TESTING)
-    {
-        SDL_Event e;
-        if(SDL_PollEvent(&e))
-        {
-            switch(e.type)
-            {
-                case SDL_KEYDOWN: //Key pressed
-                    switch(e.key.keysym.sym) /*TEST CONTROLLER :D*/
-                    {
-                        case SDLK_ESCAPE: /*EXIT*/
-                            SDL_Quit();
-                            return 0; //Exit main loop
-                        break;
-
-                        case SDLK_RIGHT: /*MOVE PLAYER RIGHT*/
-                            PlayerForward();
-                        break;
-
-                        case SDLK_LEFT: /*MOVE PLAYER LEFT*/
-                            PlayerBackward();
-                        break;
-                    }
-                    break;
-
-                case SDL_QUIT: /*EXIT*/
-                    SDL_Quit();
-                    return 0;
-                    break;
-            }
-        }
-
-        /*TESTING*/
-        //SDL_SetRenderDrawColor(renderer, 0xFF, 0x00, 0x00, 0xFF);
-        SDL_RenderClear(renderer);
-
-        SDL_RenderCopy(renderer, backgroundTexture, NULL, &backgroundRect); /*TEXTURE TEST :)*/
-
-        AnimatePlayerShoot(); //Animate player shooting(TESTING)
-
-        SDL_RenderPresent(renderer);
-    }
+    Update_State_Game(); //Update game state
 
     return 0;
 }
