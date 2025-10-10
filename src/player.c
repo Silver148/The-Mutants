@@ -14,6 +14,7 @@ Copyright 2025
 //The_Light y yo(silverhacker) haremos el movimiento del player
 
 #include "player.h"
+#include "global_vars.h"
 #include <stdio.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
@@ -25,8 +26,6 @@ int player_shoot_frames_counts = PLAYER_SHOOT_FRAMES_COUNT; //Number of frames i
 SDL_Surface* player_shoot_frames[PLAYER_SHOOT_FRAMES_COUNT]; //Array to hold the shooting frames
 SDL_Texture* player_shoot_frames_texture[PLAYER_SHOOT_FRAMES_COUNT];
 SDL_Rect playerRect = { 288, 208, 64, 64 }; //Player propierties
-extern SDL_Renderer* renderer;
-extern SDL_Window* window;
 const int moveDelay = 6;
 
 void LoadSpritesPlayer()

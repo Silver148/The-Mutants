@@ -16,13 +16,11 @@ STATE GAME :D
 */
 
 #include "states.h"
+#include "global_vars.h"
 #include <stdio.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include "player.h"
-
-extern SDL_Renderer* renderer;
-extern SDL_Window* window;
 
 SDL_Texture* backgroundTexture = NULL; //Background texture
 SDL_Rect backgroundRect;

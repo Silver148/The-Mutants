@@ -16,6 +16,7 @@ State Menu :D
 */
 
 #include "states.h"
+#include "global_vars.h"
 #include <stdio.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
