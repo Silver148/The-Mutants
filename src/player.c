@@ -11,8 +11,6 @@ group and will be considered a real gay.
 Copyright 2025
 */
 
-//The_Light y yo(silverhacker) haremos el movimiento del player
-
 #include "player.h"
 #include "global_vars.h"
 #include <stdio.h>
