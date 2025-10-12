@@ -17,18 +17,6 @@ WIN32_CC = i686-w64-mingw32-gcc
 WIN32_CFLAGS = -Iinclude -LSDL2-Mingw/i686-w64-mingw32/lib -ISDL2-Mingw/i686-w64-mingw32/include
 WIN32_LIBS = -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -mwindows -Wl,--dynamicbase -Wl,--nxcompat -Wl,-lm -ldinput8 -ldxguid -ldxerr8 -luser32 -lgdi32 -lwinmm -limm32 -lole32 -loleaut32 -lshell32 -lsetupapi -lversion -luuid
 
-#RULE LINUX
-$(NAME): $(OBJECTS)
-	$(CC) $(CFLAGS) $(OBJECTS) -o $(NAME) $(LIBS)
-
-#RULE WINDOWS X64
-$(WIN_NAME): $(OBJECTS)
-	$(WIN_CC) $(WIN_CFLAGS) $(OBJECTS) -o $(WIN_NAME) $(WIN_LIBS)
-
-# RULE WINDOWS 32-BIT
-$(WIN32_NAME): $(OBJECTS)
-	$(WIN32_CC) $(WIN32_CFLAGS) $(OBJECTS) -o $(WIN32_NAME) $(WIN32_LIBS)
-
 obj/%.o: src/%.c
 	mkdir -p obj
 	mkdir -p obj/states
@@ -40,11 +28,19 @@ else
 	$(CC) $(CFLAGS) -c $< -o $@
 endif
 
-all: Linux #DEFAULT
+OS := $(shell uname -s)
+ARCH := $(shell uname -m)
 
-Linux:
+all: $(OS)-$(ARCH)
+
+Linux-x86_64:
 	make $(NAME)
 	zip -r The_Mutants_Linux.zip $(NAME) sprites
+	@echo "BUILD COMPLETE $(OS)-$(ARCH)"
+
+Linux-i686:
+	make $(NAME) "CFLAGS=$(CFLAGS) -m32"
+	zip -r The_Mutants_Linux_32.zip $(NAME) sprites
 	@echo "BUILD COMPLETE $(OS)-$(ARCH)"
 
 windows-x64:
@@ -75,3 +71,15 @@ windows-i686:
 
 clean:
 	rm -rf obj $(NAME) $(WIN_NAME) $(WIN32_NAME) *.zip
+
+#RULE LINUX
+$(NAME): $(OBJECTS)
+	$(CC) $(CFLAGS) $(OBJECTS) -o $(NAME) $(LIBS)
+
+#RULE WINDOWS X64
+$(WIN_NAME): $(OBJECTS)
+	$(WIN_CC) $(WIN_CFLAGS) $(OBJECTS) -o $(WIN_NAME) $(WIN_LIBS)
+
+# RULE WINDOWS 32-BIT
+$(WIN32_NAME): $(OBJECTS)
+	$(WIN32_CC) $(WIN32_CFLAGS) $(OBJECTS) -o $(WIN32_NAME) $(WIN32_LIBS)
