@@ -9,21 +9,7 @@ Copyright 2025
 
 int main()
 {
-    char filesToAdd[256];
-    printf("Ingresa los archivos a agregar (o . para todos):\n");
-    scanf("%s", filesToAdd); //Escanear archivos a agregar
-
-    if(filesToAdd[0] != '\0')
-    {
-        char addCommand[512];
-        snprintf(addCommand, sizeof(addCommand), "git add %s", filesToAdd); //Crear comando
-        system(addCommand); //Ejecutar comando
-    }
-    else{
-        printf("No se ingresaron archivos. Saliendo...\n");
-        return 1;
-    }
-    
+    system("git add .");
     printf("Ingresa nombre del commit:\n");
     char commitMessage[256];
 
