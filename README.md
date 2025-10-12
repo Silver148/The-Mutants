@@ -4,7 +4,7 @@
 
 # Como compilar el juego
 
-Para compilar el juego necesitas tener w64devkit en tu PC si usas Windows. En el caso que uses Linux requieres las librería SDL2, tener el compilador de C para Linux(gcc) y la herramienta Make. (NOTA: Si quieres compilar para Linux de 32 bits desde Linux de 64 bits, requieres instalar la versión de 32 bits de SDL2 para Linux)
+Para compilar el juego necesitas tener w64devkit en tu PC si usas Windows. En el caso que uses Linux requieres las librería SDL2, tener el compilador de C para Linux(gcc) y la herramienta Make.
 
 ## CREDITOS
 
