@@ -40,7 +40,16 @@ else
 	$(CC) $(CFLAGS) -c $< -o $@
 endif
 
-all: $(NAME)
+ifeq ($(OS), Windows_NT)
+	ifeq ($(PROCESSOR_ARCHITECTURE), AMD64)
+		make windows
+	else ifeq ($(PROCESSOR_ARCHITECTURE), x86)
+		make windows32
+endif
+
+ifeq ($(OS), Linux)
+	make $(NAME)
+endif
 
 windows: 
 	make $(WIN_NAME) CC=$(WIN_CC)
