@@ -32,7 +32,7 @@ Linux-i686:
 	zip -r The_Mutants_Linux_32.zip $(NAME) sprites
 	@echo "BUILD COMPLETE... Compiled from the $(OS)-$(ARCH)"
 
-windows-x86_64:
+Windows_NT-x86_64:
 	make $(WIN_NAME) CC=$(WIN_CC)
 	cp SDL2-Mingw/x86_64-w64-mingw32/bin/SDL2.dll SDL2.dll
 	cp SDL2-Mingw/x86_64-w64-mingw32/bin/libpng16-16.dll libpng16-16.dll
@@ -45,7 +45,7 @@ windows-x86_64:
 	rm -f $(WIN_NAME)
 	@echo "BUILD COMPLETE... Compiled from the $(OS)-$(ARCH)"
 
-windows-i686:
+Windows_NT-i686:
 	make $(WIN32_NAME) CC=$(WIN32_CC)
 	cp SDL2-Mingw/i686-w64-mingw32/bin/SDL2.dll SDL2.dll
 	cp SDL2-Mingw/i686-w64-mingw32/bin/libpng16-16.dll libpng16-16.dll
