@@ -23,7 +23,6 @@ int main()
     snprintf(addCommand, sizeof(addCommand), "git add %s", filesToAdd); //Crear comando
     system(addCommand); //Ejecutar comando
 
-    system("git add .");
     printf("Ingresa nombre del commit:\n");
     char commitMessage[256];
 
