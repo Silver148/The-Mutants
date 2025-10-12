@@ -2,20 +2,26 @@ NAME = The_Mutants
 CC = gcc
 CFLAGS = -Wall -Iinclude
 LIBS = -lSDL2 -lSDL2_image
-SOURCES = src/main.c src/player.c src/states/state_menu.c src/states/state_game.c
+SOURCES = src/main.c src/player.c src/states/state_menu.c \
+			src/states/state_game.c
 OBJECTS = $(SOURCES:src/%.c=obj/%.o)
 
 # Windows x64 build settings
 WIN_NAME = The_Mutants.exe
 WIN_CC = x86_64-w64-mingw32-gcc
 WIN_CFLAGS = -Iinclude -LSDL2-Mingw/x86_64-w64-mingw32/lib -ISDL2-Mingw/x86_64-w64-mingw32/include
-WIN_LIBS = -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -mwindows  -Wl,--dynamicbase -Wl,--nxcompat -Wl,--high-entropy-va -lm -ldinput8 -ldxguid -ldxerr8 -luser32 -lgdi32 -lwinmm -limm32 -lole32 -loleaut32 -lshell32 -lsetupapi -lversion -luuid
+WIN_LIBS = -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -mwindows  \
+			-Wl,--dynamicbase -Wl,--nxcompat \
+			-Wl,--high-entropy-va -lm -ldinput8 -ldxguid -ldxerr8 -luser32 -lgdi32 \
+			-lwinmm -limm32 -lole32 -loleaut32 -lshell32 -lsetupapi -lversion -luuid
 
 # Windows x32 build settings
 WIN32_NAME = The_Mutants_32.exe
 WIN32_CC = i686-w64-mingw32-gcc
 WIN32_CFLAGS = -Iinclude -LSDL2-Mingw/i686-w64-mingw32/lib -ISDL2-Mingw/i686-w64-mingw32/include
-WIN32_LIBS = -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -mwindows -Wl,--dynamicbase -Wl,--nxcompat -Wl,-lm -ldinput8 -ldxguid -ldxerr8 -luser32 -lgdi32 -lwinmm -limm32 -lole32 -loleaut32 -lshell32 -lsetupapi -lversion -luuid
+WIN32_LIBS = -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -mwindows \
+			-Wl,--dynamicbase -Wl,--nxcompat -Wl,-lm -ldinput8 -ldxguid -ldxerr8 -luser32 -lgdi32 \
+			-lwinmm -limm32 -lole32 -loleaut32 -lshell32 -lsetupapi -lversion -luuid
 
 OS := $(shell uname -s)
 ARCH := $(shell uname -m)
