@@ -64,8 +64,16 @@ Windows_NT-i686:
 	rm -f $(WIN32_NAME)
 	@echo "BUILD COMPLETE... Compiled from the $(OS)-$(ARCH)"
 
+tools_dev:
+	gcc new_commit.c -o new_commit
+	gcc convert_gif_to_sequencePNG.c -o convert_gif_to_sequencePNG
+	$(WIN_CC) new_commit.c -o new_commit.exe
+	$(WIN_CC) convert_gif_to_sequencePNG.c -o convert_gif_to_sequencePNG.exe
+	$(WIN32_CC) new_commit.c -o new_commit_32.exe
+	$(WIN32_CC) convert_gif_to_sequencePNG.c -o convert_gif_to_sequencePNG_32.exe
+
 clean:
-	rm -rf obj $(NAME) $(WIN_NAME) $(WIN32_NAME) *.zip
+	rm -rf obj $(NAME) $(WIN_NAME) $(WIN32_NAME) *.zip new_commit new_commit.exe new_commit_32.exe
 
 #RULE LINUX
 $(NAME): $(OBJECTS)
