@@ -2,6 +2,7 @@
 
     convert_gif_to_sequencePNG.c
     by Juan Yaguaro(aka silverhacker)
+	//Se requiere ImageMagick para que funcione(ni siquiera se si esta vaina funciona xD)
 
 */
 
