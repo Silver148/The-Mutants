@@ -8,8 +8,4 @@ Para compilar el juego necesitas tener w64devkit en tu PC si usas Windows. En el
 
 ## CREDITOS
 
-Jefe de desarrollo: Juan Yaguaro(aka silverhacker)
-
-Diseñador gráfico: Abel Ferrer(aka The_Light)
-
-Asistente de desarrollo: Sebastián Colina(aka Montana-call)
+Desarrolladores: Juan Yaguaro(aka silverhacker), Sebastián Colina(aka Montana-call), Abel Ferrer(aka The_Light)
