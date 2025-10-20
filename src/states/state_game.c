@@ -25,7 +25,20 @@ STATE GAME :D
 SDL_Texture* backgroundTexture = NULL; //Background texture
 SDL_Rect backgroundRect;
 extern StatesPlayer states_player;
+StatesPlayer last_states_player = IDLE;
 SDL_RendererFlip player_flip = SDL_FLIP_NONE;
+extern int current_frame;
+extern Uint32 last_update_time;
+
+void CheckChangeStatePlayer()
+{
+    if(states_player != last_states_player){
+        current_frame = 0;
+        last_update_time = SDL_GetTicks();
+    }
+
+    last_states_player = states_player;
+}
 
 int Init_State_Game()
 {
@@ -49,10 +62,28 @@ int Init_State_Game()
     return 0;
 }
 
+void UpdateAnimsPLAYER()
+{
+    CheckChangeStatePlayer();
+
+    int max_frames_for_state;
+    
+    if (states_player == IDLE) {
+        max_frames_for_state = IDLE_FRAMES;
+    }else if (states_player == WALK) {
+        max_frames_for_state = WALK_FRAMES;
+    }else {
+        return; 
+    }
+
+    UpdateANIM(max_frames_for_state);
+}
+
 int Update_State_Game()
 {
     while(1) //Main loop(TESTING)
     {
+
         SDL_Event e;
         while(SDL_PollEvent(&e))
         {
@@ -83,6 +114,9 @@ int Update_State_Game()
             player_flip = SDL_FLIP_NONE;
             PlayerForward();
         }
+
+        UpdateAnimsPLAYER();
+        UpdateDeltaTime();
 
         /*TESTING*/
         //SDL_SetRenderDrawColor(renderer, 0xFF, 0x00, 0x00, 0xFF);

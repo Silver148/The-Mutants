@@ -25,6 +25,13 @@ typedef enum{
     WALK
 } StatesPlayer;
 
+#define PLAYER_WIDTH 64
+#define PLAYER_HEIGHT 64
+
+#define IDLE_FRAMES 2
+#define WALK_FRAMES 11
+#define FRAME_DURATION 150
+
 void LoadSpritesPlayer();
 //void AnimatePlayerShoot();
 void Update_IDLE();
@@ -33,5 +40,7 @@ void PlayerForward();
 void PlayerBackward();
 void RenderPlayer(SDL_RendererFlip flip_type);
 void PlayerWalkAnim(SDL_RendererFlip flip_type);
+void UpdateANIM(int frames);
+void UpdateDeltaTime();
 
 #endif // PLAYER_H

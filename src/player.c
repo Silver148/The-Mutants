@@ -17,28 +17,25 @@ Copyright 2025
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 
-#define PLAYER_WIDTH 64
-#define PLAYER_HEIGHT 64
-
-#define IDLE_FRAMES 2
-#define WALK_FRAMES 11
-#define FRAME_DURATION 150
-
 /*IDLE PLAYER*/
 IDLE_PLAYER idle_player;
 WALK_PLAYER walk_player;
 int current_frame = 0;
 Uint32 last_update_time = 0;
 
-int position_x = 0;
-int position_y = 0;
+float position_x = 0;
+float position_y = 0;
 
 int last_position_x = 0;    
 int last_position_y = 0;
 
 StatesPlayer states_player;
 
-float player_speed = 2.0f;
+float player_speed = 100.0f;
+
+float deltaTime = 0;
+Uint32 lastTime = 0;
+Uint32 currentTime = 0;
 
 void LoadSpritesPlayer()
 {   
@@ -49,6 +46,13 @@ void LoadSpritesPlayer()
     walk_player.tmp_surf_walkplayer = IMG_Load("sprites/walk_player_spritesheet.png");
     walk_player.tex_walkplayer = SDL_CreateTextureFromSurface(renderer, walk_player.tmp_surf_walkplayer);
     SDL_FreeSurface(walk_player.tmp_surf_walkplayer);
+}
+
+void UpdateDeltaTime()
+{
+    currentTime = SDL_GetTicks();
+    deltaTime = (double)(currentTime - lastTime) / 1000.0;
+    lastTime = currentTime;
 }
 
 void AnimatePlayerShoot()
@@ -84,18 +88,16 @@ void RenderIdlePlayerAnim(SDL_RendererFlip flip_type)
     idle_player.dest_idleplayer.w = PLAYER_WIDTH;
     idle_player.dest_idleplayer.h = PLAYER_HEIGHT;
 
-    UpdateANIM(IDLE_FRAMES);
     SDL_RenderCopyEx(renderer, idle_player.tex_idleplayer, &idle_player.src_idleplayer, &idle_player.dest_idleplayer, 0.0, NULL, flip_type);
 }
 
 void PlayerForward()
 {
-    position_x += player_speed;
+    position_x += player_speed * deltaTime;
 }
 
 void PlayerWalkAnim(SDL_RendererFlip flip_type)
 {
-    UpdateANIM(WALK_FRAMES);
     SDL_RenderCopyEx(renderer, walk_player.tex_walkplayer, &walk_player.src_walkplayer, 
     &walk_player.dest_walkplayer, 0.0, NULL, flip_type);
 }
@@ -123,5 +125,5 @@ void RenderPlayer(SDL_RendererFlip flip_type)
 
 void PlayerBackward()
 {
-    position_x -= player_speed;
+    position_x -= player_speed * deltaTime;
 }
