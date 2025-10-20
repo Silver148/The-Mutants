@@ -21,6 +21,9 @@ Copyright 2025
 #define main SDL_main 
 #endif
 
+#define BASE_WIDTH 640
+#define BASE_HEIGHT 480
+
 SDL_Window* window = NULL;
 SDL_Renderer* renderer = NULL;
 
@@ -42,7 +45,7 @@ int main(int argc, char* argv[])
     }
 
     /*Create window*/
-    window = SDL_CreateWindow("The Mutant's(TEST)", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640, 480, SDL_WINDOW_SHOWN); //Window 640x480
+    window = SDL_CreateWindow("The Mutant's(TEST)", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640, 480, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE); //Window 640x480
     if(window == NULL)
         printf("Window could not be created! SDL Error: %s\n", SDL_GetError());
 
@@ -51,6 +54,8 @@ int main(int argc, char* argv[])
     if(renderer == NULL)
         printf("Renderer could not be created! SDL Error: %s\n", SDL_GetError());
 
+    SDL_RenderSetLogicalSize(renderer, BASE_WIDTH, BASE_HEIGHT);
+    
     Init_State_Game(); //Initialize game state
 
     Update_State_Game(); //Update game state
