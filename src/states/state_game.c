@@ -65,11 +65,11 @@ int Update_State_Game()
                         break;
 
                         case SDLK_RIGHT: /*MOVE PLAYER RIGHT*/
-                            PlayerForward();
+                            //PlayerForward();
                         break;
 
                         case SDLK_LEFT: /*MOVE PLAYER LEFT*/
-                            PlayerBackward();
+                            //PlayerBackward();
                         break;
                     }
                     break;
@@ -87,7 +87,8 @@ int Update_State_Game()
 
         SDL_RenderCopy(renderer, backgroundTexture, NULL, &backgroundRect); /*TEXTURE TEST :)*/
 
-        AnimatePlayerShoot(); //Animate player shooting(TESTING)
+        //AnimatePlayerShoot(); //Animate player shooting(TESTING)
+        RenderIdlePlayerAnim(); //Render idle player animation
 
         SDL_RenderPresent(renderer);
     }

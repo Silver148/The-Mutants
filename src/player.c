@@ -17,69 +17,68 @@ Copyright 2025
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 
-#define PLAYER_SHOOT_FRAMES_COUNT 4
-#define FRAME_DELAY 250
+#define PLAYER_IDLE_WIDTH 64
+#define PLAYER_IDLE_HEIGHT 64
 
-int player_shoot_frames_counts = PLAYER_SHOOT_FRAMES_COUNT; //Number of frames in the shooting animation
-SDL_Surface* player_shoot_frames[PLAYER_SHOOT_FRAMES_COUNT]; //Array to hold the shooting frames
-SDL_Texture* player_shoot_frames_texture[PLAYER_SHOOT_FRAMES_COUNT];
-SDL_Rect playerRect = { 288, 208, 64, 64 }; //Player propierties
-const int moveDelay = 6;
+#define IDLE_FRAMES 2
+#define FRAME_DURATION 150
+
+/*IDLE PLAYER*/
+IDLE_PLAYER idle_player;
+int current_frame = 0;
+Uint32 last_update_time = 0;
 
 void LoadSpritesPlayer()
 {   
-    /*LOAD SHOOT FRAMES*/
-    player_shoot_frames[0] = IMG_Load("sprites/player_shoot_frame-0.png");
-    player_shoot_frames[1] = IMG_Load("sprites/player_shoot_frame-1.png");
-    player_shoot_frames[2] = IMG_Load("sprites/player_shoot_frame-2.png");
-    player_shoot_frames[3] = IMG_Load("sprites/player_shoot_frame-3.png");
-
-    for(int i = 0; i < player_shoot_frames_counts; i++)
-    {
-        if(player_shoot_frames[i] == NULL)
-        {
-            printf("Unable to load image %s! SDL_image Error: %s\n", "sprites/player_shoot_frame-0.png", IMG_GetError());
-            SDL_DestroyRenderer(renderer);
-            SDL_DestroyWindow(window);
-            IMG_Quit();
-            SDL_Quit();
-            exit(1);
-        }
-    }
-
-    for(int i = 0; i < player_shoot_frames_counts; i++)
-    {
-        player_shoot_frames_texture[i] = SDL_CreateTextureFromSurface(renderer, player_shoot_frames[i]);
-        SDL_FreeSurface(player_shoot_frames[i]);
-    }
+    idle_player.tmp_surf_idleplayer = IMG_Load("sprites/idle_player_spritesheet.png");
+    idle_player.tex_idleplayer = SDL_CreateTextureFromSurface(renderer, idle_player.tmp_surf_idleplayer);
+    SDL_FreeSurface(idle_player.tmp_surf_idleplayer);
 }
 
 void AnimatePlayerShoot()
 {
-    static int frame = 0; // actual frame
-    static Uint32 lastFrameTime = 0; // last frame time
+    //NOTHING YET :D
+}
 
-    // Get current time
-    Uint32 currentTime = SDL_GetTicks();
+void Update_IDLE() {
+    Uint32 current_time = SDL_GetTicks();
 
-    //Change frame every FRAME_DELAY milliseconds
-    if (currentTime > lastFrameTime + FRAME_DELAY) {
-        frame = (frame + 1) % PLAYER_SHOOT_FRAMES_COUNT; //Change frame
-        lastFrameTime = currentTime; //Update last frame time
+    if (current_time > last_update_time + FRAME_DURATION) {
+        
+        current_frame++;
+
+        if (current_frame >= IDLE_FRAMES) {
+            current_frame = 0;
+        }
+
+        last_update_time = current_time;
     }
+}
 
-    //Draw animation shoot player :)
-    SDL_RenderCopy(renderer, player_shoot_frames_texture[frame], NULL, &playerRect);
+void RenderIdlePlayerAnim()
+{
+    int src_x = current_frame * PLAYER_IDLE_WIDTH;
+    idle_player.src_idleplayer.x = src_x;
+    idle_player.src_idleplayer.y = 0;
+    idle_player.src_idleplayer.w = PLAYER_IDLE_WIDTH;
+    idle_player.src_idleplayer.h = PLAYER_IDLE_HEIGHT;
+
+    idle_player.dest_idleplayer.x = 100;
+    idle_player.dest_idleplayer.y = 100;
+    idle_player.dest_idleplayer.w = PLAYER_IDLE_WIDTH * 2;
+    idle_player.dest_idleplayer.h = PLAYER_IDLE_HEIGHT * 2;
+
+    Update_IDLE();
+
+    SDL_RenderCopy(renderer, idle_player.tex_idleplayer, &idle_player.src_idleplayer, &idle_player.dest_idleplayer);
 }
 
 void PlayerForward()
 {
-    playerRect.x += 10;
 }
 
 void PlayerBackward()
 {
-    playerRect.x -= 10;
 }
 
 /*The_Light por favor manda el sprite de idle del playe a GitHub :)*/
