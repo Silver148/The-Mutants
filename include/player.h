@@ -32,5 +32,6 @@ void RenderIdlePlayerAnim(SDL_RendererFlip flip_type);
 void PlayerForward();
 void PlayerBackward();
 void RenderPlayer(SDL_RendererFlip flip_type);
+void PlayerWalkAnim(SDL_RendererFlip flip_type);
 
 #endif // PLAYER_H

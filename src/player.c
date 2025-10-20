@@ -93,6 +93,13 @@ void PlayerForward()
     position_x += player_speed;
 }
 
+void PlayerWalkAnim(SDL_RendererFlip flip_type)
+{
+    UpdateANIM(WALK_FRAMES);
+    SDL_RenderCopyEx(renderer, walk_player.tex_walkplayer, &walk_player.src_walkplayer, 
+    &walk_player.dest_walkplayer, 0.0, NULL, flip_type);
+}
+
 void RenderPlayer(SDL_RendererFlip flip_type)
 {
     int walk_player_src_x = current_frame * PLAYER_WIDTH;
@@ -110,8 +117,7 @@ void RenderPlayer(SDL_RendererFlip flip_type)
     if(states_player == IDLE){
         RenderIdlePlayerAnim(flip_type);
     }else if(states_player == WALK){
-        UpdateANIM(WALK_FRAMES);
-        SDL_RenderCopyEx(renderer, walk_player.tex_walkplayer, &walk_player.src_walkplayer, &walk_player.dest_walkplayer, 0.0, NULL, flip_type);
+        PlayerWalkAnim(flip_type);
     }
 }
 
@@ -119,5 +125,3 @@ void PlayerBackward()
 {
     position_x -= player_speed;
 }
-
-/*The_Light por favor manda el sprite de idle del playe a GitHub :)*/
