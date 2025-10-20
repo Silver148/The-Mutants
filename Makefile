@@ -73,8 +73,7 @@ tools_dev:
 	$(WIN32_CC) convert_gif_to_sequencePNG.c -o convert_gif_to_sequencePNG_32.exe
 
 clean:
-	rm -rf obj $(NAME) $(WIN_NAME) $(WIN32_NAME) *.zip new_commit new_commit.exe new_commit_32.exe \
-	convert_gif_to_sequencePNG.exe convert_gif_to_sequencePNG
+	rm -rf obj $(NAME) $(WIN_NAME) $(WIN32_NAME) *.zip new_commit *.exe
 
 #RULE LINUX
 $(NAME): $(OBJECTS)
