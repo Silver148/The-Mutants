@@ -24,6 +24,8 @@ STATE GAME :D
 
 SDL_Texture* backgroundTexture = NULL; //Background texture
 SDL_Rect backgroundRect;
+extern StatesPlayer states_player;
+SDL_RendererFlip player_flip = SDL_FLIP_NONE;
 
 int Init_State_Game()
 {
@@ -52,33 +54,34 @@ int Update_State_Game()
     while(1) //Main loop(TESTING)
     {
         SDL_Event e;
-        if(SDL_PollEvent(&e))
+        while(SDL_PollEvent(&e))
         {
-            switch(e.type)
+            if(e.type == SDL_QUIT)
             {
-                case SDL_KEYDOWN: //Key pressed
-                    switch(e.key.keysym.sym) /*TEST CONTROLLER :D*/
-                    {
-                        case SDLK_ESCAPE: /*EXIT*/
-                            SDL_Quit();
-                            return 0; //Exit main loop
-                        break;
-
-                        case SDLK_RIGHT: /*MOVE PLAYER RIGHT*/
-                            //PlayerForward();
-                        break;
-
-                        case SDLK_LEFT: /*MOVE PLAYER LEFT*/
-                            //PlayerBackward();
-                        break;
-                    }
-                    break;
-
-                case SDL_QUIT: /*EXIT*/
-                    SDL_Quit();
-                    return 0;
-                    break;
+                SDL_Quit();
+                return 0;
             }
+        }
+
+        states_player = IDLE;
+
+        const Uint8 *state = SDL_GetKeyboardState(NULL);
+
+        if(state[SDL_SCANCODE_ESCAPE]){
+            SDL_Quit();
+            return 0;
+        }
+
+        if(state[SDL_SCANCODE_LEFT]){
+            states_player = WALK;
+            player_flip = SDL_FLIP_HORIZONTAL;
+            PlayerBackward();
+        }
+
+        if(state[SDL_SCANCODE_RIGHT]){
+            states_player = WALK;
+            player_flip = SDL_FLIP_NONE;
+            PlayerForward();
         }
 
         /*TESTING*/
@@ -88,7 +91,7 @@ int Update_State_Game()
         SDL_RenderCopy(renderer, backgroundTexture, NULL, &backgroundRect); /*TEXTURE TEST :)*/
 
         //AnimatePlayerShoot(); //Animate player shooting(TESTING)
-        RenderIdlePlayerAnim(); //Render idle player animation
+        RenderPlayer(player_flip); //Render player
 
         SDL_RenderPresent(renderer);
     }

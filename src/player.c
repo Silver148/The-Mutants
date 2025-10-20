@@ -17,22 +17,38 @@ Copyright 2025
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 
-#define PLAYER_IDLE_WIDTH 64
-#define PLAYER_IDLE_HEIGHT 64
+#define PLAYER_WIDTH 64
+#define PLAYER_HEIGHT 64
 
 #define IDLE_FRAMES 2
+#define WALK_FRAMES 11
 #define FRAME_DURATION 150
 
 /*IDLE PLAYER*/
 IDLE_PLAYER idle_player;
+WALK_PLAYER walk_player;
 int current_frame = 0;
 Uint32 last_update_time = 0;
+
+int position_x = 0;
+int position_y = 0;
+
+int last_position_x = 0;    
+int last_position_y = 0;
+
+StatesPlayer states_player;
+
+float player_speed = 2.0f;
 
 void LoadSpritesPlayer()
 {   
     idle_player.tmp_surf_idleplayer = IMG_Load("sprites/idle_player_spritesheet.png");
     idle_player.tex_idleplayer = SDL_CreateTextureFromSurface(renderer, idle_player.tmp_surf_idleplayer);
     SDL_FreeSurface(idle_player.tmp_surf_idleplayer);
+
+    walk_player.tmp_surf_walkplayer = IMG_Load("sprites/walk_player_spritesheet.png");
+    walk_player.tex_walkplayer = SDL_CreateTextureFromSurface(renderer, walk_player.tmp_surf_walkplayer);
+    SDL_FreeSurface(walk_player.tmp_surf_walkplayer);
 }
 
 void AnimatePlayerShoot()
@@ -40,14 +56,14 @@ void AnimatePlayerShoot()
     //NOTHING YET :D
 }
 
-void Update_IDLE() {
+void UpdateANIM(int frames) {
     Uint32 current_time = SDL_GetTicks();
 
     if (current_time > last_update_time + FRAME_DURATION) {
         
         current_frame++;
 
-        if (current_frame >= IDLE_FRAMES) {
+        if (current_frame >= frames) {
             current_frame = 0;
         }
 
@@ -55,30 +71,53 @@ void Update_IDLE() {
     }
 }
 
-void RenderIdlePlayerAnim()
+void RenderIdlePlayerAnim(SDL_RendererFlip flip_type)
 {
-    int src_x = current_frame * PLAYER_IDLE_WIDTH;
-    idle_player.src_idleplayer.x = src_x;
+    int idle_player_src_x = current_frame * PLAYER_WIDTH;
+    idle_player.src_idleplayer.x = idle_player_src_x;
     idle_player.src_idleplayer.y = 0;
-    idle_player.src_idleplayer.w = PLAYER_IDLE_WIDTH;
-    idle_player.src_idleplayer.h = PLAYER_IDLE_HEIGHT;
+    idle_player.src_idleplayer.w = PLAYER_WIDTH;
+    idle_player.src_idleplayer.h = PLAYER_HEIGHT;
 
-    idle_player.dest_idleplayer.x = 100;
-    idle_player.dest_idleplayer.y = 100;
-    idle_player.dest_idleplayer.w = PLAYER_IDLE_WIDTH * 2;
-    idle_player.dest_idleplayer.h = PLAYER_IDLE_HEIGHT * 2;
+    idle_player.dest_idleplayer.x = position_x;
+    idle_player.dest_idleplayer.y = position_y;
+    idle_player.dest_idleplayer.w = PLAYER_WIDTH;
+    idle_player.dest_idleplayer.h = PLAYER_HEIGHT;
 
-    Update_IDLE();
-
-    SDL_RenderCopy(renderer, idle_player.tex_idleplayer, &idle_player.src_idleplayer, &idle_player.dest_idleplayer);
+    UpdateANIM(IDLE_FRAMES);
+    SDL_RenderCopyEx(renderer, idle_player.tex_idleplayer, &idle_player.src_idleplayer, &idle_player.dest_idleplayer, 0.0, NULL, flip_type);
 }
 
 void PlayerForward()
 {
+    position_x += player_speed;
+}
+
+void RenderPlayer(SDL_RendererFlip flip_type)
+{
+    int walk_player_src_x = current_frame * PLAYER_WIDTH;
+
+    walk_player.src_walkplayer.x = walk_player_src_x;
+    walk_player.src_walkplayer.y = 0;
+    walk_player.src_walkplayer.w = PLAYER_WIDTH;
+    walk_player.src_walkplayer.h = PLAYER_HEIGHT;
+
+    walk_player.dest_walkplayer.x = position_x;
+    walk_player.dest_walkplayer.y = position_y;
+    walk_player.dest_walkplayer.w = PLAYER_WIDTH;
+    walk_player.dest_walkplayer.h = PLAYER_HEIGHT;
+
+    if(states_player == IDLE){
+        RenderIdlePlayerAnim(flip_type);
+    }else if(states_player == WALK){
+        UpdateANIM(WALK_FRAMES);
+        SDL_RenderCopyEx(renderer, walk_player.tex_walkplayer, &walk_player.src_walkplayer, &walk_player.dest_walkplayer, 0.0, NULL, flip_type);
+    }
 }
 
 void PlayerBackward()
 {
+    position_x -= player_speed;
 }
 
 /*The_Light por favor manda el sprite de idle del playe a GitHub :)*/
