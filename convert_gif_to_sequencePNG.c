@@ -12,15 +12,17 @@
 int main(int argc, char *argv[]) {
     printf("convert_gif_to_sequencePNG by Juan Yaguaro(aka silverhacker)\n");
 
-    if (argc != 2) {
-        printf("Usage: %s <input_gif_file>\n", argv[0]);
+    if (argc != 4) {
+        printf("Usage: %s <input_gif_file> <output_path> <name_frames>\n", argv[0]);
         return 1;
     }
 
     char *input_gif = argv[1];
+    char *output_path = argv[2];
+    char *name_frames = argv[3];
 
     char command[512];
-    snprintf(command, sizeof(command), "convert %s frame_%%03d.png", input_gif);
+    snprintf(command, sizeof(command), "convert %s %s%s-frame_%%03d.png", input_gif, output_path, name_frames);
     system(command);
 
     return 0;
