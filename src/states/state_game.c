@@ -30,6 +30,10 @@ SDL_RendererFlip player_flip = SDL_FLIP_NONE;
 extern int current_frame;
 extern Uint32 last_update_time;
 
+extern bool is_jumping;
+extern float velocity_y;
+extern float jump_force;
+
 void CheckChangeStatePlayer()
 {
     if(states_player != last_states_player){
@@ -72,11 +76,17 @@ void UpdateAnimsPLAYER()
         max_frames_for_state = IDLE_FRAMES;
     }else if (states_player == WALK) {
         max_frames_for_state = WALK_FRAMES;
+    }else if (states_player == JUMP) {
+        max_frames_for_state = JUMP_FRAMES;
     }else {
         return; 
     }
 
     UpdateANIM(max_frames_for_state);
+}
+
+void UpdateJump(){
+    if(is_jumping){PlayerJump();}
 }
 
 int Update_State_Game()
@@ -91,6 +101,14 @@ int Update_State_Game()
             {
                 SDL_Quit();
                 return 0;
+            }
+
+            if (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_SPACE)
+            {
+                if (!is_jumping) {
+                    is_jumping = true;
+                    velocity_y = -jump_force; 
+                }
             }
         }
 
@@ -117,6 +135,7 @@ int Update_State_Game()
 
         UpdateAnimsPLAYER();
         UpdateDeltaTime();
+        UpdateJump();
 
         /*TESTING*/
         //SDL_SetRenderDrawColor(renderer, 0xFF, 0x00, 0x00, 0xFF);

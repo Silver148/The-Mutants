@@ -20,9 +20,18 @@ typedef struct{
     SDL_Rect dest_walkplayer;
 } WALK_PLAYER;
 
+typedef struct{
+    /*JUMP PLAYER*/
+    SDL_Surface* tmp_surf_jumpplayer;
+    SDL_Texture* tex_jumpplayer;
+    SDL_Rect src_jumpplayer;
+    SDL_Rect dest_jumpplayer;
+} JUMP_PLAYER;
+
 typedef enum{
     IDLE,
-    WALK
+    WALK,
+    JUMP
 } StatesPlayer;
 
 #define PLAYER_WIDTH 64
@@ -30,17 +39,26 @@ typedef enum{
 
 #define IDLE_FRAMES 2
 #define WALK_FRAMES 11
+#define JUMP_FRAMES 2
 #define FRAME_DURATION 150
 
+/*LOAD SPRITES*/
 void LoadSpritesPlayer();
 //void AnimatePlayerShoot();
-void Update_IDLE();
-void RenderIdlePlayerAnim(SDL_RendererFlip flip_type);
+
+/*Movement*/
 void PlayerForward();
 void PlayerBackward();
+void PlayerJump();
+
+/*RENDER AND ANIMATION*/
 void RenderPlayer(SDL_RendererFlip flip_type);
 void PlayerWalkAnim(SDL_RendererFlip flip_type);
 void UpdateANIM(int frames);
+void Update_IDLE();
+void RenderIdlePlayerAnim(SDL_RendererFlip flip_type);
+
+/*DELTA TIME*/
 void UpdateDeltaTime();
 
 #endif // PLAYER_H
