@@ -27,9 +27,8 @@ Copyright 2025
 SDL_Window* window = NULL;
 SDL_Renderer* renderer = NULL;
 
-//Func Main
-int main(int argc, char* argv[])
-{   
+int InitSDLAndSubSystems()
+{
     /*Initialize SDL*/
     if(SDL_Init(SDL_INIT_VIDEO) && SDL_Init(SDL_INIT_AUDIO) < 0)
     {
@@ -54,8 +53,16 @@ int main(int argc, char* argv[])
     if(renderer == NULL)
         printf("Renderer could not be created! SDL Error: %s\n", SDL_GetError());
 
-    SDL_RenderSetLogicalSize(renderer, BASE_WIDTH, BASE_HEIGHT);
-    
+    SDL_RenderSetLogicalSize(renderer, BASE_WIDTH, BASE_HEIGHT); //Set logical size for renderer
+
+    return 1;
+}
+
+//Func Main
+int main(int argc, char* argv[])
+{   
+    InitSDLAndSubSystems(); //Initialize SDL and subsystems
+
     Init_State_Game(); //Initialize game state
 
     Update_State_Game(); //Update game state
