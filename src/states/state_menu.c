@@ -23,10 +23,12 @@ State Menu :D
 
 int Init_State_Menu()
 {
+    //NOTHING :D
     return 0;
 }
 
 int Update_State_Menu()
 {
+    //NOTHING :D
     return 0;
 }
