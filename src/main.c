@@ -10,6 +10,7 @@ group and will be considered a real gay.
 
 Copyright 2025
 */
+/* pitos*/ 
 
 #include <stdio.h>
 #include <SDL2/SDL.h>
