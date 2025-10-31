@@ -43,7 +43,13 @@ int last_position_y = 0;
 /*STATES OF THE PLAYER*/
 StatesPlayer states_player;
 
+/* control de velocidad(boost) */
+void SetPlayerSpeedMultiplier(float multiplier);
+void ResetPlayerSpeed(void);
+
 /*PLAYER SPEED*/
+/* Base and current player speed */
+static float base_player_speed = 100.0f;
 float player_speed = 100.0f;
 
 /*DELTA TIMES*/
@@ -53,7 +59,7 @@ Uint32 currentTime = 0;
 
 /*JUMP VARIABLES*/
 bool is_jumping = false;
-float jump_force = 300.0f;
+float jump_force = 250.0f;
 float gravity = 900.0f;
 float velocity_y = 0.0f;
 
@@ -185,4 +191,24 @@ void PlayerJump()
 void PlayerBackward()
 {
     position_x -= player_speed * deltaTime;
+}
+
+/*
+ * Set a multiplier for player speed. multiplier = 1.0 -> normal speed.
+ * Example: SetPlayerSpeedMultiplier(1.8f) to increase by 80%.
+ */
+void SetPlayerSpeedMultiplier(float multiplier)
+{
+    if (multiplier <= 0.0f) {
+        /* avoid invalid speeds */
+        player_speed = base_player_speed;
+    } else {
+        player_speed = base_player_speed * multiplier;
+    }
+}
+
+/* restaura la velocidad del jugador a la normal*/
+void ResetPlayerSpeed(void)
+{
+    player_speed = base_player_speed;
 }
