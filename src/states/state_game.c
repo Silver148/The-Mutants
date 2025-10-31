@@ -111,7 +111,6 @@ int Update_State_Game()
                 }
             }
         }
-    }
 
         states_player = IDLE;
 
@@ -166,8 +165,8 @@ int Update_State_Game()
         //AnimatePlayerShoot(); //Animate player shooting(TESTING)
         RenderPlayer(player_flip); //Render player
 
-        SDL_RenderPresent(renderer);
-        
-    
+        SDL_RenderPresent(renderer);    
+    }
+
     return 0;
 }
