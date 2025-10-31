@@ -5,7 +5,7 @@ CC = gcc
 CFLAGS = -Wall -Iinclude
 LIBS = -lSDL2 -lSDL2_image
 SOURCES = src/main.c src/player.c src/states/state_menu.c \
-			src/states/state_game.c
+			src/states/state_game.c src/zombies.c
 OBJECTS = $(SOURCES:src/%.c=obj/%.o)
 
 # Windows x64 build settings

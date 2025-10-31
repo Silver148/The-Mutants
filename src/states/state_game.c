@@ -21,6 +21,7 @@ STATE GAME :D
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include "player.h"
+#include "zombies.h"
 
 SDL_Texture* backgroundTexture = NULL; //Background texture
 SDL_Rect backgroundRect;
@@ -62,6 +63,7 @@ int Init_State_Game()
     backgroundRect.h = 480;
 
     LoadSpritesPlayer(); //Load player sprites
+    LoadSpritesZombies(); //Load zombies sprites
 
     return 0;
 }
@@ -164,6 +166,8 @@ int Update_State_Game()
 
         //AnimatePlayerShoot(); //Animate player shooting(TESTING)
         RenderPlayer(player_flip); //Render player
+
+        RenderZombieIdle();
 
         SDL_RenderPresent(renderer);    
     }
