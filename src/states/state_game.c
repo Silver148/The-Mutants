@@ -120,7 +120,26 @@ int Update_State_Game()
             SDL_Quit();
             return 0;
         }
+  /* si shift esta pulsado, el jugador obtiene velocidad*/
+        if (state[SDL_SCANCODE_LSHIFT] || state[SDL_SCANCODE_RSHIFT]) {
+            SetPlayerSpeedMultiplier(1.8f); /* boost: 80% faster (adjustable) */
+        } else {
+            ResetPlayerSpeed();
+        }
 
+        if(state[SDL_SCANCODE_LEFT]){
+            states_player = WALK;
+            player_flip = SDL_FLIP_HORIZONTAL;
+            PlayerBackward();
+        }
+
+        if(state[SDL_SCANCODE_RIGHT]){
+            states_player = WALK;
+            player_flip = SDL_FLIP_NONE;
+            PlayerForward();
+        }
+
+        
         if(state[SDL_SCANCODE_LEFT]){
             states_player = WALK;
             player_flip = SDL_FLIP_HORIZONTAL;
@@ -147,6 +166,7 @@ int Update_State_Game()
         RenderPlayer(player_flip); //Render player
 
         SDL_RenderPresent(renderer);
-    }
+        
+    
     return 0;
 }
