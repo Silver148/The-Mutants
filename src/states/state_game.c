@@ -111,6 +111,7 @@ int Update_State_Game()
                 }
             }
         }
+    }
 
         states_player = IDLE;
 

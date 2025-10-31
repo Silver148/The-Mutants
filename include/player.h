@@ -57,6 +57,8 @@ void PlayerWalkAnim(SDL_RendererFlip flip_type);
 void UpdateANIM(int frames);
 void Update_IDLE();
 void RenderIdlePlayerAnim(SDL_RendererFlip flip_type);
+void SetPlayerSpeedMultiplier(float multiplier);
+void ResetPlayerSpeed(void);
 
 /*DELTA TIME*/
 void UpdateDeltaTime();
