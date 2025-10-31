@@ -40,6 +40,8 @@ float position_y = POS_Y;
 int last_position_x = 0;    
 int last_position_y = 0;
 
+int health = 150; 
+
 /*STATES OF THE PLAYER*/
 StatesPlayer states_player;
 
