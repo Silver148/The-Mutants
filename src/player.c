@@ -51,8 +51,8 @@ void ResetPlayerSpeed(void);
 
 /*PLAYER SPEED*/
 /* Base and current player speed */
-static float base_player_speed = 100.0f;
-float player_speed = 100.0f;
+static float base_player_speed = 60.0f;
+float player_speed = 60.0f;
 
 /*DELTA TIMES*/
 float deltaTime = 0;
