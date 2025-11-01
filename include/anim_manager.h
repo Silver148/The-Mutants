@@ -4,6 +4,5 @@
 #define FRAME_DURATION 150
 
 void UpdateANIM(int frames);
-void CheckChangeStatePlayer();
 
 #endif // ANIM_MANAGER_H
