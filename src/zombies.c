@@ -26,9 +26,9 @@ void LoadSpritesZombies()
     idle_zombie.tex_zombie_idle = SDL_CreateTextureFromSurface(renderer, idle_zombie.tmp_surf_zombie_idle);
     SDL_FreeSurface(idle_zombie.tmp_surf_zombie_idle);
 
-    walk_zombie.tmp_surf_walkzombie = IMG_Load("sprites/walk_zombie_spritesheet.png");
-    walk_zombie.tex_walkzombie = SDL_CreateTextureFromSurface(renderer,  walk_zombie.tmp_surf_walkzombie);
-    SDL_FreeSurface(walk_zombie.tmp_surf_walkzombie);
+    walk_zombie.tmp_surf_walk_zombie = IMG_Load("sprites/walk_zombie_spritesheet.png");
+    walk_zombie.tex_walk_zombie = SDL_CreateTextureFromSurface(renderer,  walk_zombie.tmp_surf_walk_zombie);
+    SDL_FreeSurface(walk_zombie.tmp_surf_walk_zombie);
 
 }
 
