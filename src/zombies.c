@@ -18,6 +18,7 @@ Copyright 2025
 #include <SDL2/SDL_image.h>
 
 IDLE_ZOMBIE idle_zombie;
+WALK_ZOMBIE walk_zombie;
 
 void LoadSpritesZombies()
 {
@@ -25,8 +26,8 @@ void LoadSpritesZombies()
     idle_zombie.tex_zombie_idle = SDL_CreateTextureFromSurface(renderer, idle_zombie.tmp_surf_zombie_idle);
     SDL_FreeSurface(idle_zombie.tmp_surf_zombie_idle);
 
-     walk_zombie.tmp_surf_walkzombie = IMG_Load("sprites/walk_zombie_spritesheet.png");
-     walk_zombie.tex_walkzombie = SDL_CreateTextureFromSurface(renderer,  walk_zombie.tmp_surf_walkzombie);
+    walk_zombie.tmp_surf_walkzombie = IMG_Load("sprites/walk_zombie_spritesheet.png");
+    walk_zombie.tex_walkzombie = SDL_CreateTextureFromSurface(renderer,  walk_zombie.tmp_surf_walkzombie);
     SDL_FreeSurface(walk_zombie.tmp_surf_walkzombie);
 
 }

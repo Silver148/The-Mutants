@@ -10,6 +10,13 @@ typedef struct{
     SDL_Rect dest_zombie_idle;
 } IDLE_ZOMBIE;
 
+typedef struct{
+    SDL_Surface* tmp_surf_walk_zombie;
+    SDL_Texture* tex_walk_zombie;
+    SDL_Rect src_walk_zombie;
+    SDL_Rect dest_walk_zombie;
+} WALK_ZOMBIE;
+
 typedef enum{
     IDLE_Z,
     WALK_Z
