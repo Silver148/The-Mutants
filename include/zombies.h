@@ -10,6 +10,11 @@ typedef struct{
     SDL_Rect dest_zombie_idle;
 } IDLE_ZOMBIE;
 
+typedef enum{
+    IDLE_Z,
+    WALK_Z
+} StatesZombie;
+
 void RenderZombieIdle();
 void LoadSpritesZombies();
 
