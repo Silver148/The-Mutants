@@ -40,7 +40,6 @@ typedef enum{
 #define IDLE_FRAMES 2
 #define WALK_FRAMES 11
 #define JUMP_FRAMES 2
-#define FRAME_DURATION 150
 
 /*LOAD SPRITES*/
 void LoadSpritesPlayer();
@@ -59,8 +58,5 @@ void Update_IDLE();
 void RenderIdlePlayerAnim(SDL_RendererFlip flip_type);
 void SetPlayerSpeedMultiplier(float multiplier);
 void ResetPlayerSpeed(void);
-
-/*DELTA TIME*/
-void UpdateDeltaTime();
 
 #endif // PLAYER_H

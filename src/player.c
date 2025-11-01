@@ -12,7 +12,9 @@ Copyright 2025
 */
 
 #include "player.h"
+#include "delta_time.h"
 #include "global_vars.h"
+#include "anim_manager.h"
 #include <stdio.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
@@ -25,10 +27,6 @@ IDLE_PLAYER idle_player;
 
 /*WALK PLAYER*/
 WALK_PLAYER walk_player;
-
-/*CURRENT FRAME AND LAST UPDATE TIME FOR ANIMATIONS*/
-int current_frame = 0;
-Uint32 last_update_time = 0;
 
 /*JUMP PLAYER*/
 JUMP_PLAYER jump_player;
@@ -54,16 +52,16 @@ void ResetPlayerSpeed(void);
 static float base_player_speed = 60.0f;
 float player_speed = 60.0f;
 
-/*DELTA TIMES*/
-float deltaTime = 0;
-Uint32 lastTime = 0;
-Uint32 currentTime = 0;
-
 /*JUMP VARIABLES*/
 bool is_jumping = false;
 float jump_force = 250.0f;
 float gravity = 900.0f;
 float velocity_y = 0.0f;
+
+extern float deltaTime;
+
+extern int current_frame;
+extern Uint32 last_update_time;
 
 
 void LoadSpritesPlayer()
@@ -82,31 +80,9 @@ void LoadSpritesPlayer()
 
 }
 
-void UpdateDeltaTime()
-{
-    currentTime = SDL_GetTicks();
-    deltaTime = (double)(currentTime - lastTime) / 1000.0;
-    lastTime = currentTime;
-}
-
 void AnimatePlayerShoot()
 {
     //NOTHING YET :D
-}
-
-void UpdateANIM(int frames) {
-    Uint32 current_time = SDL_GetTicks();
-
-    if (current_time > last_update_time + FRAME_DURATION) {
-        
-        current_frame++;
-
-        if (current_frame >= frames) {
-            current_frame = 0;
-        }
-
-        last_update_time = current_time;
-    }
 }
 
 void RenderIdlePlayerAnim(SDL_RendererFlip flip_type)

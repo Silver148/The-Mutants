@@ -17,23 +17,27 @@ STATE GAME :D
 
 #include "states.h"
 #include "global_vars.h"
+#include "player.h"
+#include "zombies.h"
+#include "delta_time.h"
+#include "anim_manager.h"
+
 #include <stdio.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
-#include "player.h"
-#include "zombies.h"
 
 SDL_Texture* backgroundTexture = NULL; //Background texture
 SDL_Rect backgroundRect;
 extern StatesPlayer states_player;
 StatesPlayer last_states_player = IDLE;
 SDL_RendererFlip player_flip = SDL_FLIP_NONE;
-extern int current_frame;
-extern Uint32 last_update_time;
 
 extern bool is_jumping;
 extern float velocity_y;
 extern float jump_force;
+
+extern int current_frame;
+extern Uint32 last_update_time;
 
 void CheckChangeStatePlayer()
 {
