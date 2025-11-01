@@ -108,14 +108,6 @@ int Update_State_Game()
                 SDL_Quit();
                 return 0;
             }
-
-            if (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_SPACE)
-            {
-                if (!is_jumping) {
-                    is_jumping = true;
-                    velocity_y = -jump_force; 
-                }
-            }
         }
 
         states_player = IDLE;
@@ -139,13 +131,20 @@ int Update_State_Game()
             PlayerBackward();
         }
 
+        if(state[SDL_SCANCODE_SPACE]){
+            if (!is_jumping) {
+                states_player = JUMP;
+                is_jumping = true;
+                velocity_y = -jump_force; 
+            }
+        }
+
         if(state[SDL_SCANCODE_RIGHT]){
             states_player = WALK;
             player_flip = SDL_FLIP_NONE;
             PlayerForward();
         }
 
-        
         if(state[SDL_SCANCODE_LEFT]){
             states_player = WALK;
             player_flip = SDL_FLIP_HORIZONTAL;
@@ -161,6 +160,12 @@ int Update_State_Game()
         UpdateAnimsPLAYER();
         UpdateDeltaTime();
         UpdateJump();
+
+        if(is_jumping && states_player != JUMP){
+            states_player = JUMP;
+        }else{
+            states_player = IDLE;
+        }
 
         /*TESTING*/
         //SDL_SetRenderDrawColor(renderer, 0xFF, 0x00, 0x00, 0xFF);
