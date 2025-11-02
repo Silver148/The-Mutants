@@ -140,7 +140,7 @@ int Update_State_Game()
             stamina = 500.0f;
         }
         
-        SDL_Log("Stamina: %.2f\n", stamina);
+        SDL_Log("Stamina: %.2f\n", stamina); // DEBUG STAMINA
         stamina += 3.0f;
 
         if(state[SDL_SCANCODE_LEFT]){
