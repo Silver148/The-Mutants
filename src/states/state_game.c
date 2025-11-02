@@ -40,6 +40,9 @@ extern float jump_force;
 extern int current_frame;
 extern Uint32 last_update_time;
 
+/*STAMINA*/
+float stamina = 500.0f;
+
 void CheckChangeStatePlayer()
 {
     if(states_player != last_states_player){
@@ -122,9 +125,23 @@ int Update_State_Game()
         /* si shift esta pulsado, el jugador obtiene velocidad*/
         if (state[SDL_SCANCODE_LSHIFT] || state[SDL_SCANCODE_RSHIFT]) {
             SetPlayerSpeedMultiplier(1.8f); /* boost: 80% faster (adjustable) */
+            stamina -= 6.0f;
+
+            if(stamina <= 0.0f){
+            ResetPlayerSpeed();
+            stamina = 0.0f;
+            }
+
         } else {
             ResetPlayerSpeed();
         }
+
+        if(stamina > 500.0f){
+            stamina = 500.0f;
+        }
+        
+        SDL_Log("Stamina: %.2f\n", stamina);
+        stamina += 3.0f;
 
         if(state[SDL_SCANCODE_LEFT]){
             input_state = WALK;
