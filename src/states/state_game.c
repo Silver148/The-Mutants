@@ -99,7 +99,6 @@ int Update_State_Game()
 {
     while(1) //Main loop(TESTING)
     {
-
         SDL_Event e;
         while(SDL_PollEvent(&e))
         {
@@ -110,7 +109,7 @@ int Update_State_Game()
             }
         }
 
-        states_player = IDLE;
+        StatesPlayer input_state = IDLE; // Inicializa input_state
 
         const Uint8 *state = SDL_GetKeyboardState(NULL);
 
@@ -118,7 +117,8 @@ int Update_State_Game()
             SDL_Quit();
             return 0;
         }
-  /* si shift esta pulsado, el jugador obtiene velocidad*/
+
+        /* si shift esta pulsado, el jugador obtiene velocidad*/
         if (state[SDL_SCANCODE_LSHIFT] || state[SDL_SCANCODE_RSHIFT]) {
             SetPlayerSpeedMultiplier(1.8f); /* boost: 80% faster (adjustable) */
         } else {
@@ -126,58 +126,44 @@ int Update_State_Game()
         }
 
         if(state[SDL_SCANCODE_LEFT]){
-            states_player = WALK;
+            input_state = WALK;
             player_flip = SDL_FLIP_HORIZONTAL;
             PlayerBackward();
         }
 
         if(state[SDL_SCANCODE_SPACE]){
             if (!is_jumping) {
-                states_player = JUMP;
+                input_state = JUMP; // Cambia a JUMP si no está saltando
                 is_jumping = true;
                 velocity_y = -jump_force; 
             }
         }
 
         if(state[SDL_SCANCODE_RIGHT]){
-            states_player = WALK;
+            input_state = WALK;
             player_flip = SDL_FLIP_NONE;
             PlayerForward();
         }
 
-        if(state[SDL_SCANCODE_LEFT]){
-            states_player = WALK;
-            player_flip = SDL_FLIP_HORIZONTAL;
-            PlayerBackward();
-        }
-
-        if(state[SDL_SCANCODE_RIGHT]){
-            states_player = WALK;
-            player_flip = SDL_FLIP_NONE;
-            PlayerForward();
+        // Decide el estado final del jugador
+        if (is_jumping) {
+            states_player = JUMP; // Mantiene JUMP si está saltando
+        } else {
+            states_player = input_state; // Usa el estado de entrada
         }
 
         UpdateAnimsPLAYER();
         UpdateDeltaTime();
         UpdateJump();
 
-        if(is_jumping && states_player != JUMP){
-            states_player = JUMP;
-        }else{
-            states_player = IDLE;
-        }
-
         /*TESTING*/
-        //SDL_SetRenderDrawColor(renderer, 0xFF, 0x00, 0x00, 0xFF);
         SDL_RenderClear(renderer);
 
         SDL_RenderCopy(renderer, backgroundTexture, NULL, &backgroundRect); /*TEXTURE TEST :)*/
 
-        //AnimatePlayerShoot(); //Animate player shooting(TESTING)
         RenderPlayer(player_flip); //Render player
-
         RenderZombieIdle();
-
+        
         SDL_RenderPresent(renderer);    
     }
 
