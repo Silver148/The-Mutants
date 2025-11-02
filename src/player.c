@@ -104,6 +104,10 @@ void RenderIdlePlayerAnim(SDL_RendererFlip flip_type)
 void PlayerForward()
 {
     position_x += player_speed * deltaTime;
+
+    if(position_x > 640 - PLAYER_WIDTH){
+        position_x = 640 - PLAYER_WIDTH;
+    }
 }
 
 void PlayerWalkAnim(SDL_RendererFlip flip_type)
@@ -169,6 +173,10 @@ void PlayerJump()
 void PlayerBackward()
 {
     position_x -= player_speed * deltaTime;
+
+    if(position_x < 0){
+        position_x = 0;
+    }
 }
 
 /*
