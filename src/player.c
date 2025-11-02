@@ -63,7 +63,6 @@ extern float deltaTime;
 extern int current_frame;
 extern Uint32 last_update_time;
 
-
 void LoadSpritesPlayer()
 {   
     idle_player.tmp_surf_idleplayer = IMG_Load("sprites/idle_player_spritesheet.png");

@@ -39,6 +39,7 @@ extern float jump_force;
 
 extern int current_frame;
 extern Uint32 last_update_time;
+extern int frame_duration;
 
 /*STAMINA*/
 float stamina = 500.0f;
@@ -126,14 +127,17 @@ int Update_State_Game()
         if (state[SDL_SCANCODE_LSHIFT] || state[SDL_SCANCODE_RSHIFT]) {
             SetPlayerSpeedMultiplier(1.8f); /* boost: 80% faster (adjustable) */
             stamina -= 6.0f;
+            frame_duration = FRAME_DURATION / 2; // Aumenta la velocidad de la animación
 
             if(stamina <= 0.0f){
             ResetPlayerSpeed();
             stamina = 0.0f;
+            frame_duration = FRAME_DURATION;
             }
 
         } else {
             ResetPlayerSpeed();
+            frame_duration = FRAME_DURATION;
         }
 
         if(stamina > 500.0f){
