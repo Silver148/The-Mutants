@@ -21,6 +21,7 @@ STATE GAME :D
 #include "zombies.h"
 #include "delta_time.h"
 #include "anim_manager.h"
+#include "music.h"
 
 #include <stdio.h>
 #include <SDL2/SDL.h>
@@ -163,7 +164,7 @@ int Update_State_Game()
 
         RenderPlayer(player_flip); //Render player
         RenderZombieIdle();
-        
+
         SDL_RenderPresent(renderer);    
     }
 

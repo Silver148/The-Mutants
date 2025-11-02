@@ -1,0 +1,25 @@
+#include "music.h"
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_mixer.h>
+
+int InitMusic()
+{
+    if(Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
+    {
+        printf("SDL_mixer could not initialize! SDL_mixer Error: %s\n", Mix_GetError());
+        return -1;
+    }
+    return 0;
+}
+
+int PlayMusicStateGame()
+{
+    Mix_Music* bgm = Mix_LoadMUS("music/Drill_random_TEST.mp3");
+    if(bgm == NULL)
+    {
+        printf("Failed to load beat music! SDL_mixer Error: %s\n", Mix_GetError());
+        return -1;
+    }
+    Mix_PlayMusic(bgm, -1); // Play music indefinitely
+    return 0;
+}

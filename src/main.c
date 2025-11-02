@@ -16,6 +16,7 @@ Copyright 2025
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <stdbool.h>
+#include "music.h"
 #include "states.h"
 
 #ifdef __MINGW32__
@@ -63,6 +64,10 @@ int InitSDLAndSubSystems()
 int main(int argc, char* argv[])
 {   
     InitSDLAndSubSystems(); //Initialize SDL and subsystems
+
+    InitMusic(); //Initialize music subsystem
+
+    PlayMusicStateGame(); //Play music
 
     Init_State_Game(); //Initialize game state
 
