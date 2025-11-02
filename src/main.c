@@ -63,6 +63,8 @@ int InitSDLAndSubSystems()
 //Func Main
 int main(int argc, char* argv[])
 {   
+
+    //Sebas puso esto xD
     InitSDLAndSubSystems(); //Initialize SDL and subsystems
 
     InitMusic(); //Initialize music subsystem
