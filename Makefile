@@ -63,7 +63,8 @@ Windows_NT-i686:
 	cp SDL2-Mingw/i686-w64-mingw32/bin/libjpeg-9.dll libjpeg-9.dll
 	cp SDL2-Mingw/i686-w64-mingw32/bin/SDL2_image.dll SDL2_image.dll
 	cp SDL2-Mingw/i686-w64-mingw32/bin/libtiff-5.dll libtiff-5.dll
-	zip -r The_Mutants_windows32.zip $(WIN32_NAME) SDL2.dll libpng16-16.dll zlib1.dll libjpeg-9.dll SDL2_image.dll libtiff-5.dll sprites music
+	cp SDL2-Mingw/i686-w64-mingw32/bin/SDL2_mixer.dll SDL2_mixer.dll
+	zip -r The_Mutants_windows32.zip $(WIN32_NAME) SDL2.dll libpng16-16.dll zlib1.dll libjpeg-9.dll SDL2_image.dll libtiff-5.dll SDL2_mixer.dll sprites music
 	rm -f *.dll
 	rm -f $(WIN32_NAME)
 	@echo "BUILD COMPLETE... Compiled from the $(OS)-$(ARCH)"
