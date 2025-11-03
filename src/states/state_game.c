@@ -42,8 +42,14 @@ extern Uint32 last_update_time;
 extern float deltaTime;
 extern int frame_duration;
 
-/*STAMINA*/
+/*VARIABLES STAMINA*/
 float stamina = 25.0f;
+
+const int ANCHO_MAXIMO_BARRA = 300;
+const int ALTURA_BARRA = 20;
+
+const int POS_X_BARRA = (640 / 2) - (ANCHO_MAXIMO_BARRA / 2);
+const int POS_Y_BARRA = (480 - ALTURA_BARRA - 40);
 
 void CheckChangeStatePlayer()
 {
@@ -99,6 +105,33 @@ void UpdateAnimsPLAYER()
 
 void UpdateJump(){
     if(is_jumping){PlayerJump();}
+}
+
+void RenderBarStamina()
+{   
+    // 1. Calcular la proporción de la Stamina (entre 0 y 1)
+    float proporcion = stamina / 25.0f;
+
+    // 2. Calcular el nuevo ancho en píxeles
+    int anchoActual = (int)(proporcion * ANCHO_MAXIMO_BARRA);
+
+    SDL_Rect barraActual = {
+    POS_X_BARRA,
+    POS_Y_BARRA,
+    anchoActual,
+    ALTURA_BARRA
+    };
+
+    SDL_Rect marcoBarra = {POS_X_BARRA, POS_Y_BARRA, ANCHO_MAXIMO_BARRA, ALTURA_BARRA}; // Bar
+
+    SDL_SetRenderDrawColor(renderer, 50, 50, 50, 255); //Bar background
+    SDL_RenderFillRect(renderer, &marcoBarra);
+
+    SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255); //Stamina color
+    SDL_RenderFillRect(renderer, &barraActual);
+
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255); //Border color
+    SDL_RenderDrawRect(renderer, &marcoBarra);
 }
 
 int Update_State_Game()
@@ -183,6 +216,8 @@ int Update_State_Game()
         SDL_RenderClear(renderer);
 
         SDL_RenderCopy(renderer, backgroundTexture, NULL, &backgroundRect); /*TEXTURE TEST :)*/
+
+        RenderBarStamina(); //Render stamina bar
 
         RenderPlayer(player_flip); //Render player
         RenderZombieIdle();
