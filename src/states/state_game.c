@@ -213,6 +213,7 @@ int Update_State_Game()
         UpdateJump();
 
         /*TESTING*/
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); //clean screen with black color
         SDL_RenderClear(renderer);
 
         SDL_RenderCopy(renderer, backgroundTexture, NULL, &backgroundRect); /*TEXTURE TEST :)*/
