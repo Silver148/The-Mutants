@@ -152,13 +152,16 @@ int Update_State_Game()
 
         const Uint8 *state = SDL_GetKeyboardState(NULL);
 
+        /*BOOL MOVEMENT*/
+        bool is_moving = state[SDL_SCANCODE_LEFT] || state[SDL_SCANCODE_RIGHT];
+
         if(state[SDL_SCANCODE_ESCAPE]){
             SDL_Quit();
             return 0;
         }
 
         /* si shift esta pulsado, el jugador obtiene velocidad*/
-        if (state[SDL_SCANCODE_LSHIFT] || state[SDL_SCANCODE_RSHIFT]) {
+        if ((state[SDL_SCANCODE_LSHIFT] || state[SDL_SCANCODE_RSHIFT]) && is_moving){
             SetPlayerSpeedMultiplier(1.8f); /* boost: 80% faster (adjustable) */
             stamina -= 6.0f * deltaTime;
             frame_duration = FRAME_DURATION / 2; // Aumenta la velocidad de la animación
