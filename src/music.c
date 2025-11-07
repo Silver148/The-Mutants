@@ -14,7 +14,7 @@ int InitMusic()
 
 int PlayMusicStateGame()
 {
-    Mix_Music* bgm = Mix_LoadMUS("music/Drill_random_TEST.mp3");
+    Mix_Music* bgm = Mix_LoadMUS("music/Terminator 2 Judgment Day _ Guns N' Roses - You Could Be Mine (Terminator 2 Soundtrack) - Braindead Soundtracks.mp3");
     if(bgm == NULL)
     {
         printf("Failed to load beat music! SDL_mixer Error: %s\n", Mix_GetError());
