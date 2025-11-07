@@ -20,6 +20,9 @@ int PlayMusicStateGame()
         printf("Failed to load beat music! SDL_mixer Error: %s\n", Mix_GetError());
         return -1;
     }
+
+    Mix_VolumeMusic(MIX_MAX_VOLUME / 4); // Set volume to 25%
+
     Mix_PlayMusic(bgm, -1); // Play music indefinitely
     return 0;
 }
