@@ -32,4 +32,4 @@ Desarrolladores: Juan Yaguaro(aka silverhacker), Sebastián Colina(aka Sebas-142
 
 Hasta ahora el juego es de código cerrado para evitar que se roben nuestra idea y nuestro código, así que queda terminántemente prohibido compartir el código del juego antes de que se presente el juego :), así que, el que filtre el código del juego, queda expulsado de este proyecto para siempre sin ninguna oportunidad de volver.
 
-PROYECTO EDUCATIVO CONFIDENCIAL ![CONFIDENTIAL LOGO](https://imgur.com/a/y1qa3RY)
+PROYECTO EDUCATIVO CONFIDENCIAL ![CONFIDENTIAL LOGO](https://imgur.com/a/confidential-y1qa3RY)
