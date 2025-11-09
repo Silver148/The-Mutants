@@ -28,8 +28,32 @@ Desarrolladores: Juan Yaguaro(aka silverhacker), Sebastián Colina(aka Sebas-142
 
 * Sistema de vida en el jugador
 
-# IMPORTANTE
+# POLÍTICAS DE CONFIDENCIALIDAD ⚠️
 
 Hasta ahora el juego es de código cerrado para evitar que se roben nuestra idea y nuestro código, así que queda terminántemente prohibido compartir el código del juego antes de que se presente el juego :), así que, el que filtre el código del juego, queda expulsado de este proyecto para siempre sin ninguna oportunidad de volver.
+
+**Este es un proyecto desarrollado exclusivamente para la Feria Tecnológica del ETR Fermín Toro.
+El acceso y distribución del juego por los momentos están estrictamente controlados.**
+
+## 🔐 POLÍTICAS ESTRICTAS DE DISTRIBUCIÓN
+
+### 📅 DISTRIBUCIÓN ACTUAL (PRE-FERIA)
+
+# ✅ PERMITIDO ACTUALMENTE
+- Compartir ejecutables SOLO entre miembros del equipo de desarrollo
+- Testing interno y preparación para la feria
+
+# ❌ PROHIBIDO ACTUALMENTE  
+- Distribuir ejecutables a personas externas al equipo
+- Compartir el juego con amigos, familiares u otros estudiantes
+- Publicar en internet, redes sociales o cualquier plataformas
+
+# Este juego se liberará al público cuando se presente en la feria tecnológica
+
+# ✅ LO QUE SE LIBERARÁ ESE DÍA:
+- 🔓 CÓDIGO FUENTE completo (repositorio público)
+- 🔓 EJECUTABLES finales para distribución
+- 🔓 DOCUMENTACIÓN técnica
+- 🔓 BINARIOS de compilación
 
 PROYECTO EDUCATIVO CONFIDENCIAL ![CONFIDENTIAL LOGO](https://i.ibb.co/rK7JWn73/pngwing-com.png)
