@@ -1,3 +1,18 @@
+/*
+THE MUTANT'S
+
+Authors: Abel Ferrer(aka The_Light), Juan Yaguaro(aka silverhacker), Sebastián Colina(aka Sebas-1423)
+File: anim_manager.c
+
+THIS CODE WILL REMAIN CONFIDENTIAL UNTIL THE PROJECT IS COMPLETED. 
+Anyone who leaks this code will be automatically kicked out of the 
+group and will be considered a real gay.
+
+Copyright 2025
+*/
+
+/* ANIMATION MANAGER by Juan Yaguaro*/
+
 #include "anim_manager.h"
 #include <SDL2/SDL.h>
 

@@ -1,3 +1,18 @@
+/*
+THE MUTANT'S
+
+Authors: Abel Ferrer(aka The_Light), Juan Yaguaro(aka silverhacker), Sebastián Colina(aka Sebas-1423)
+File: main.c
+
+THIS CODE WILL REMAIN CONFIDENTIAL UNTIL THE PROJECT IS COMPLETED. 
+Anyone who leaks this code will be automatically kicked out of the 
+group and will be considered a real gay.
+
+Copyright 2025
+*/
+
+/* MUSIC MANAGEMENT by Juan Yaguaro */
+
 #include "music.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_mixer.h>

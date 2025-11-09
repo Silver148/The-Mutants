@@ -11,6 +11,8 @@ group and will be considered a real gay.
 Copyright 2025
 */
 
+/* ZOMBIES MANAGEMENT by Juan Yaguaro and Abel Ferrer*/
+
 #include "zombies.h"
 #include "global_vars.h"
 #include <stdio.h>
