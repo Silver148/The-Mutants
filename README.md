@@ -2,11 +2,11 @@
 
 ## Próximo juego para la feria tecnológica del ETR Fermín Toro
 
-Este juego está hecho en C con la librería SDL
+Este juego está hecho en C con la librería SDL2
 
 # Como compilar el juego
 
-Para compilar el juego necesitas tener w64devkit en tu PC si usas Windows(O WSL en Windows modernos). En el caso que uses Linux requieres las librería SDL2, tener el compilador de C para Linux(gcc) y la herramienta Make.
+Para compilar el juego necesitas tener w64devkit en tu PC si usas Windows(O WSL en Windows modernos, pero se requieren las siguientes librerías: SDL2, SDL2-Mixer y SDL2-Image, y tambíen se requiere el compilador de C(en WSL está gcc) y también la herramienta Make). En el caso que uses Linux requieres las librería SDL2, SDL2-Mixer y SDL2-Image, y también tener el compilador de C para Linux(gcc) y la herramienta Make.
 
 ## CREDITOS
 
