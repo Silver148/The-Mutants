@@ -6,7 +6,7 @@ Este juego está hecho en C con la librería SDL
 
 # Como compilar el juego
 
-Para compilar el juego necesitas tener w64devkit en tu PC si usas Windows. En el caso que uses Linux requieres las librería SDL2, tener el compilador de C para Linux(gcc) y la herramienta Make.
+Para compilar el juego necesitas tener w64devkit en tu PC si usas Windows(O WSL en Windows modernos). En el caso que uses Linux requieres las librería SDL2, tener el compilador de C para Linux(gcc) y la herramienta Make.
 
 ## CREDITOS
 
