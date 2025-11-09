@@ -2,7 +2,7 @@
 
 ## Próximo juego para la feria tecnológica del ETR Fermín Toro
 
-Este juego está hecho en C con la librería SDL2
+Este juego está hecho en C con la librería SDL2.
 
 # Como compilar el juego
 
@@ -27,3 +27,9 @@ Desarrolladores: Juan Yaguaro(aka silverhacker), Sebastián Colina(aka Sebas-142
 * Sistema de manejo de armas para el jugador
 
 * Sistema de vida en el jugador
+
+# IMPORTANTE
+
+Hasta ahora el juego es de código cerrado para evitar que se roben nuestra idea y nuestro código, así que queda terminántemente prohibido compartir el código del juego antes de que se presente el juego :), así que, el que filtre el código del juego, queda expulsado de este proyecto para siempre sin ninguna oportunidad de volver.
+
+PROYECTO EDUCATIVO CONFIDENCIAL ![CONFIDENTIAL LOGO](https://www.pngwing.com/76d14099-24ea-49cc-b6b8-fda0d52c9e3ad)
