@@ -80,6 +80,8 @@ int Init_State_Game()
 
     LoadSpritesPlayer(); //Load player sprites
     LoadSpritesZombies(); //Load zombies sprites
+    /* init a test zombie (x,y) */
+    InitZombie(150.0f, 250.0f);
 
     return 0;
 }
@@ -211,9 +213,12 @@ int Update_State_Game()
             states_player = input_state; // Usa el estado de entrada
         }
 
-        UpdateAnimsPLAYER();
-        UpdateDeltaTime();
-        UpdateJump();
+    UpdateAnimsPLAYER();
+    UpdateDeltaTime();
+    UpdateJump();
+
+    /* update zombies AI and movement */
+    UpdateZombies();
 
         /*TESTING*/
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); //clean screen with black color
@@ -223,8 +228,8 @@ int Update_State_Game()
 
         RenderBarStamina(); //Render stamina bar
 
-        RenderPlayer(player_flip); //Render player
-        RenderZombieIdle();
+    RenderPlayer(player_flip); //Render player
+    RenderZombies();
 
         SDL_RenderPresent(renderer);    
     }
