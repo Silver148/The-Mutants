@@ -3,7 +3,7 @@
 NAME = The_Mutants
 CC = gcc
 CFLAGS = -Wall -Iinclude
-LIBS = -lSDL2 -lSDL2_image -lSDL2_mixer
+LIBS = -lSDL2 -lSDL2_image -lSDL2_mixer -lm
 SOURCES = src/main.c src/player.c src/states/state_menu.c \
 			src/states/state_game.c src/zombies.c src/delta_time.c src/anim_manager.c \
 			src/music.c
