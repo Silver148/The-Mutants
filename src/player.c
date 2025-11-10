@@ -38,7 +38,7 @@ float position_y = POS_Y;
 int last_position_x = 0;    
 int last_position_y = 0;
 
-int health = 300; 
+int health = 170; 
 
 /*STATES OF THE PLAYER*/
 StatesPlayer states_player;
@@ -196,4 +196,13 @@ void SetPlayerSpeedMultiplier(float multiplier)
 void ResetPlayerSpeed(void)
 {
     player_speed = base_player_speed;
+}
+
+void CheckIfPlayerIsDead()
+{
+    if(health <= 0)
+    {
+        SDL_Log("Player is dead!\n");
+        exit(0);
+    }
 }

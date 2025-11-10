@@ -53,10 +53,10 @@ void PlayerJump();
 /*RENDER AND ANIMATION*/
 void RenderPlayer(SDL_RendererFlip flip_type);
 void PlayerWalkAnim(SDL_RendererFlip flip_type);
-void UpdateANIM(int frames);
 void Update_IDLE();
 void RenderIdlePlayerAnim(SDL_RendererFlip flip_type);
 void SetPlayerSpeedMultiplier(float multiplier);
 void ResetPlayerSpeed(void);
+void CheckIfPlayerIsDead();
 
 #endif // PLAYER_H

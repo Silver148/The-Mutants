@@ -248,6 +248,7 @@ int Update_State_Game()
     UpdateAnimsPLAYER();
     UpdateDeltaTime();
     UpdateJump();
+    CheckIfPlayerIsDead();
 
     /* update zombies AI and movement */
     UpdateZombies();
