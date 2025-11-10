@@ -36,6 +36,7 @@ SDL_RendererFlip player_flip = SDL_FLIP_NONE;
 extern bool is_jumping;
 extern float velocity_y;
 extern float jump_force;
+extern int health;
 
 extern int current_frame;
 extern Uint32 last_update_time;
@@ -136,6 +137,37 @@ void RenderBarStamina()
     SDL_RenderDrawRect(renderer, &marcoBarra);
 }
 
+void RenderBarHealth()
+{
+    /* Player health bar (top-left) */
+    const int MAX_HEALTH = 150; /* matches player.c initial value */
+    const int HEALTH_BAR_WIDTH = 200;
+    const int HEALTH_BAR_HEIGHT = 16;
+    const int HEALTH_POS_X = 20;
+    const int HEALTH_POS_Y = 20;
+
+    float proportion = (float)health / (float)MAX_HEALTH;
+    if(proportion < 0.0f) proportion = 0.0f;
+    if(proportion > 1.0f) proportion = 1.0f;
+
+    int currentWidth = (int)(proportion * HEALTH_BAR_WIDTH);
+
+    SDL_Rect healthRect = { HEALTH_POS_X, HEALTH_POS_Y, currentWidth, HEALTH_BAR_HEIGHT };
+    SDL_Rect frameRect = { HEALTH_POS_X, HEALTH_POS_Y, HEALTH_BAR_WIDTH, HEALTH_BAR_HEIGHT };
+
+    /* background */
+    SDL_SetRenderDrawColor(renderer, 50, 50, 50, 255);
+    SDL_RenderFillRect(renderer, &frameRect);
+
+    /* health fill (red) */
+    SDL_SetRenderDrawColor(renderer, 200, 0, 0, 255);
+    SDL_RenderFillRect(renderer, &healthRect);
+
+    /* border */
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+    SDL_RenderDrawRect(renderer, &frameRect);
+}
+
 int Update_State_Game()
 {
     while(1) //Main loop(TESTING)
@@ -226,10 +258,11 @@ int Update_State_Game()
 
         SDL_RenderCopy(renderer, backgroundTexture, NULL, &backgroundRect); /*TEXTURE TEST :)*/
 
+        RenderBarHealth(); // Render player health
         RenderBarStamina(); //Render stamina bar
 
-    RenderPlayer(player_flip); //Render player
-    RenderZombies();
+        RenderPlayer(player_flip); //Render player
+        RenderZombies();
 
         SDL_RenderPresent(renderer);    
     }

@@ -14,6 +14,7 @@ Copyright 2025
 /* ZOMBIES MANAGEMENT by Juan Yaguaro and Abel Ferrer*/
 #include "zombies.h"
 #include "global_vars.h"
+#include "player.h"
 #include <stdio.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
@@ -38,6 +39,7 @@ extern float deltaTime;       /* provided by delta_time.c */
 extern float position_x;      /* player position X (player.c) */
 extern float position_y;      /* player position Y (player.c) */
 extern int current_frame;     /* frame index for animations */
+extern int health;            /* player health (player.c) */
 
 void LoadSpritesZombies()
 {
@@ -75,7 +77,7 @@ void InitZombie(float x, float y)
     zombie.x = x;
     zombie.y = y;
     zombie.base_y = y; /* keep a reference for ground level */
-    zombie.speed = 22.0f; /* px/sec, tweak as needed */
+    zombie.speed = 40.0f; /* px/sec, tweak as needed */
     zombie.dir = -1;
     zombie.wander_timer = 0.5f + (rand()%200)/100.0f; /* 0.5 - 2.5s */
     zombie.state = IDLE_Z;
@@ -87,6 +89,10 @@ void InitZombie(float x, float y)
 
     zombie.dest.w = ZOMBIE_WIDTH;
     zombie.dest.h = ZOMBIE_HEIGHT;
+    /* attack defaults */
+    zombie.attack_cooldown = 1.0f; /* 1 second between hits */
+    zombie.attack_timer = 0.0f;
+    zombie.attack_damage = 10;
 }
 
 static void zombie_chase_player(float dx, float dy, float dist)
@@ -139,6 +145,12 @@ void UpdateZombies()
         zombie_wander();
     }
 
+    /* update attack timer */
+    if(zombie.attack_timer > 0.0f){
+        zombie.attack_timer -= deltaTime;
+        if(zombie.attack_timer < 0.0f) zombie.attack_timer = 0.0f;
+    }
+
     /* screen bounds clamp (basic) assuming 640x480 playfield; adjust if different */
     if(zombie.x < 0) zombie.x = 0;
     if(zombie.x > 640 - ZOMBIE_WIDTH) zombie.x = 640 - ZOMBIE_WIDTH;
@@ -151,6 +163,22 @@ void UpdateZombies()
     zombie.dest.x = (int)zombie.x;
     zombie.dest.y = (int)zombie.base_y;
     zombie.src.x = current_frame * ZOMBIE_WIDTH; /* assumes animation frames arranged horizontally */
+
+    /* simple AABB collision with player */
+    SDL_Rect zrect = { zombie.dest.x, zombie.dest.y, zombie.dest.w, zombie.dest.h };
+    SDL_Rect prect = { (int)position_x, (int)position_y, PLAYER_WIDTH, PLAYER_HEIGHT };
+
+    if (zrect.x < prect.x + prect.w && zrect.x + zrect.w > prect.x &&
+        zrect.y < prect.y + prect.h && zrect.y + zrect.h > prect.y)
+    {
+        /* collision */
+        if(zombie.attack_timer <= 0.0f){
+            health -= zombie.attack_damage;
+            if(health < 0) health = 0;
+            zombie.attack_timer = zombie.attack_cooldown;
+            SDL_Log("Player hit by zombie! Health=%d\n", health);
+        }
+    }
 }
 
 void RenderZombies()

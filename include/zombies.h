@@ -33,6 +33,10 @@ typedef struct {
     StatesZombie state; /* animation/state */
     SDL_Rect src;       /* texture source rect */
     SDL_Rect dest;      /* texture destination rect */
+    /* attack/collision */
+    float attack_timer;     /* current cooldown timer (seconds) */
+    float attack_cooldown;  /* seconds between attacks */
+    int attack_damage;      /* damage applied per hit */
 } ZOMBIE;
 
 /* ZOMBIES API */
