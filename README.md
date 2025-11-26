@@ -16,7 +16,7 @@ Desarrolladores: Juan Yaguaro(aka silverhacker), Sebastián Colina(aka Sebas-142
 
 * Menú
 
-* IA de zombies
+* IA de zombies ✅
 
 * Niveles
 
@@ -26,7 +26,7 @@ Desarrolladores: Juan Yaguaro(aka silverhacker), Sebastián Colina(aka Sebas-142
 
 * Sistema de manejo de armas para el jugador
 
-* Sistema de vida en el jugador
+* Sistema de vida en el jugador ✅
 
 # POLÍTICAS DE CONFIDENCIALIDAD ⚠️
 
