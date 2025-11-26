@@ -54,6 +54,5 @@ El acceso y distribución del juego por los momentos están estrictamente contro
 - 🔓 CÓDIGO FUENTE completo (repositorio público)
 - 🔓 EJECUTABLES finales para distribución
 - 🔓 DOCUMENTACIÓN técnica
-- 🔓 BINARIOS de compilación
 
 PROYECTO EDUCATIVO CONFIDENCIAL ![CONFIDENTIAL LOGO](https://i.ibb.co/rK7JWn73/pngwing-com.png)
