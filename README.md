@@ -10,7 +10,7 @@ Para compilar el juego necesitas tener w64devkit en tu PC si usas Windows(O WSL 
 
 ## CREDITOS
 
-Desarrolladores: Juan Yaguaro(aka silverhacker), Sebastián Colina(aka Sebas-1423), Abel Ferrer(aka The_Light)
+Desarrolladores: Juan Yaguaro(aka silverhacker) and Abel Ferrer(aka The_Light)
 
 ## Cosas que se quieren agregar :D
 

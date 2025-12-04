@@ -1,7 +1,7 @@
 /*
 THE MUTANT'S
 
-Authors: Abel Ferrer(aka The_Light), Juan Yaguaro(aka silverhacker), Sebastián Colina(aka Sebas-1423)
+Authors: Abel Ferrer(aka The_Light) and Juan Yaguaro(aka silverhacker)
 File: delta_time.c
 
 THIS CODE WILL REMAIN CONFIDENTIAL UNTIL THE PROJECT IS COMPLETED. 
