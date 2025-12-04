@@ -34,21 +34,28 @@ ZOMBIE zombie;
 #define ZOMBIE_HEIGHT 64
 #define ZOMBIE_DETECT_RADIUS 180.0f
 
+/* Animation frames for zombies */
+#define ZOMBIE_IDLE_FRAMES 4    // Ajusta según tus spritesheets
+#define ZOMBIE_WALK_FRAMES 4    // Ajusta según tus spritesheets
+#define FRAME_DURATION_ZOMBIE 150  // ms por frame
+
 /* external globals from other modules */
 extern float deltaTime;       /* provided by delta_time.c */
 extern float position_x;      /* player position X (player.c) */
 extern float position_y;      /* player position Y (player.c) */
-extern int current_frame;     /* frame index for animations */
 extern int health;            /* player health (player.c) */
 
 void LoadSpritesZombies()
 {
-
     /* load idle */
     idle_zombie.tmp_surf_zombie_idle = IMG_Load("sprites/idle_zombie-spritesheet.png");
     if(idle_zombie.tmp_surf_zombie_idle){
         idle_zombie.tex_zombie_idle = SDL_CreateTextureFromSurface(renderer, idle_zombie.tmp_surf_zombie_idle);
         SDL_FreeSurface(idle_zombie.tmp_surf_zombie_idle);
+        
+        // Inicializar animación idle
+        Animation_Init(&idle_zombie.idle_anim, ZOMBIE_WIDTH, ZOMBIE_HEIGHT, 
+                      ZOMBIE_IDLE_FRAMES, FRAME_DURATION_ZOMBIE);
     } else {
         fprintf(stderr, "Failed to load idle_zombie sprite\n");
         idle_zombie.tex_zombie_idle = NULL;
@@ -59,6 +66,10 @@ void LoadSpritesZombies()
     if(walk_zombie.tmp_surf_walk_zombie){
         walk_zombie.tex_walk_zombie = SDL_CreateTextureFromSurface(renderer, walk_zombie.tmp_surf_walk_zombie);
         SDL_FreeSurface(walk_zombie.tmp_surf_walk_zombie);
+        
+        // Inicializar animación walk
+        Animation_Init(&walk_zombie.walk_anim, ZOMBIE_WIDTH, ZOMBIE_HEIGHT, 
+                      ZOMBIE_WALK_FRAMES, FRAME_DURATION_ZOMBIE);
     } else {
         fprintf(stderr, "Failed to load walk_zombie sprite\n");
         walk_zombie.tex_walk_zombie = NULL;
@@ -82,13 +93,10 @@ void InitZombie(float x, float y)
     zombie.wander_timer = 0.5f + (rand()%200)/100.0f; /* 0.5 - 2.5s */
     zombie.state = IDLE_Z;
 
-    zombie.src.x = 0;
-    zombie.src.y = 0;
-    zombie.src.w = ZOMBIE_WIDTH;
-    zombie.src.h = ZOMBIE_HEIGHT;
-
+    // Ya no necesitamos src aquí, la animación maneja esto
     zombie.dest.w = ZOMBIE_WIDTH;
     zombie.dest.h = ZOMBIE_HEIGHT;
+    
     /* attack defaults */
     zombie.attack_cooldown = 1.0f; /* 1 second between hits */
     zombie.attack_timer = 0.0f;
@@ -162,7 +170,8 @@ void UpdateZombies()
     /* update dest rect for rendering */
     zombie.dest.x = (int)zombie.x;
     zombie.dest.y = (int)zombie.base_y;
-    zombie.src.x = current_frame * ZOMBIE_WIDTH; /* assumes animation frames arranged horizontally */
+    
+    // ¡NO usar current_frame global! La animación maneja esto internamente
 
     /* simple AABB collision with player */
     SDL_Rect zrect = { zombie.dest.x, zombie.dest.y, zombie.dest.w, zombie.dest.h };
@@ -184,15 +193,26 @@ void UpdateZombies()
 void RenderZombies()
 {
     SDL_Texture* tex = NULL;
+    SDL_Rect* src_rect = NULL;
+    
     if(zombie.state == IDLE_Z){
         tex = idle_zombie.tex_zombie_idle;
+        if (tex != NULL) {
+            Animation_Update(&idle_zombie.idle_anim);
+            src_rect = Animation_GetSourceRect(&idle_zombie.idle_anim);
+        }
     } else {
         tex = walk_zombie.tex_walk_zombie;
+        if (tex != NULL) {
+            Animation_Update(&walk_zombie.walk_anim);
+            src_rect = Animation_GetSourceRect(&walk_zombie.walk_anim);
+        }
     }
 
-    if(tex == NULL) return; /* nothing to draw */
+    if(tex == NULL || src_rect == NULL) return; /* nothing to draw */
 
-    SDL_RenderCopyEx(renderer, tex, &zombie.src, &zombie.dest, 0.0, NULL, (zombie.dir < 0) ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE);
+    SDL_RenderCopyEx(renderer, tex, src_rect, &zombie.dest, 0.0, NULL, 
+                    (zombie.dir < 0) ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE);
 }
 
 /* kept for compatibility with existing calls */

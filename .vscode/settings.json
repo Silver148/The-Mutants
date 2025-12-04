@@ -1,3 +1,4 @@
 {
-    "cmake.sourceDirectory": "C:/Users/Admin/Desktop/my_project/The-Mutants/SDL2-Mingw/test"
+    "cmake.sourceDirectory": "C:/Users/Admin/Desktop/my_project/The-Mutants/SDL2-Mingw/test",
+    "C_Cpp.errorSquiggles": "disabled"
 }

@@ -3,6 +3,8 @@
 #include <stdbool.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include "anim_manager.h"
+#define FRAME_DURATION_PLAYER 150
 
 typedef struct{
     /*IDLE PLAYER*/
@@ -10,6 +12,7 @@ typedef struct{
     SDL_Texture* tex_idleplayer;
     SDL_Rect src_idleplayer;
     SDL_Rect dest_idleplayer;
+    Animation idle_anim;
 } IDLE_PLAYER;
 
 typedef struct{
@@ -18,6 +21,7 @@ typedef struct{
     SDL_Texture* tex_walkplayer;
     SDL_Rect src_walkplayer;
     SDL_Rect dest_walkplayer;
+    Animation walk_anim;
 } WALK_PLAYER;
 
 typedef struct{
@@ -26,6 +30,7 @@ typedef struct{
     SDL_Texture* tex_jumpplayer;
     SDL_Rect src_jumpplayer;
     SDL_Rect dest_jumpplayer;
+    Animation jump_anim;
 } JUMP_PLAYER;
 
 typedef enum{

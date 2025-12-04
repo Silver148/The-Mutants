@@ -63,20 +63,21 @@ extern float deltaTime;
 extern int current_frame;
 extern Uint32 last_update_time;
 
-void LoadSpritesPlayer()
-{   
+void LoadSpritesPlayer() {   
     idle_player.tmp_surf_idleplayer = IMG_Load("sprites/idle_player_spritesheet.png");
     idle_player.tex_idleplayer = SDL_CreateTextureFromSurface(renderer, idle_player.tmp_surf_idleplayer);
     SDL_FreeSurface(idle_player.tmp_surf_idleplayer);
+    Animation_Init(&idle_player.idle_anim, PLAYER_WIDTH, PLAYER_HEIGHT, IDLE_FRAMES, FRAME_DURATION_PLAYER);
 
     walk_player.tmp_surf_walkplayer = IMG_Load("sprites/walk_player_spritesheet.png");
     walk_player.tex_walkplayer = SDL_CreateTextureFromSurface(renderer, walk_player.tmp_surf_walkplayer);
     SDL_FreeSurface(walk_player.tmp_surf_walkplayer);
+    Animation_Init(&walk_player.walk_anim, PLAYER_WIDTH, PLAYER_HEIGHT, WALK_FRAMES, FRAME_DURATION_PLAYER);
 
     jump_player.tmp_surf_jumpplayer = IMG_Load("sprites/jump_player-spritesheet.png");
     jump_player.tex_jumpplayer = SDL_CreateTextureFromSurface(renderer, jump_player.tmp_surf_jumpplayer);
     SDL_FreeSurface(jump_player.tmp_surf_jumpplayer);
-
+    Animation_Init(&jump_player.jump_anim, PLAYER_WIDTH, PLAYER_HEIGHT, JUMP_FRAMES, FRAME_DURATION_PLAYER);
 }
 
 void AnimatePlayerShoot()
@@ -84,20 +85,17 @@ void AnimatePlayerShoot()
     //NOTHING YET :D
 }
 
-void RenderIdlePlayerAnim(SDL_RendererFlip flip_type)
-{
-    int idle_player_src_x = current_frame * PLAYER_WIDTH;
-    idle_player.src_idleplayer.x = idle_player_src_x;
-    idle_player.src_idleplayer.y = 0;
-    idle_player.src_idleplayer.w = PLAYER_WIDTH;
-    idle_player.src_idleplayer.h = PLAYER_HEIGHT;
-
+void RenderIdlePlayerAnim(SDL_RendererFlip flip_type) {
+    Animation_Update(&idle_player.idle_anim);
+    SDL_Rect* src_rect = Animation_GetSourceRect(&idle_player.idle_anim);
+    
     idle_player.dest_idleplayer.x = position_x;
     idle_player.dest_idleplayer.y = position_y;
     idle_player.dest_idleplayer.w = PLAYER_WIDTH;
     idle_player.dest_idleplayer.h = PLAYER_HEIGHT;
 
-    SDL_RenderCopyEx(renderer, idle_player.tex_idleplayer, &idle_player.src_idleplayer, &idle_player.dest_idleplayer, 0.0, NULL, flip_type);
+    SDL_RenderCopyEx(renderer, idle_player.tex_idleplayer, src_rect, 
+                    &idle_player.dest_idleplayer, 0.0, NULL, flip_type);
 }
 
 void PlayerForward()
@@ -111,21 +109,9 @@ void PlayerForward()
 
 void PlayerWalkAnim(SDL_RendererFlip flip_type)
 {
-    SDL_RenderCopyEx(renderer, walk_player.tex_walkplayer, &walk_player.src_walkplayer, 
-    &walk_player.dest_walkplayer, 0.0, NULL, flip_type);
-}
+    Animation_Update(&walk_player.walk_anim);
 
-void PlayerJumpAnim(SDL_RendererFlip flip_type)
-{
-    SDL_RenderCopyEx(renderer, jump_player.tex_jumpplayer, &jump_player.src_jumpplayer, 
-    &jump_player.dest_jumpplayer, 0.0, NULL, flip_type);
-}
-
-void RenderPlayer(SDL_RendererFlip flip_type)
-{
-    int walk_player_src_x = current_frame * PLAYER_WIDTH;
-    int jump_player_src_x = current_frame * PLAYER_WIDTH;
-
+    int walk_player_src_x = walk_player.walk_anim.current_frame * PLAYER_WIDTH;
     walk_player.src_walkplayer.x = walk_player_src_x;
     walk_player.src_walkplayer.y = 0;
     walk_player.src_walkplayer.w = PLAYER_WIDTH;
@@ -135,6 +121,14 @@ void RenderPlayer(SDL_RendererFlip flip_type)
     walk_player.dest_walkplayer.y = position_y;
     walk_player.dest_walkplayer.w = PLAYER_WIDTH;
     walk_player.dest_walkplayer.h = PLAYER_HEIGHT;
+
+    SDL_RenderCopyEx(renderer, walk_player.tex_walkplayer, &walk_player.src_walkplayer, 
+    &walk_player.dest_walkplayer, 0.0, NULL, flip_type);
+}
+
+void PlayerJumpAnim(SDL_RendererFlip flip_type)
+{
+    int jump_player_src_x = jump_player.jump_anim.current_frame * PLAYER_WIDTH;
 
     jump_player.src_jumpplayer.x = jump_player_src_x;
     jump_player.src_jumpplayer.y = 0;
@@ -146,6 +140,12 @@ void RenderPlayer(SDL_RendererFlip flip_type)
     jump_player.dest_jumpplayer.w = PLAYER_WIDTH;
     jump_player.dest_jumpplayer.h = PLAYER_HEIGHT;
 
+    SDL_RenderCopyEx(renderer, jump_player.tex_jumpplayer, &jump_player.src_jumpplayer, 
+    &jump_player.dest_jumpplayer, 0.0, NULL, flip_type);
+}
+
+void RenderPlayer(SDL_RendererFlip flip_type)
+{
     if(states_player == IDLE){
         RenderIdlePlayerAnim(flip_type);
     }else if(states_player == WALK){

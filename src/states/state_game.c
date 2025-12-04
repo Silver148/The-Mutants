@@ -2,7 +2,7 @@
 THE MUTANT'S
 
 Authors: Abel Ferrer(aka The_Light), Juan Yaguaro(aka silverhacker), Sebastián Colina(aka Sebas-1423)
-File: state_menu.c
+File: state_game.c  // CORREGÍ EL NOMBRE
 
 THIS CODE WILL REMAIN CONFIDENTIAL UNTIL THE PROJECT IS COMPLETED. 
 Anyone who leaks this code will be automatically kicked out of the 
@@ -38,10 +38,11 @@ extern float velocity_y;
 extern float jump_force;
 extern int health;
 
-extern int current_frame;
-extern Uint32 last_update_time;
+extern IDLE_PLAYER idle_player;
+extern WALK_PLAYER walk_player;
+extern JUMP_PLAYER jump_player;
+
 extern float deltaTime;
-extern int frame_duration;
 
 /*VARIABLES STAMINA*/
 float stamina = 25.0f;
@@ -55,10 +56,19 @@ const int POS_Y_BARRA = (480 - ALTURA_BARRA - 40);
 void CheckChangeStatePlayer()
 {
     if(states_player != last_states_player){
-        current_frame = 0;
-        last_update_time = SDL_GetTicks();
+        switch(last_states_player) {
+            case IDLE:
+                Animation_Reset(&idle_player.idle_anim);
+                break;
+            case WALK:
+                Animation_Reset(&walk_player.walk_anim);
+                break;
+            case JUMP:
+                Animation_Reset(&jump_player.jump_anim);
+                break;
+        }
     }
-
+    
     last_states_player = states_player;
 }
 
@@ -90,20 +100,6 @@ int Init_State_Game()
 void UpdateAnimsPLAYER()
 {
     CheckChangeStatePlayer();
-
-    int max_frames_for_state;
-    
-    if (states_player == IDLE) {
-        max_frames_for_state = IDLE_FRAMES;
-    }else if (states_player == WALK) {
-        max_frames_for_state = WALK_FRAMES;
-    }else if (states_player == JUMP) {
-        max_frames_for_state = JUMP_FRAMES;
-    }else {
-        return; 
-    }
-
-    UpdateANIM(max_frames_for_state);
 }
 
 void UpdateJump(){
@@ -140,7 +136,7 @@ void RenderBarStamina()
 void RenderBarHealth()
 {
     /* Player health bar (top-left) */
-    const int MAX_HEALTH = 150; /* matches player.c initial value */
+    const int MAX_HEALTH = 170; /* CORREGÍ: debe ser 170 para coincidir con player.c */
     const int HEALTH_BAR_WIDTH = 200;
     const int HEALTH_BAR_HEIGHT = 16;
     const int HEALTH_POS_X = 20;
@@ -198,24 +194,33 @@ int Update_State_Game()
         if ((state[SDL_SCANCODE_LSHIFT] || state[SDL_SCANCODE_RSHIFT]) && is_moving){
             SetPlayerSpeedMultiplier(1.8f); /* boost: 80% faster (adjustable) */
             stamina -= 6.0f * deltaTime;
-            frame_duration = FRAME_DURATION / 2; // Aumenta la velocidad de la animación
+            
+            // Modificar solo la velocidad de animación de walk cuando está caminando
+            if(states_player == WALK) {
+                walk_player.walk_anim.frame_duration = FRAME_DURATION_PLAYER / 2;
+            }
 
             if(stamina <= 0.0f){
-            ResetPlayerSpeed();
-            stamina = 0.0f;
-            frame_duration = FRAME_DURATION;
+                ResetPlayerSpeed();
+                stamina = 0.0f;
+                // Restaurar velocidad normal de animación
+                if(states_player == WALK) {
+                    walk_player.walk_anim.frame_duration = FRAME_DURATION_PLAYER;
+                }
             }
 
         } else {
             ResetPlayerSpeed();
-            frame_duration = FRAME_DURATION;
+            // Restaurar velocidad normal de animación
+            if(states_player == WALK) {
+                walk_player.walk_anim.frame_duration = FRAME_DURATION_PLAYER;
+            }
         }
 
         if(stamina > 25.0f){
             stamina = 25.0f;
         }
         
-        //SDL_Log("Stamina: %.2f\n", stamina); // DEBUG STAMINA
         stamina += 3.0f * deltaTime;
 
         if(state[SDL_SCANCODE_LEFT]){

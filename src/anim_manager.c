@@ -16,22 +16,42 @@ Copyright 2025
 #include "anim_manager.h"
 #include <SDL2/SDL.h>
 
-/*CURRENT FRAME AND LAST UPDATE TIME FOR ANIMATIONS*/
-int current_frame = 0;
-Uint32 last_update_time = 0;
-int frame_duration = FRAME_DURATION;
 
-void UpdateANIM(int frames) {
+void Animation_Init(Animation* anim, int frame_width, int frame_height, int total_frames, int frame_duration) {
+    anim->current_frame = 0;
+    anim->last_update_time = 0;
+    anim->frame_duration = frame_duration;
+    anim->total_frames = total_frames;
+    anim->frame_width = frame_width;
+    anim->frame_height = frame_height;
+    
+    anim->src_rect.x = 0;
+    anim->src_rect.y = 0;
+    anim->src_rect.w = frame_width;
+    anim->src_rect.h = frame_height;
+}
+
+void Animation_Update(Animation* anim) {
     Uint32 current_time = SDL_GetTicks();
-
-    if (current_time > last_update_time + frame_duration) {
+    
+    if (current_time > anim->last_update_time + anim->frame_duration) {
+        anim->current_frame++;
         
-        current_frame++;
-
-        if (current_frame >= frames) {
-            current_frame = 0;
+        if (anim->current_frame >= anim->total_frames) {
+            anim->current_frame = 0;
         }
-
-        last_update_time = current_time;
+        
+        anim->src_rect.x = anim->current_frame * anim->frame_width;
+        anim->last_update_time = current_time;
     }
+}
+
+void Animation_Reset(Animation* anim) {
+    anim->current_frame = 0;
+    anim->src_rect.x = 0;
+    anim->last_update_time = SDL_GetTicks();
+}
+
+SDL_Rect* Animation_GetSourceRect(Animation* anim) {
+    return &anim->src_rect;
 }
