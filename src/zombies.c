@@ -35,8 +35,8 @@ ZOMBIE zombie;
 #define ZOMBIE_DETECT_RADIUS 180.0f
 
 /* Animation frames for zombies */
-#define ZOMBIE_IDLE_FRAMES 4    // Ajusta según tus spritesheets
-#define ZOMBIE_WALK_FRAMES 4    // Ajusta según tus spritesheets
+#define ZOMBIE_IDLE_FRAMES 4
+#define ZOMBIE_WALK_FRAMES 4
 #define FRAME_DURATION_ZOMBIE 150  // ms por frame
 
 /* external globals from other modules */
