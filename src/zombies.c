@@ -170,8 +170,6 @@ void UpdateZombies()
     /* update dest rect for rendering */
     zombie.dest.x = (int)zombie.x;
     zombie.dest.y = (int)zombie.base_y;
-    
-    // ¡NO usar current_frame global! La animación maneja esto internamente
 
     /* simple AABB collision with player */
     SDL_Rect zrect = { zombie.dest.x, zombie.dest.y, zombie.dest.w, zombie.dest.h };
