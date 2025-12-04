@@ -93,7 +93,6 @@ void InitZombie(float x, float y)
     zombie.wander_timer = 0.5f + (rand()%200)/100.0f; /* 0.5 - 2.5s */
     zombie.state = IDLE_Z;
 
-    // Ya no necesitamos src aquí, la animación maneja esto
     zombie.dest.w = ZOMBIE_WIDTH;
     zombie.dest.h = ZOMBIE_HEIGHT;
     
