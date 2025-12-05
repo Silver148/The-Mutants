@@ -17,6 +17,7 @@ State Menu :D
 
 #include "states.h"
 #include "global_vars.h"
+#include "version.h"
 #include <stdio.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
@@ -26,11 +27,17 @@ extern SDL_Renderer* renderer;
 
 SDL_Surface* start_surface = NULL;
 SDL_Texture* start_texture = NULL;
-TTF_Font* font = NULL;
 SDL_Rect start_rect;
+
+TTF_Font* font = NULL;
+
 SDL_Rect quit_rect;
 SDL_Surface* quit_surface = NULL;
 SDL_Texture* quit_texture = NULL;
+
+SDL_Surface* version_surface = NULL;
+SDL_Texture* version_texture = NULL;
+SDL_Rect version_rect;
 
 int Init_State_Menu()
 {
@@ -61,6 +68,19 @@ int Init_State_Menu()
     quit_rect.y = 300;
     quit_rect.w = quitW;
     quit_rect.h = quitH;
+
+    /*VERSION*/
+    version_surface = TTF_RenderText_Solid(font, "Version 0.19 Pre-Alpha", (SDL_Color){255, 255, 255, 255});
+    version_texture = SDL_CreateTextureFromSurface(renderer, version_surface);
+
+    SDL_FreeSurface(version_surface);
+
+    int versionW = 0, versionH = 0;
+    SDL_QueryTexture(version_texture, NULL, NULL, &versionW, &versionH);
+    version_rect.x = 10;
+    version_rect.y = 10;
+    version_rect.w = versionW;
+    version_rect.h = versionH;
 
     return 0;
 }
@@ -105,6 +125,7 @@ int Update_State_Menu()
 
         SDL_RenderCopy(renderer, start_texture, NULL, &start_rect); //START TEXT
         SDL_RenderCopy(renderer, quit_texture, NULL, &quit_rect); //QUIT TEXT
+        SDL_RenderCopy(renderer, version_texture, NULL, &version_rect); //VERSION TEXT
 
         SDL_RenderPresent(renderer);
     }
