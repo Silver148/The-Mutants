@@ -14,7 +14,7 @@ Desarrolladores: Juan Yaguaro(aka silverhacker) and Abel Ferrer(aka The_Light)
 
 ## Cosas que se quieren agregar :D
 
-* Menú
+* Menú ✅
 
 * IA de zombies ✅
 
