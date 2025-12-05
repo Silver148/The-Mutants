@@ -41,3 +41,18 @@ int PlayMusicStateGame()
     Mix_PlayMusic(bgm, -1); // Play music indefinitely
     return 0;
 }
+
+int PlayMusicStateMenu()
+{
+    Mix_Music* bgm = Mix_LoadMUS("music/Drill_random_TEST.mp3");
+    if(bgm == NULL)
+    {
+        printf("Failed to load menu music! SDL_mixer Error: %s\n", Mix_GetError());
+        return -1;
+    }
+
+    Mix_VolumeMusic(MIX_MAX_VOLUME / 4); // Set volume to 25%
+
+    Mix_PlayMusic(bgm, -1); // Play music indefinitely
+    return 0;
+}

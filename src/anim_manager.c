@@ -16,7 +16,6 @@ Copyright 2025
 #include "anim_manager.h"
 #include <SDL2/SDL.h>
 
-
 void Animation_Init(Animation* anim, int frame_width, int frame_height, int total_frames, int frame_duration) {
     anim->current_frame = 0;
     anim->last_update_time = 0;

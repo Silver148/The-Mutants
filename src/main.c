@@ -16,6 +16,7 @@ Copyright 2025
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <stdbool.h>
+#include <SDL2/SDL_ttf.h>
 #include "music.h"
 #include "states.h"
 
@@ -45,6 +46,11 @@ int InitSDLAndSubSystems()
         return 1;
     }
 
+    if(TTF_Init() < 0){
+        printf("SDL_ttf could not initialize! SDL_ttf Error: %s\n", TTF_GetError());
+        return 1;
+    }
+
     /*Create window*/
     window = SDL_CreateWindow("The Mutant's(TEST)", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640, 480, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE); //Window 640x480
     if(window == NULL)
@@ -69,10 +75,19 @@ int main(int argc, char* argv[])
 
     InitMusic(); //Initialize music subsystem
 
-    PlayMusicStateGame(); //Play music
+    PlayMusicStateMenu(); //Play music for menu state
+
+    /*STATES*/
+    Init_State_Menu(); //Initialize menu state
+    Update_State_Menu(); //Update menu state
+
+    /*
+    Cuando el jugador presiona "Start" en el menú, se sale del bucle del menú y se inicia el estado del juego.
+    */
+
+    PlayMusicStateGame(); //Play music for game state
 
     Init_State_Game(); //Initialize game state
-
     Update_State_Game(); //Update game state
 
     return 0;
