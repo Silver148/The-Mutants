@@ -31,9 +31,9 @@ Desarrolladores: Juan Yaguaro(aka silverhacker) and Abel Ferrer(aka The_Light)
 ## Modo DEBUG
 
 Se puede compilar el juego en modo DEBUG. Para compilar el juego en modo DEBUG se escribe el comando:
-´´´
+```
 make debug-windows-x64
-´´´
+```
 
 # POLÍTICAS DE CONFIDENCIALIDAD ⚠️
 
