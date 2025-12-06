@@ -53,6 +53,15 @@ const int ALTURA_BARRA = 20;
 const int POS_X_BARRA = (640 / 2) - (ANCHO_MAXIMO_BARRA / 2);
 const int POS_Y_BARRA = (480 - ALTURA_BARRA - 40);
 
+void ShowHitboxPlayer()
+{
+    Hitbox player_hitbox = GetPlayerHitbox();
+
+    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); // Red color for hitbox
+    SDL_Rect hitboxRect = { (int)player_hitbox.x, (int)player_hitbox.y, player_hitbox.w, player_hitbox.h };
+    SDL_RenderDrawRect(renderer, &hitboxRect);
+}
+
 void CheckChangeStatePlayer()
 {
     if(states_player != last_states_player){
@@ -268,7 +277,13 @@ int Update_State_Game()
         RenderBarStamina(); //Render stamina bar
 
         RenderPlayer(player_flip); //Render player
-        RenderZombies();
+
+        RenderZombies(); //Render zombies
+
+        #ifdef DEBUG
+        ShowHitboxPlayer(); // Show player hitbox for testing
+        ShowHitboxZombie(); // Show zombie hitbox for testing
+        #endif
 
         SDL_RenderPresent(renderer);    
     }

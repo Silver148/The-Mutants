@@ -35,11 +35,15 @@ typedef struct {
     int attack_damage;
 } ZOMBIE;
 
-// Prototipos de funciones
 void LoadSpritesZombies();
 void InitZombie(float x, float y);
+
+/*RENDER FUCTIONS*/
 void UpdateZombies();
 void RenderZombies();
 void RenderZombieIdle();
+
+/*HITBOX FUNC*/
+void ShowHitboxZombie();
 
 #endif

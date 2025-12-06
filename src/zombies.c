@@ -39,11 +39,26 @@ ZOMBIE zombie;
 #define ZOMBIE_WALK_FRAMES 4
 #define FRAME_DURATION_ZOMBIE 150  // ms por frame
 
+/* HITBOX VARIABLES FOR ZOMBIES */
+#define ZOMBIE_HITBOX_OFFSET_X 12
+#define ZOMBIE_HITBOX_OFFSET_Y 8
+#define ZOMBIE_HITBOX_WIDTH (ZOMBIE_WIDTH - 24)
+#define ZOMBIE_HITBOX_HEIGHT (ZOMBIE_HEIGHT - 16)
+
 /* external globals from other modules */
 extern float deltaTime;       /* provided by delta_time.c */
-extern float position_x;      /* player position X (player.c) */
-extern float position_y;      /* player position Y (player.c) */
 extern int health;            /* player health (player.c) */
+
+void ShowHitboxZombie()
+{
+    SDL_Rect hitboxRect = { zombie.dest.x + ZOMBIE_HITBOX_OFFSET_X, 
+                            zombie.dest.y + ZOMBIE_HITBOX_OFFSET_Y, 
+                            ZOMBIE_HITBOX_WIDTH, 
+                            ZOMBIE_HITBOX_HEIGHT };
+
+    SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255); // Green color for hitbox
+    SDL_RenderDrawRect(renderer, &hitboxRect);
+}
 
 void LoadSpritesZombies()
 {
@@ -140,8 +155,8 @@ static void zombie_wander()
 void UpdateZombies()
 {
     /* compute vector to player */
-    float dx = position_x - zombie.x;
-    float dy = position_y - zombie.y;
+    float dx = GetPositionPlayerX() - zombie.x;
+    float dy = GetPositionPlayerY() - zombie.y;
     float dist = sqrtf(dx*dx + dy*dy);
 
     if(dist <= ZOMBIE_DETECT_RADIUS){
@@ -170,9 +185,12 @@ void UpdateZombies()
     zombie.dest.x = (int)zombie.x;
     zombie.dest.y = (int)zombie.base_y;
 
+    /*GET PLAYER HITBOX*/
+    Hitbox player_hitbox = GetPlayerHitbox();
+
     /* simple AABB collision with player */
-    SDL_Rect zrect = { zombie.dest.x, zombie.dest.y, zombie.dest.w, zombie.dest.h };
-    SDL_Rect prect = { (int)position_x, (int)position_y, PLAYER_WIDTH, PLAYER_HEIGHT };
+    SDL_Rect zrect = { zombie.dest.x + ZOMBIE_HITBOX_OFFSET_X, zombie.dest.y + ZOMBIE_HITBOX_OFFSET_Y, zombie.dest.w, zombie.dest.h };
+    SDL_Rect prect = { (int)player_hitbox.x, (int)player_hitbox.y, player_hitbox.w, player_hitbox.h };
 
     if (zrect.x < prect.x + prect.w && zrect.x + zrect.w > prect.x &&
         zrect.y < prect.y + prect.h && zrect.y + zrect.h > prect.y)

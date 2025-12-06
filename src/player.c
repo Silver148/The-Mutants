@@ -63,6 +63,26 @@ extern float deltaTime;
 extern int current_frame;
 extern Uint32 last_update_time;
 
+/*HITBOX VARIABLES*/
+static Hitbox player_hitbox;
+#define PLAYER_HITBOX_OFFSET_X 15
+#define PLAYER_HITBOX_OFFSET_Y 10 
+#define PLAYER_HITBOX_WIDTH (PLAYER_WIDTH - 30)
+#define PLAYER_HITBOX_HEIGHT (PLAYER_HEIGHT - 20)
+
+void UpdatePlayerHitbox(void) {
+
+    player_hitbox.x = position_x + PLAYER_HITBOX_OFFSET_X;
+    player_hitbox.y = position_y + PLAYER_HITBOX_OFFSET_Y;
+    player_hitbox.w = PLAYER_HITBOX_WIDTH;
+    player_hitbox.h = PLAYER_HITBOX_HEIGHT;
+}
+
+Hitbox GetPlayerHitbox(void) {
+    UpdatePlayerHitbox();
+    return player_hitbox;
+}
+
 void LoadSpritesPlayer() {   
     idle_player.tmp_surf_idleplayer = IMG_Load("sprites/idle_player_spritesheet.png");
     idle_player.tex_idleplayer = SDL_CreateTextureFromSurface(renderer, idle_player.tmp_surf_idleplayer);
@@ -105,6 +125,7 @@ void PlayerForward()
     if(position_x > 640 - PLAYER_WIDTH){
         position_x = 640 - PLAYER_WIDTH;
     }
+    UpdatePlayerHitbox();
 }
 
 void PlayerWalkAnim(SDL_RendererFlip flip_type)
@@ -167,6 +188,7 @@ void PlayerJump()
         is_jumping = false;
         velocity_y = 0.0f;
     }
+    UpdatePlayerHitbox();
 }
 
 void PlayerBackward()
@@ -176,6 +198,7 @@ void PlayerBackward()
     if(position_x < 0){
         position_x = 0;
     }
+    UpdatePlayerHitbox();
 }
 
 /*
@@ -205,4 +228,14 @@ void CheckIfPlayerIsDead()
         SDL_Log("Player is dead!\n");
         exit(0);
     }
+}
+
+float GetPositionPlayerX(void)
+{
+    return position_x;
+}
+
+float GetPositionPlayerY(void)
+{
+    return position_y;
 }

@@ -64,4 +64,16 @@ void SetPlayerSpeedMultiplier(float multiplier);
 void ResetPlayerSpeed(void);
 void CheckIfPlayerIsDead();
 
+/*POSITION X AND Y*/
+float GetPositionPlayerX(void);
+float GetPositionPlayerY(void);
+
+typedef struct {
+    float x, y;
+    int w, h;
+} Hitbox;
+
+Hitbox GetPlayerHitbox(void);
+void UpdatePlayerHitbox(void);
+
 #endif // PLAYER_H
