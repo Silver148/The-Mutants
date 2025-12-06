@@ -28,6 +28,10 @@ Desarrolladores: Juan Yaguaro(aka silverhacker) and Abel Ferrer(aka The_Light)
 
 * Sistema de vida en el jugador ✅
 
+## Modo DEBUG
+
+Se puede compilar el juego en modo DEBUG. Para compilar el juego en modo DEBUG se escribe el comando ´make debug-windows-x64´ para 64 bits y ´make debug-windows-x32´
+
 # POLÍTICAS DE CONFIDENCIALIDAD ⚠️
 
 Hasta ahora el juego es de código cerrado para evitar que se roben nuestra idea y nuestro código, así que queda terminántemente prohibido compartir el código del juego antes de que se presente el juego :), así que, el que filtre el código del juego, queda expulsado de este proyecto para siempre sin ninguna oportunidad de volver.
