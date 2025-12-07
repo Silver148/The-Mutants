@@ -69,8 +69,11 @@ int Init_State_Menu()
     quit_rect.w = quitW;
     quit_rect.h = quitH;
 
+    char TEXT_VERSION[64];
+    snprintf(TEXT_VERSION, sizeof(TEXT_VERSION), "Version %d.%d.%d Pre-Alpha", GAME_VERSION_MAJOR, GAME_VERSION_MINOR, GAME_VERSION_PATCH);
+
     /*VERSION*/
-    version_surface = TTF_RenderText_Solid(font, "Version 0.19 Pre-Alpha", (SDL_Color){255, 255, 255, 255});
+    version_surface = TTF_RenderText_Solid(font, TEXT_VERSION, (SDL_Color){255, 255, 255, 255});
     version_texture = SDL_CreateTextureFromSurface(renderer, version_surface);
 
     SDL_FreeSurface(version_surface);
