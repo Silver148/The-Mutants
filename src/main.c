@@ -19,6 +19,7 @@ Copyright 2025
 #include <SDL2/SDL_ttf.h>
 #include "music.h"
 #include "states.h"
+#include "version.h"
 
 #ifdef __MINGW32__
 #define main SDL_main 
@@ -51,8 +52,11 @@ int InitSDLAndSubSystems()
         return 1;
     }
 
+    char window_title[64];
+    snprintf(window_title, sizeof(window_title), "The Mutant's %d.%d.%d", GAME_VERSION_MAJOR, GAME_VERSION_MINOR, GAME_VERSION_PATCH);
+
     /*Create window*/
-    window = SDL_CreateWindow("The Mutant's(TEST)", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640, 480, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE); //Window 640x480
+    window = SDL_CreateWindow(window_title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640, 480, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE); //Window 640x480
     if(window == NULL)
         printf("Window could not be created! SDL Error: %s\n", SDL_GetError());
 
@@ -70,7 +74,6 @@ int InitSDLAndSubSystems()
 int main(int argc, char* argv[])
 {   
 
-    //Sebas puso esto xD
     InitSDLAndSubSystems(); //Initialize SDL and subsystems
 
     InitMusic(); //Initialize music subsystem
