@@ -6,7 +6,7 @@ CFLAGS = -Wall -Iinclude
 LIBS = -lSDL2 -lSDL2_image -lSDL2_mixer -lSDL2_ttf -lm
 SOURCES = src/main.c src/player.c src/states/state_menu.c \
 			src/states/state_game.c src/zombies.c src/delta_time.c src/anim_manager.c \
-			src/music.c
+			src/music.c src/settings.c
 OBJECTS = $(SOURCES:src/%.c=obj/%.o)
 
 # Windows x64 build settings

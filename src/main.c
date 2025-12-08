@@ -17,6 +17,7 @@ Copyright 2025
 #include <SDL2/SDL_image.h>
 #include <stdbool.h>
 #include <SDL2/SDL_ttf.h>
+#include "settings.h"
 #include "music.h"
 #include "states.h"
 #include "version.h"
@@ -30,6 +31,7 @@ Copyright 2025
 
 SDL_Window* window = NULL;
 SDL_Renderer* renderer = NULL;
+Settings game_settings;
 
 int InitSDLAndSubSystems()
 {
@@ -77,6 +79,7 @@ int main(int argc, char* argv[])
     InitSDLAndSubSystems(); //Initialize SDL and subsystems
 
     InitMusic(); //Initialize music subsystem
+    LoadSettingsFromFile(&game_settings); //Load settings from file
 
     PlayMusicStateMenu(); //Play music for menu state
 

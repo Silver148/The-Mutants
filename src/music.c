@@ -14,8 +14,11 @@ Copyright 2025
 /* MUSIC MANAGEMENT by Juan Yaguaro */
 
 #include "music.h"
+#include "settings.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_mixer.h>
+
+extern Settings game_settings;
 
 int InitMusic()
 {
@@ -36,7 +39,7 @@ int PlayMusicStateGame()
         return -1;
     }
 
-    Mix_VolumeMusic(MIX_MAX_VOLUME / 4); // Set volume to 25%
+    Mix_VolumeMusic(game_settings.volume_music_in_game);
 
     Mix_PlayMusic(bgm, -1); // Play music indefinitely
     return 0;
@@ -51,8 +54,13 @@ int PlayMusicStateMenu()
         return -1;
     }
 
-    Mix_VolumeMusic(MIX_MAX_VOLUME / 4); // Set volume to 25%
-
+    Mix_VolumeMusic(game_settings.volume_music_in_menu);
     Mix_PlayMusic(bgm, -1); // Play music indefinitely
+    return 0;
+}
+
+int ChangeMusicVolume(int volume)
+{
+    Mix_VolumeMusic(volume);
     return 0;
 }
