@@ -289,7 +289,6 @@ void RenderZombies() {
                         (z->dir < 0) ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE);
         
         //Bar Zombie health
-        #ifdef DEBUG
         if (z->health < 100) {
             SDL_Rect health_bg = {z->dest.x, z->dest.y - 10, ZOMBIE_WIDTH, 5};
             SDL_Rect health_fg = {z->dest.x, z->dest.y - 10, 
@@ -299,7 +298,6 @@ void RenderZombies() {
             SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
             SDL_RenderFillRect(renderer, &health_fg);
         }
-        #endif
     }
 }
 
