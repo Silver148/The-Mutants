@@ -45,6 +45,10 @@ SDL_Surface* settings_surface = NULL;
 SDL_Texture* settings_texture = NULL;
 SDL_Rect settings_rect;
 
+SDL_Surface* skins_surface = NULL;
+SDL_Texture* skins_texture = NULL;
+SDL_Rect skins_rect;
+
 extern Settings game_settings;
 
 int Init_State_Menu()
@@ -75,6 +79,18 @@ int Init_State_Menu()
     settings_rect.y = 300;
     settings_rect.w = settingsW;
     settings_rect.h = settingsH;
+
+    /*SKINS TEXT*/
+    skins_surface = TTF_RenderText_Solid(font, "Skins", (SDL_Color){255, 0, 0, 255});
+    skins_texture = SDL_CreateTextureFromSurface(renderer, skins_surface);
+    SDL_FreeSurface(skins_surface);
+
+    int skinsW = 0, skinsH = 0;
+    SDL_QueryTexture(skins_texture, NULL, NULL, &skinsW, &skinsH);
+    skins_rect.x = (640 - skinsW) / 2;
+    skins_rect.y = 350;
+    skins_rect.w = skinsW;
+    skins_rect.h = skinsH;
 
     /*QUIT TEXT*/
     quit_surface = TTF_RenderText_Solid(font, "Quit", (SDL_Color){255, 0, 0, 255});
@@ -297,6 +313,78 @@ int State_Config(){
     return 0;
 }
 
+int State_Skins(){
+
+    /*SKINS TEXT*/
+    SDL_Surface* skins_text_surface = TTF_RenderText_Solid(font, "Skins", (SDL_Color){255, 255, 255, 255});
+    SDL_Texture* skins_text_texture = SDL_CreateTextureFromSurface(renderer, skins_text_surface);
+    SDL_FreeSurface(skins_text_surface);
+
+    SDL_Rect skins_text_rect;
+    int skins_textW = 0, skins_textH = 0;
+    SDL_QueryTexture(skins_text_texture, NULL, NULL, &skins_textW, &skins_textH);
+    skins_text_rect.x = (640 - skins_textW) / 2;
+    skins_text_rect.y = 50;
+    skins_text_rect.w = skins_textW;
+    skins_text_rect.h = skins_textH;
+
+    /*<-*/
+    SDL_Surface* arrow = TTF_RenderText_Solid(font, "<-", (SDL_Color){255, 255, 255, 255});
+    SDL_Texture* arrow_texture = SDL_CreateTextureFromSurface(renderer, arrow);
+    SDL_FreeSurface(arrow);
+
+    SDL_Rect arrow_rect;
+    int arrowW = 0, arrowH = 0;
+    SDL_QueryTexture(arrow_texture, NULL, NULL, &arrowW, &arrowH);
+    arrow_rect.x = 10;
+    arrow_rect.y = 10;
+    arrow_rect.w = arrowW;
+    arrow_rect.h = arrowH;
+
+    while(1)
+    {
+        SDL_Event e;
+        while(SDL_PollEvent(&e))
+        {
+            if(e.type == SDL_QUIT)
+            {
+                SDL_DestroyTexture(skins_text_texture);
+
+                TTF_CloseFont(font);
+                TTF_Quit();
+                SDL_Quit();
+                return 0;
+            }
+
+            if(e.type == SDL_MOUSEBUTTONDOWN)
+            {
+                int mx = e.button.x;
+                int my = e.button.y;
+
+                if(mx >= arrow_rect.x && mx <= arrow_rect.x + arrow_rect.w &&
+                   my >= arrow_rect.y && my <= arrow_rect.y + arrow_rect.h)
+                {
+                    SDL_DestroyTexture(skins_text_texture);
+                    SDL_DestroyTexture(arrow_texture);
+
+                    Init_State_Menu();
+                    Update_State_Menu();
+                    return 0;
+                }
+            }
+        }
+
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(renderer);
+
+        SDL_RenderCopy(renderer, skins_text_texture, NULL, &skins_text_rect); /*SKINS TEXT*/
+        SDL_RenderCopy(renderer, arrow_texture, NULL, &arrow_rect); /*ARROW*/
+
+        SDL_RenderPresent(renderer);
+    }
+
+}
+
 int Update_State_Menu()
 {
 
@@ -343,8 +431,17 @@ int Update_State_Menu()
                     SDL_DestroyTexture(settings_texture);
 
                     State_Config();
+                }else if(mx >= skins_rect.x && mx <= skins_rect.x + skins_rect.w &&
+                   my >= skins_rect.y && my <= skins_rect.y + skins_rect.h)
+                {
+                    SDL_DestroyTexture(start_texture);
+                    SDL_DestroyTexture(quit_texture);
+                    SDL_DestroyTexture(version_texture);
+                    SDL_DestroyTexture(settings_texture);
+                    SDL_DestroyTexture(skins_texture);
+
+                    State_Skins();
                 }
-            }
         }
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
@@ -352,10 +449,12 @@ int Update_State_Menu()
 
         SDL_RenderCopy(renderer, start_texture, NULL, &start_rect); //START TEXT
         SDL_RenderCopy(renderer, quit_texture, NULL, &quit_rect); //QUIT TEXT
+        SDL_RenderCopy(renderer, skins_texture, NULL, &skins_rect); //SKINS TEXT
         SDL_RenderCopy(renderer, version_texture, NULL, &version_rect); //VERSION TEXT
         SDL_RenderCopy(renderer, settings_texture, NULL, &settings_rect); //SETTINGS TEXT
 
         SDL_RenderPresent(renderer);
+        }
     }
 
     return 0;
