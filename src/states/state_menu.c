@@ -402,6 +402,32 @@ int State_Config(){
 
 int State_Skins(){
 
+    /*HUEHUEHUEHUE XDDDDDDDD*/
+    SDL_Surface* huehuehue_surface = IMG_Load("skins/huehuehue.png");
+    SDL_Texture* huehuehue_texture = SDL_CreateTextureFromSurface(renderer, huehuehue_surface);
+    SDL_FreeSurface(huehuehue_surface);
+
+    SDL_Rect huehuehue_rect;
+    int huehuehueW = 0, huehuehueH = 0;
+    SDL_QueryTexture(huehuehue_texture, NULL, NULL, &huehuehueW, &huehuehueH);
+    huehuehue_rect.x = 640 / 2 - (huehuehueW / 4) / 2;
+    huehuehue_rect.y = 100;
+    huehuehue_rect.w = huehuehueW / 4;
+    huehuehue_rect.h = huehuehueH / 4;
+
+    /*DEFAULT SKIN PLAYER PREVIEW*/
+    SDL_Surface* default_skin_surface = IMG_Load("sprites/gif/idle_player.gif");
+    SDL_Texture* default_skin_texture = SDL_CreateTextureFromSurface(renderer, default_skin_surface);
+    SDL_FreeSurface(default_skin_surface);
+
+    SDL_Rect default_skin_rect;
+    int default_skinW = 0, default_skinH = 0;
+    SDL_QueryTexture(default_skin_texture, NULL, NULL, &default_skinW, &default_skinH);
+    default_skin_rect.x = 640 / 2 - (default_skinW / 4) / 2;
+    default_skin_rect.y = 100;
+    default_skin_rect.w = default_skinW / 4;
+    default_skin_rect.h = default_skinH / 4;
+
     /*SKINS TEXT*/
     SDL_Surface* skins_text_surface = TTF_RenderText_Solid(font, "Skins", (SDL_Color){255, 255, 255, 255});
     SDL_Texture* skins_text_texture = SDL_CreateTextureFromSurface(renderer, skins_text_surface);
@@ -443,6 +469,25 @@ int State_Skins(){
                 return 0;
             }
 
+            if(e.type == SDL_KEYDOWN)
+            {
+                switch(e.key.keysym.sym)
+                {
+                    case SDLK_LEFT:
+                        SDL_DestroyTexture(huehuehue_texture);
+                        SDL_RenderCopy(renderer, default_skin_texture, NULL, &default_skin_rect); /*DEFAULT SKIN PREVIEW*/
+                        SDL_RenderPresent(renderer);
+                        break;
+                    case SDLK_RIGHT:
+                        SDL_DestroyTexture(default_skin_texture);
+                        SDL_RenderCopy(renderer, huehuehue_texture, NULL, &huehuehue_rect); /*HUEHUEHUE SKIN PREVIEW*/
+                        SDL_RenderPresent(renderer);
+                        break;
+                    default:
+                        break;
+                }
+            }
+
             if(e.type == SDL_MOUSEBUTTONDOWN)
             {
                 int mx = e.button.x;
@@ -452,6 +497,7 @@ int State_Skins(){
                    my >= arrow_rect.y && my <= arrow_rect.y + arrow_rect.h)
                 {
                     SDL_DestroyTexture(skins_text_texture);
+                    SDL_DestroyTexture(huehuehue_texture);
                     SDL_DestroyTexture(arrow_texture);
 
                     Init_State_Menu();
