@@ -7,7 +7,8 @@
 #include <stdio.h>
 
 extern float deltaTime; /* from delta_time.c */
-extern ZOMBIE zombie; /* single zombie instance (from zombies.c) */
+extern ZOMBIE zombies[MAX_ZOMBIES];/*zombies instance (from zombies.c) */
+extern int num_zombies;; 
 
 static Projectile projectiles[MAX_PROJECTILES];
 
@@ -35,41 +36,81 @@ void SpawnProjectile(float x, float y, float vx, float vy, int damage)
 
 void UpdateProjectiles()
 {
-    extern ZOMBIE zombie; /* from zombies.c */
-    for(int i=0;i<MAX_PROJECTILES;i++){
+    
+    for(int i = 0; i < MAX_PROJECTILES; i++) {
         if(!projectiles[i].active) continue;
 
         projectiles[i].x += projectiles[i].vx * deltaTime;
         projectiles[i].y += projectiles[i].vy * deltaTime;
 
-        /* off-screen kill */
-        if(projectiles[i].x < -50 || projectiles[i].x > 700 || projectiles[i].y < -50 || projectiles[i].y > 530){
+        if(projectiles[i].x < -50 || projectiles[i].x > 700 || 
+           projectiles[i].y < -50 || projectiles[i].y > 530) {
             projectiles[i].active = 0;
             continue;
         }
 
-        /* collision with single zombie (AABB) */
-        if(zombie.alive){
-            SDL_Rect prect = { (int)projectiles[i].x, (int)projectiles[i].y, projectiles[i].w, projectiles[i].h };
-            SDL_Rect zrect = { zombie.dest.x, zombie.dest.y, zombie.dest.w, zombie.dest.h };
-            if (prect.x < zrect.x + zrect.w && prect.x + prect.w > zrect.x &&
-                prect.y < zrect.y + zrect.h && prect.y + prect.h > zrect.y)
-            {
-                /* hit */
-                zombie.health -= projectiles[i].damage;
+        SDL_Rect prect = { 
+            (int)projectiles[i].x, 
+            (int)projectiles[i].y, 
+            projectiles[i].w, 
+            projectiles[i].h 
+        };
+        
+        SDL_Rect prect_hitbox = {
+            (int)projectiles[i].x + PROJECTILE_HITBOX_OFFSET_X,
+            (int)projectiles[i].y + PROJECTILE_HITBOX_OFFSET_Y,
+            PROJECTILE_HITBOX_WIDTH,
+            PROJECTILE_HITBOX_HEIGHT
+        };
+
+        int projectile_hit = 0;
+        
+        for(int z = 0; z < MAX_ZOMBIES && !projectile_hit; z++) {
+            if(!zombies[z].alive) continue;
+            
+            //ZOMBIE HITBOX
+            SDL_Rect zrect = {
+                zombies[z].dest.x + ZOMBIE_HITBOX_OFFSET_X,
+                zombies[z].dest.y + ZOMBIE_HITBOX_OFFSET_Y,
+                ZOMBIE_HITBOX_WIDTH,
+                ZOMBIE_HITBOX_HEIGHT
+            };
+            
+            //AAB Collision check
+            if (prect_hitbox.x < zrect.x + zrect.w && 
+                prect_hitbox.x + prect_hitbox.w > zrect.x &&
+                prect_hitbox.y < zrect.y + zrect.h && 
+                prect_hitbox.y + prect_hitbox.h > zrect.y) {
+                
+                // HIT
+                zombies[z].health -= projectiles[i].damage;
+                projectile_hit = 1;
                 projectiles[i].active = 0;
-                SDL_Log("Zombie hit! health=%d\n", zombie.health);
-                if(zombie.health <= 0){
-                    zombie.alive = 0;
-                    zombie.speed = 0.0f;
-                    DeleteZombies();
+                
+                #ifdef DEBUG
+                SDL_Log("Zombie hit! ID: %d, HP: %d\n", 
+                       zombies[z].id, zombies[z].health);
+                #endif
+                
+                if(zombies[z].health <= 0) {
+                    zombies[z].alive = 0;
+                    zombies[z].speed = 0.0f;
+                    num_zombies--;
+                    
+                    #ifdef DEBUG
+                    SDL_Log("Zombie %d eliminado! Zombies restantes: %d\n", 
+                           zombies[z].id, num_zombies);
+                    #else
                     SDL_Log("Zombie died\n");
+                    #endif
+                    
                 }
+                
+                break;
             }
         }
     }
 }
-
 void RenderProjectiles()
 {
     SDL_SetRenderDrawColor(renderer, 255, 220, 0, 255);

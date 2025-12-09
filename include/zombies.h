@@ -4,6 +4,19 @@
 #include <SDL2/SDL.h>
 #include "anim_manager.h"
 
+#define MAX_ZOMBIES 20
+
+/* tuning */
+#define ZOMBIE_WIDTH 64
+#define ZOMBIE_HEIGHT 64
+#define ZOMBIE_DETECT_RADIUS 180.0f
+
+/* HITBOX VARIABLES FOR ZOMBIES */
+#define ZOMBIE_HITBOX_OFFSET_X 24
+#define ZOMBIE_HITBOX_OFFSET_Y 8
+#define ZOMBIE_HITBOX_WIDTH (ZOMBIE_WIDTH - 48)
+#define ZOMBIE_HITBOX_HEIGHT (ZOMBIE_HEIGHT - 24)
+
 typedef enum {
     IDLE_Z,
     WALK_Z
@@ -35,6 +48,7 @@ typedef struct {
     int attack_damage;
     int health;
     int alive; /* boolean-like flag */
+    int id;
 } ZOMBIE;
 
 void LoadSpritesZombies();
@@ -46,7 +60,8 @@ void RenderZombies();
 void RenderZombieIdle();
 void DeleteZombies();
 
+
 /*HITBOX FUNC*/
-void ShowHitboxZombie();
+void ShowHitboxZombie(int zombie_index);
 
 #endif

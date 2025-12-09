@@ -54,7 +54,7 @@ const int ALTURA_BARRA = 20;
 const int POS_X_BARRA = (640 / 2) - (ANCHO_MAXIMO_BARRA / 2);
 const int POS_Y_BARRA = (480 - ALTURA_BARRA - 40);
 
-extern ZOMBIE zombie;
+extern ZOMBIE zombies[MAX_ZOMBIES];/*zombies instance (from zombies.c) */
 
 void ShowHitboxPlayer()
 {
@@ -196,7 +196,7 @@ int Update_State_Game()
         const Uint8 *state = SDL_GetKeyboardState(NULL);
 
         /*BOOL MOVEMENT*/
-        bool is_moving = state[SDL_SCANCODE_LEFT] || state[SDL_SCANCODE_RIGHT];
+        bool is_moving = state[SDL_SCANCODE_A] || state[SDL_SCANCODE_D];
 
         if(state[SDL_SCANCODE_ESCAPE]){
             SDL_Quit();
@@ -236,7 +236,7 @@ int Update_State_Game()
         
         stamina += 3.0f * deltaTime;
 
-        if(state[SDL_SCANCODE_LEFT]){
+        if(state[SDL_SCANCODE_A]){
             input_state = WALK;
             player_flip = SDL_FLIP_HORIZONTAL;
             PlayerBackward();
@@ -250,15 +250,15 @@ int Update_State_Game()
             }
         }
 
-        if(state[SDL_SCANCODE_RIGHT]){
+        if(state[SDL_SCANCODE_D]){
             input_state = WALK;
             player_flip = SDL_FLIP_NONE;
             PlayerForward();
         }
 
-        /* Shooting: press Z to shoot (simple cooldown) */
-        static float shoot_timer = 0.0f;
-        if(shoot_timer > 0.0f) shoot_timer -= deltaTime;
+            /* Shooting: press Z to shoot (simple cooldown) */
+            static float shoot_timer = 0.0f;
+            if(shoot_timer > 0.0f) shoot_timer -= deltaTime;
         if(state[SDL_SCANCODE_Z] && shoot_timer <= 0.0f){
             /* spawn projectile from player's front */
             float px = GetPositionPlayerX() + (player_flip == SDL_FLIP_NONE ? PLAYER_WIDTH : -8);
@@ -282,9 +282,7 @@ int Update_State_Game()
     CheckIfPlayerIsDead();
 
     /* update zombies AI and movement */
-    if(zombie.alive){
-        UpdateZombies();
-    }
+    UpdateZombies();
     
     UpdateProjectiles();
 
@@ -303,8 +301,12 @@ int Update_State_Game()
         RenderProjectiles(); // bullets
 
         #ifdef DEBUG
-        ShowHitboxPlayer(); // Show player hitbox for testing
-        ShowHitboxZombie(); // Show zombie hitbox for testing
+        ShowHitboxPlayer();
+        for (int i = 0; i < MAX_ZOMBIES; i++) {
+            if (zombies[i].alive) {
+                ShowHitboxZombie(i);
+            }
+        }
         #endif
 
         SDL_RenderPresent(renderer);    

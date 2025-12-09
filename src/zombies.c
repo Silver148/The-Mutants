@@ -26,38 +26,30 @@ Copyright 2025
 IDLE_ZOMBIE idle_zombie;
 WALK_ZOMBIE walk_zombie;
 
-/* single zombie instance for now */
-ZOMBIE zombie;
-
-/* tuning */
-#define ZOMBIE_WIDTH 64
-#define ZOMBIE_HEIGHT 64
-#define ZOMBIE_DETECT_RADIUS 180.0f
+ZOMBIE zombies[MAX_ZOMBIES];
+int num_zombies = 0;
+int next_zombie_id = 0;
 
 /* Animation frames for zombies */
 #define ZOMBIE_IDLE_FRAMES 4
 #define ZOMBIE_WALK_FRAMES 4
 #define FRAME_DURATION_ZOMBIE 150  // ms por frame
 
-/* HITBOX VARIABLES FOR ZOMBIES */
-#define ZOMBIE_HITBOX_OFFSET_X 12
-#define ZOMBIE_HITBOX_OFFSET_Y 8
-#define ZOMBIE_HITBOX_WIDTH (ZOMBIE_WIDTH - 24)
-#define ZOMBIE_HITBOX_HEIGHT (ZOMBIE_HEIGHT - 16)
-
 /* external globals from other modules */
 extern float deltaTime;       /* provided by delta_time.c */
 extern int health;            /* player health (player.c) */
 
-void ShowHitboxZombie()
-{
-    SDL_Rect hitboxRect = { zombie.dest.x + ZOMBIE_HITBOX_OFFSET_X, 
-                            zombie.dest.y + ZOMBIE_HITBOX_OFFSET_Y, 
-                            ZOMBIE_HITBOX_WIDTH, 
-                            ZOMBIE_HITBOX_HEIGHT };
+#define INITIAL_ZOMBIES 3
+#define SPAWN_COOLDOWN 5.0f
+float spawn_timer = 0.0f;
 
-    SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255); // Green color for hitbox
-    SDL_RenderDrawRect(renderer, &hitboxRect);
+static int find_free_zombie_slot() {
+    for (int i = 0; i < MAX_ZOMBIES; i++) {
+        if (!zombies[i].alive) {
+            return i;
+        }
+    }
+    return -1;
 }
 
 void LoadSpritesZombies()
@@ -91,146 +83,247 @@ void LoadSpritesZombies()
     }
 }
 
+static void get_random_spawn_position(float* x, float* y) {
+    float player_x = GetPositionPlayerX();
+    
+    do {
+        *x = 50 + rand() % (640 - 100);
+    } while (fabsf(*x - player_x) < 100.0f); 
+    
+    *y = 350.0f;
+}
+
+int SpawnZombie(float x, float y) {
+    int slot = find_free_zombie_slot();
+    if (slot == -1) {
+        printf("The maximum number of zombies has already spawned!\n");
+        return -1;
+    }
+    
+    ZOMBIE* z = &zombies[slot];
+    
+    z->x = x;
+    z->y = 350.0f;
+    z->base_y = 350.0f;
+    z->speed = 30.0f + (rand() % 20);
+    z->dir = (rand() % 2) ? 1 : -1;
+    z->wander_timer = 0.5f + (rand() % 200) / 100.0f;
+    z->state = IDLE_Z;
+    
+    z->dest.w = ZOMBIE_WIDTH;
+    z->dest.h = ZOMBIE_HEIGHT;
+    
+    z->attack_cooldown = 1.0f + (rand() % 100) / 100.0f;
+    z->attack_timer = 0.0f;
+    z->attack_damage = 5 + (rand() % 10);
+    z->health = 100 + (rand() % 50);
+    z->alive = 1;
+    z->id = next_zombie_id++;
+    
+    num_zombies++;
+    printf("Zombie %d spawn in (%.1f, %.1f) HP: %d\n", 
+           z->id, x, y, z->health);
+    
+    return z->id;
+}
+
+void SpawnZombieRandom() {
+    float x, y;
+    get_random_spawn_position(&x, &y);
+    SpawnZombie(x, y);
+}
+
 void InitZombie(float x, float y)
 {
-    /* seed random once */
-    static int seeded = 0;
-    if(!seeded){
-        srand((unsigned int)time(NULL));
-        seeded = 1;
+    num_zombies = 0;
+    next_zombie_id = 0;
+    spawn_timer = 0.0f;
+
+    /*INICIALIZAR ZOMBIES*/
+    for (int i = 0; i < MAX_ZOMBIES; i++) {
+        zombies[i].alive = 0;
+        zombies[i].id = -1;
+    }
+    
+    /*SPAWNEAR LOS PRIMEROS ZOMBIES*/
+    for (int i = 0; i < INITIAL_ZOMBIES; i++) {
+        SpawnZombieRandom();
     }
 
-    zombie.x = x;
-    zombie.y = 350.0f;
-    zombie.base_y = y; /* keep a reference for ground level */
-    zombie.speed = 40.0f; /* px/sec, tweak as needed */
-    zombie.dir = -1;
-    zombie.wander_timer = 0.5f + (rand()%200)/100.0f; /* 0.5 - 2.5s */
-    zombie.state = IDLE_Z;
-
-    zombie.dest.w = ZOMBIE_WIDTH;
-    zombie.dest.h = ZOMBIE_HEIGHT;
-    
-    /* attack defaults */
-    zombie.attack_cooldown = 1.0f; /* 1 second between hits */
-    zombie.attack_timer = 0.0f;
-    zombie.attack_damage = 10;
-    /* health and alive */
-    zombie.health = 100;
-    zombie.alive = 1;
 }
 
-static void zombie_chase_player(float dx, float dy, float dist)
-{
-    /* Chase only horizontally to avoid 'flying' when player jumps */
-    if(fabsf(dx) <= 0.5f) return; /* already close on X */
+void KillZombie(int zombie_id) {
+    for (int i = 0; i < MAX_ZOMBIES; i++) {
+        if (zombies[i].alive && zombies[i].id == zombie_id) {
+            zombies[i].alive = 0;
+            num_zombies--;
+            printf("Zombie %d killed. Remaining Zombies: %d\n", 
+                   zombie_id, num_zombies);
+            break;
+        }
+    }
+}
+
+static void zombie_chase_player(ZOMBIE* z, float dx, float dy, float dist) {
+    if(fabsf(dx) <= 0.5f) return;
 
     float nx = (dx < 0.0f) ? -1.0f : 1.0f;
-    zombie.x += nx * zombie.speed * deltaTime;
-
-    /* keep zombie on the ground level */
-    zombie.y = zombie.base_y;
-
-    zombie.state = WALK_Z;
-    zombie.dir = (nx < 0.0f) ? -1 : 1;
+    z->x += nx * z->speed * deltaTime;
+    z->y = z->base_y;
+    z->state = WALK_Z;
+    z->dir = (nx < 0.0f) ? -1 : 1;
 }
 
-static void zombie_wander()
-{
-    zombie.wander_timer -= deltaTime;
-    if(zombie.wander_timer <= 0.0f){
-        /* pick new direction: -1, 0, 1 */
-        int r = rand() % 3; /* 0,1,2 */
-        zombie.dir = r - 1;
-        zombie.wander_timer = 0.5f + (rand()%200)/100.0f; /* 0.5 - 2.5s */
+static void zombie_wander(ZOMBIE* z) {
+    z->wander_timer -= deltaTime;
+    if(z->wander_timer <= 0.0f){
+        int r = rand() % 3;
+        z->dir = r - 1;
+        z->wander_timer = 0.5f + (rand() % 200) / 100.0f;
     }
 
-    if(zombie.dir != 0){
-        zombie.x += zombie.dir * zombie.speed * deltaTime * 0.6f; /* wander slower */
-        zombie.state = WALK_Z;
+    if(z->dir != 0){
+        z->x += z->dir * z->speed * deltaTime * 0.6f;
+        z->state = WALK_Z;
     } else {
-        zombie.state = IDLE_Z;
+        z->state = IDLE_Z;
     }
-    /* ensure zombie stays on ground */
-    zombie.y = zombie.base_y;
+    z->y = z->base_y;
 }
 
-void UpdateZombies()
-{
-    /* compute vector to player */
-    float dx = GetPositionPlayerX() - zombie.x;
-    float dy = GetPositionPlayerY() - zombie.y;
-    float dist = sqrtf(dx*dx + dy*dy);
-
-    if(dist <= ZOMBIE_DETECT_RADIUS){
-        /* chase player */
-        zombie_chase_player(dx, dy, dist);
-    } else {
-        /* wander */
-        zombie_wander();
-    }
-
-    /* update attack timer */
-    if(zombie.attack_timer > 0.0f){
-        zombie.attack_timer -= deltaTime;
-        if(zombie.attack_timer < 0.0f) zombie.attack_timer = 0.0f;
-    }
-
-    /* screen bounds clamp (basic) assuming 640x480 playfield; adjust if different */
-    if(zombie.x < 0) zombie.x = 0;
-    if(zombie.x > 640 - ZOMBIE_WIDTH) zombie.x = 640 - ZOMBIE_WIDTH;
-    /* keep vertical position clamped around base_y */
-    if(zombie.base_y < 0) zombie.base_y = 0;
-    if(zombie.base_y > 480 - ZOMBIE_HEIGHT) zombie.base_y = 480 - ZOMBIE_HEIGHT;
-    zombie.y = zombie.base_y;
-
-    /* update dest rect for rendering */
-    zombie.dest.x = (int)zombie.x;
-    zombie.dest.y = (int)zombie.base_y;
-
-    /*GET PLAYER HITBOX*/
-    Hitbox player_hitbox = GetPlayerHitbox();
-
-    /* simple AABB collision with player */
-    SDL_Rect zrect = { zombie.dest.x + ZOMBIE_HITBOX_OFFSET_X, zombie.dest.y + ZOMBIE_HITBOX_OFFSET_Y, zombie.dest.w, zombie.dest.h };
-    SDL_Rect prect = { (int)player_hitbox.x, (int)player_hitbox.y, player_hitbox.w, player_hitbox.h };
-
-    if (zrect.x < prect.x + prect.w && zrect.x + zrect.w > prect.x &&
-        zrect.y < prect.y + prect.h && zrect.y + zrect.h > prect.y)
-    {
-        /* collision */
-        if(zombie.attack_timer <= 0.0f){
-            health -= zombie.attack_damage;
-            if(health < 0) health = 0;
-            zombie.attack_timer = zombie.attack_cooldown;
-            SDL_Log("Player hit by zombie! Health=%d\n", health);
-        }
-    }
-}
-
-void RenderZombies()
-{
-    SDL_Texture* tex = NULL;
-    SDL_Rect* src_rect = NULL;
+void UpdateZombies() {
+    float player_x = GetPositionPlayerX();
+    float player_y = GetPositionPlayerY();
     
-    if(zombie.state == IDLE_Z){
-        tex = idle_zombie.tex_zombie_idle;
-        if (tex != NULL) {
-            Animation_Update(&idle_zombie.idle_anim);
-            src_rect = Animation_GetSourceRect(&idle_zombie.idle_anim);
-        }
-    } else {
-        tex = walk_zombie.tex_walk_zombie;
-        if (tex != NULL) {
-            Animation_Update(&walk_zombie.walk_anim);
-            src_rect = Animation_GetSourceRect(&walk_zombie.walk_anim);
-        }
+    spawn_timer += deltaTime;
+    if (spawn_timer >= SPAWN_COOLDOWN && num_zombies < MAX_ZOMBIES) {
+        SpawnZombieRandom();
+        spawn_timer = 0.0f;
     }
 
-    if(tex == NULL || src_rect == NULL) return; /* nothing to draw */
+    for (int i = 0; i < MAX_ZOMBIES; i++) {
+        ZOMBIE* z = &zombies[i];
+        if (!z->alive) continue;
+        
+        float dx = player_x - z->x;
+        float dy = player_y - z->y;
+        float dist = sqrtf(dx*dx + dy*dy);
+        
+        if(dist <= ZOMBIE_DETECT_RADIUS){
+            zombie_chase_player(z, dx, dy, dist);
+        } else {
+            zombie_wander(z);
+        }
+        
+        if(z->attack_timer > 0.0f){
+            z->attack_timer -= deltaTime;
+            if(z->attack_timer < 0.0f) z->attack_timer = 0.0f;
+        }
+        
+        if(z->x < 0) z->x = 0;
+        if(z->x > 640 - ZOMBIE_WIDTH) z->x = 640 - ZOMBIE_WIDTH;
+        if(z->base_y < 0) z->base_y = 0;
+        if(z->base_y > 480 - ZOMBIE_HEIGHT) z->base_y = 480 - ZOMBIE_HEIGHT;
+        z->y = z->base_y;
+        
+        z->dest.x = (int)z->x;
+        z->dest.y = (int)z->base_y;
+        
+        Hitbox player_hitbox = GetPlayerHitbox();
+        SDL_Rect zrect = { 
+            z->dest.x + ZOMBIE_HITBOX_OFFSET_X, 
+            z->dest.y + ZOMBIE_HITBOX_OFFSET_Y, 
+            ZOMBIE_HITBOX_WIDTH, 
+            ZOMBIE_HITBOX_HEIGHT 
+        };
+        SDL_Rect prect = { 
+            (int)player_hitbox.x, 
+            (int)player_hitbox.y, 
+            player_hitbox.w, 
+            player_hitbox.h 
+        };
+        
+        if (zrect.x < prect.x + prect.w && zrect.x + zrect.w > prect.x &&
+            zrect.y < prect.y + prect.h && zrect.y + zrect.h > prect.y) {
+            if(z->attack_timer <= 0.0f){
+                health -= z->attack_damage;
+                if(health < 0) health = 0;
+                z->attack_timer = z->attack_cooldown;
+                SDL_Log("Player hit by zombie %d! Health: %d\n", 
+                       z->id, health);
+            }
+        }
+        
+        if (z->health <= 0) {
+            KillZombie(z->id);
+        }
+    }
+}
 
-    SDL_RenderCopyEx(renderer, tex, src_rect, &zombie.dest, 0.0, NULL, 
-                    (zombie.dir < 0) ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE);
+
+void RenderZombies() {
+    for (int i = 0; i < MAX_ZOMBIES; i++) {
+        ZOMBIE* z = &zombies[i];
+        if (!z->alive) continue;
+        
+        SDL_Texture* tex = NULL;
+        SDL_Rect* src_rect = NULL;
+        
+        if(z->state == IDLE_Z){
+            tex = idle_zombie.tex_zombie_idle;
+            if (tex != NULL) {
+                Animation_Update(&idle_zombie.idle_anim);
+                src_rect = Animation_GetSourceRect(&idle_zombie.idle_anim);
+            }
+        } else {
+            tex = walk_zombie.tex_walk_zombie;
+            if (tex != NULL) {
+                Animation_Update(&walk_zombie.walk_anim);
+                src_rect = Animation_GetSourceRect(&walk_zombie.walk_anim);
+            }
+        }
+        
+        if(tex == NULL || src_rect == NULL) continue;
+        
+        SDL_RenderCopyEx(renderer, tex, src_rect, &z->dest, 0.0, NULL, 
+                        (z->dir < 0) ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE);
+        
+        //Bar Zombie health
+        #ifdef DEBUG
+        if (z->health < 100) {
+            SDL_Rect health_bg = {z->dest.x, z->dest.y - 10, ZOMBIE_WIDTH, 5};
+            SDL_Rect health_fg = {z->dest.x, z->dest.y - 10, 
+                                 (ZOMBIE_WIDTH * z->health) / 100, 5};
+            SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+            SDL_RenderFillRect(renderer, &health_bg);
+            SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+            SDL_RenderFillRect(renderer, &health_fg);
+        }
+        #endif
+    }
+}
+
+void ShowHitboxZombie(int zombie_index) {
+    if (zombie_index < 0 || zombie_index >= MAX_ZOMBIES || 
+        !zombies[zombie_index].alive) return;
+    
+    ZOMBIE* z = &zombies[zombie_index];
+    SDL_Rect hitboxRect = { 
+        z->dest.x + ZOMBIE_HITBOX_OFFSET_X, 
+        z->dest.y + ZOMBIE_HITBOX_OFFSET_Y, 
+        ZOMBIE_HITBOX_WIDTH, 
+        ZOMBIE_HITBOX_HEIGHT 
+    };
+    
+    SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+    SDL_RenderDrawRect(renderer, &hitboxRect);
+}
+
+void CleanupZombieSystem() {
+    for (int i = 0; i < MAX_ZOMBIES; i++) {
+        zombies[i].alive = 0;
+    }
+    num_zombies = 0;
 }
 
 /* kept for compatibility with existing calls */
@@ -238,16 +331,4 @@ void RenderZombieIdle()
 {
     /* simple wrapper that renders the zombie at its current position */
     RenderZombies();
-}
-
-void DeleteZombies()
-{
-    if(idle_zombie.tex_zombie_idle){
-        SDL_DestroyTexture(idle_zombie.tex_zombie_idle);
-        idle_zombie.tex_zombie_idle = NULL;
-    }
-    if(walk_zombie.tex_walk_zombie){
-        SDL_DestroyTexture(walk_zombie.tex_walk_zombie);
-        walk_zombie.tex_walk_zombie = NULL;
-    }
 }
