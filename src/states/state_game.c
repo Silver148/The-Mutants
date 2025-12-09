@@ -54,6 +54,8 @@ const int ALTURA_BARRA = 20;
 const int POS_X_BARRA = (640 / 2) - (ANCHO_MAXIMO_BARRA / 2);
 const int POS_Y_BARRA = (480 - ALTURA_BARRA - 40);
 
+extern ZOMBIE zombie;
+
 void ShowHitboxPlayer()
 {
     Hitbox player_hitbox = GetPlayerHitbox();
@@ -259,8 +261,8 @@ int Update_State_Game()
         if(shoot_timer > 0.0f) shoot_timer -= deltaTime;
         if(state[SDL_SCANCODE_Z] && shoot_timer <= 0.0f){
             /* spawn projectile from player's front */
-            float px = position_x + (player_flip == SDL_FLIP_NONE ? PLAYER_WIDTH : -8);
-            float py = position_y + (PLAYER_HEIGHT / 2);
+            float px = GetPositionPlayerX() + (player_flip == SDL_FLIP_NONE ? PLAYER_WIDTH : -8);
+            float py = GetPositionPlayerY() + (PLAYER_HEIGHT / 2);
             float speed = 320.0f;
             float vx = (player_flip == SDL_FLIP_NONE) ? speed : -speed;
             SpawnProjectile(px, py, vx, 0.0f, 25); /* 25 damage */
@@ -280,7 +282,10 @@ int Update_State_Game()
     CheckIfPlayerIsDead();
 
     /* update zombies AI and movement */
-    UpdateZombies();
+    if(zombie.alive){
+        UpdateZombies();
+    }
+    
     UpdateProjectiles();
 
         /*TESTING*/

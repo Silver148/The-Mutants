@@ -62,6 +62,7 @@ void UpdateProjectiles()
                 if(zombie.health <= 0){
                     zombie.alive = 0;
                     zombie.speed = 0.0f;
+                    DeleteZombies();
                     SDL_Log("Zombie died\n");
                 }
             }

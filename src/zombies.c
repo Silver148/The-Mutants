@@ -239,3 +239,15 @@ void RenderZombieIdle()
     /* simple wrapper that renders the zombie at its current position */
     RenderZombies();
 }
+
+void DeleteZombies()
+{
+    if(idle_zombie.tex_zombie_idle){
+        SDL_DestroyTexture(idle_zombie.tex_zombie_idle);
+        idle_zombie.tex_zombie_idle = NULL;
+    }
+    if(walk_zombie.tex_walk_zombie){
+        SDL_DestroyTexture(walk_zombie.tex_walk_zombie);
+        walk_zombie.tex_walk_zombie = NULL;
+    }
+}

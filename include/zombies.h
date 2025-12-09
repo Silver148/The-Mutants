@@ -44,6 +44,7 @@ void InitZombie(float x, float y);
 void UpdateZombies();
 void RenderZombies();
 void RenderZombieIdle();
+void DeleteZombies();
 
 /*HITBOX FUNC*/
 void ShowHitboxZombie();
