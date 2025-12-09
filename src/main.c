@@ -17,6 +17,7 @@ Copyright 2025
 #include <SDL2/SDL_image.h>
 #include <stdbool.h>
 #include <SDL2/SDL_ttf.h>
+#include <windows.h>
 #include "settings.h"
 #include "music.h"
 #include "states.h"
@@ -75,6 +76,12 @@ int InitSDLAndSubSystems()
 //Func Main
 int main(int argc, char* argv[])
 {   
+    #ifdef _WIN32
+    // Redirigir stdout/stderr a la consola de VS
+    AllocConsole();
+    freopen("CONOUT$", "w", stdout);
+    freopen("CONOUT$", "w", stderr);
+    #endif
 
     InitSDLAndSubSystems(); //Initialize SDL and subsystems
 
