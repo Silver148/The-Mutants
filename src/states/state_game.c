@@ -22,6 +22,7 @@ STATE GAME :D by Juan Yaguaro And Abel Ferrer
 #include "delta_time.h"
 #include "anim_manager.h"
 #include "music.h"
+#include "projectiles.h"
 
 #include <stdio.h>
 #include <SDL2/SDL.h>
@@ -84,10 +85,10 @@ void CheckChangeStatePlayer()
 int Init_State_Game()
 {
     /*Load BACKGROUND test main menu test*/
-    SDL_Surface* background_surface = IMG_Load("sprites/CHIP8-PS2-BACKGROUND.png");
+    SDL_Surface* background_surface = IMG_Load("sprites/112 sin título_20251208211901.png");
 
     if(background_surface == NULL)
-        printf("Unable to load image %s! SDL_image Error: %s\n", "sprites/CHIP8-PS2-BACKGROUND.png", IMG_GetError());
+        printf("Unable to load image %s! SDL_image Error: %s\n", "sprites/112 sin título_20251208211901.png", IMG_GetError());
 
     backgroundTexture = SDL_CreateTextureFromSurface(renderer, background_surface); //Convert surface to texture
     SDL_FreeSurface(background_surface); //Free loaded surface
@@ -102,6 +103,7 @@ int Init_State_Game()
     LoadSpritesZombies(); //Load zombies sprites
     /* init a test zombie (x,y) */
     InitZombie(150.0f, 250.0f);
+    InitProjectiles();
 
     return 0;
 }
@@ -252,6 +254,19 @@ int Update_State_Game()
             PlayerForward();
         }
 
+        /* Shooting: press Z to shoot (simple cooldown) */
+        static float shoot_timer = 0.0f;
+        if(shoot_timer > 0.0f) shoot_timer -= deltaTime;
+        if(state[SDL_SCANCODE_Z] && shoot_timer <= 0.0f){
+            /* spawn projectile from player's front */
+            float px = position_x + (player_flip == SDL_FLIP_NONE ? PLAYER_WIDTH : -8);
+            float py = position_y + (PLAYER_HEIGHT / 2);
+            float speed = 320.0f;
+            float vx = (player_flip == SDL_FLIP_NONE) ? speed : -speed;
+            SpawnProjectile(px, py, vx, 0.0f, 25); /* 25 damage */
+            shoot_timer = 0.3f; /* 300ms between shots */
+        }
+
         // Decide el estado final del jugador
         if (is_jumping) {
             states_player = JUMP; // Mantiene JUMP si está saltando
@@ -266,6 +281,7 @@ int Update_State_Game()
 
     /* update zombies AI and movement */
     UpdateZombies();
+    UpdateProjectiles();
 
         /*TESTING*/
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); //clean screen with black color
@@ -279,6 +295,7 @@ int Update_State_Game()
         RenderPlayer(player_flip); //Render player
 
         RenderZombies(); //Render zombies
+        RenderProjectiles(); // bullets
 
         #ifdef DEBUG
         ShowHitboxPlayer(); // Show player hitbox for testing

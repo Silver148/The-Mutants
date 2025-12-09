@@ -33,6 +33,8 @@ typedef struct {
     float attack_cooldown;
     float attack_timer;
     int attack_damage;
+    int health;
+    int alive; /* boolean-like flag */
 } ZOMBIE;
 
 void LoadSpritesZombies();
