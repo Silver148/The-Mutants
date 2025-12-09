@@ -115,6 +115,9 @@ void InitZombie(float x, float y)
     zombie.attack_cooldown = 1.0f; /* 1 second between hits */
     zombie.attack_timer = 0.0f;
     zombie.attack_damage = 10;
+    /* health and alive */
+    zombie.health = 100;
+    zombie.alive = 1;
 }
 
 static void zombie_chase_player(float dx, float dy, float dist)
@@ -189,7 +192,7 @@ void UpdateZombies()
     Hitbox player_hitbox = GetPlayerHitbox();
 
     /* simple AABB collision with player */
-    SDL_Rect zrect = { zombie.dest.x + ZOMBIE_HITBOX_OFFSET_X, zombie.dest.y + ZOMBIE_HITBOX_OFFSET_Y, ZOMBIE_HITBOX_WIDTH, ZOMBIE_HITBOX_HEIGHT };
+    SDL_Rect zrect = { zombie.dest.x + ZOMBIE_HITBOX_OFFSET_X, zombie.dest.y + ZOMBIE_HITBOX_OFFSET_Y, zombie.dest.w, zombie.dest.h };
     SDL_Rect prect = { (int)player_hitbox.x, (int)player_hitbox.y, player_hitbox.w, player_hitbox.h };
 
     if (zrect.x < prect.x + prect.w && zrect.x + zrect.w > prect.x &&
