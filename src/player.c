@@ -19,7 +19,7 @@ Copyright 2025
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 
-#define POS_Y 250
+#define POS_Y 350
 #define POS_X 100
 
 /*IDLE PLAYER*/

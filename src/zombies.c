@@ -101,7 +101,7 @@ void InitZombie(float x, float y)
     }
 
     zombie.x = x;
-    zombie.y = y;
+    zombie.y = 350.0f;
     zombie.base_y = y; /* keep a reference for ground level */
     zombie.speed = 40.0f; /* px/sec, tweak as needed */
     zombie.dir = -1;
