@@ -129,7 +129,7 @@ int State_Config(){
     char volumen_text_in_menu[64];
     snprintf(volumen_text_in_menu, sizeof(volumen_text_in_menu), "Volumen de la musica del menu: %d", game_settings.volume_music_in_menu);
 
-    /*VOLUMEN TEXT MENU*/
+    /*VOLUMEN MUSIC MENU TEXT*/
     SDL_Surface* volumen_text_menu = TTF_RenderText_Solid(font, volumen_text_in_menu, (SDL_Color){255, 255, 255, 255});
     SDL_Texture* volumen_text_menu_texture = SDL_CreateTextureFromSurface(renderer, volumen_text_menu);
     SDL_FreeSurface(volumen_text_menu);
@@ -142,7 +142,23 @@ int State_Config(){
     volumen_text_menu_rect.w = volumen_text_menu_W;
     volumen_text_menu_rect.h = volumen_text_menu_H;
 
-    /*+*/
+    /*VOLUMEN GAME TEXT*/
+    char volumen_text_in_game[64];
+    snprintf(volumen_text_in_game, sizeof(volumen_text_in_game), "Volumen de la musica del juego: %d", game_settings.volume_music_in_game);
+
+    SDL_Surface* volumen_text_game = TTF_RenderText_Solid(font, volumen_text_in_game, (SDL_Color){255, 255, 255, 255});
+    SDL_Texture* volumen_text_game_texture = SDL_CreateTextureFromSurface(renderer, volumen_text_game);
+    SDL_FreeSurface(volumen_text_game);
+
+    SDL_Rect volumen_text_game_rect;
+    int volumen_text_game_W = 0, volumen_text_game_H = 0;
+    SDL_QueryTexture(volumen_text_game_texture, NULL, NULL, &volumen_text_game_W, &volumen_text_game_H);
+    volumen_text_game_rect.x = (640 - volumen_text_game_W) / 2;
+    volumen_text_game_rect.y = volumen_text_menu_rect.y - volumen_text_game_H - 20;
+    volumen_text_game_rect.w = volumen_text_game_W;
+    volumen_text_game_rect.h = volumen_text_game_H;
+
+    /*+(Volumen menu)*/
     SDL_Surface* plus_surface = TTF_RenderText_Solid(font, "+", (SDL_Color){255, 255, 255, 255});
     SDL_Texture* plus_texture = SDL_CreateTextureFromSurface(renderer, plus_surface);
     SDL_FreeSurface(plus_surface);
@@ -155,7 +171,7 @@ int State_Config(){
     plus_rect.w = plusW;
     plus_rect.h = plusH;
 
-    /*-*/
+    /*-(Volumen menu)*/
     SDL_Surface* minus_surface = TTF_RenderText_Solid(font, "-", (SDL_Color){255, 255, 255, 255});
     SDL_Texture* minus_texture = SDL_CreateTextureFromSurface(renderer, minus_surface);
     SDL_FreeSurface(minus_surface);
@@ -206,6 +222,32 @@ int State_Config(){
     arrow_rect.y = 10;
     arrow_rect.w = arrowW;
     arrow_rect.h = arrowH;
+
+    /*+(Volumen in game)*/
+    SDL_Surface* plus_game_surface = TTF_RenderText_Solid(font, "+", (SDL_Color){255, 255, 255, 255});
+    SDL_Texture* plus_game_texture = SDL_CreateTextureFromSurface(renderer, plus_game_surface);
+    SDL_FreeSurface(plus_game_surface);
+
+    SDL_Rect plus_game_rect;
+    int plus_gameW = 0, plus_gameH = 0;
+    SDL_QueryTexture(plus_game_texture, NULL, NULL, &plus_gameW, &plus_gameH);
+    plus_game_rect.x = volumen_text_game_rect.x + volumen_text_game_rect.w + 10;
+    plus_game_rect.y = volumen_text_game_rect.y;
+    plus_game_rect.h = plus_gameH;
+    plus_game_rect.w = plus_gameW;
+
+    /*-(Volumen in game)*/
+    SDL_Surface* minus_game_surface = TTF_RenderText_Solid(font, "-", (SDL_Color){255, 255, 255, 255});
+    SDL_Texture* minus_game_texture = SDL_CreateTextureFromSurface(renderer, minus_game_surface);
+    SDL_FreeSurface(minus_game_surface);
+
+    SDL_Rect minus_game_rect;
+    int minus_gameW = 0, minus_gameH = 0;
+    SDL_QueryTexture(minus_game_texture, NULL, NULL, &minus_gameW, &minus_gameH);
+    minus_game_rect.x = plus_game_rect.x + plus_game_rect.w + 10;
+    minus_game_rect.y = volumen_text_game_rect.y;
+    minus_game_rect.w = minus_gameW;
+    minus_game_rect.h = minus_gameH;
 
     while(1)
     {
@@ -286,6 +328,48 @@ int State_Config(){
                     SDL_FreeSurface(volumen_text_menu);
                 }
 
+                if(mx >= plus_game_rect.x && mx <= plus_game_rect.x + plus_game_rect.w &&
+                   my >= plus_game_rect.y && my <= plus_game_rect.y + plus_game_rect.h)
+                {
+                    if(game_settings.volume_music_in_game < 100){
+                        game_settings.volume_music_in_game += 10;
+                        if(game_settings.volume_music_in_game > 100){
+                            game_settings.volume_music_in_game = 100;
+                        }
+                    }
+
+                    SDL_DestroyTexture(volumen_text_game_texture);
+
+                    char volumen_text_in_game[64];
+                    snprintf(volumen_text_in_game, sizeof(volumen_text_in_game), "Volumen de la musica del juego: %d", game_settings.volume_music_in_game);
+
+                    /*CLEAN UP AND RECREATE TEXTURE*/
+                    SDL_Surface* volumen_text_game = TTF_RenderText_Solid(font, volumen_text_in_game, (SDL_Color){255, 255, 255, 255});
+                    volumen_text_game_texture = SDL_CreateTextureFromSurface(renderer, volumen_text_game);
+                    SDL_FreeSurface(volumen_text_game);
+                }
+
+                if(mx >= minus_game_rect.x && mx <= minus_game_rect.x + minus_game_rect.w &&
+                   my >= minus_game_rect.y && my <= minus_game_rect.y + minus_game_rect.h)
+                {
+                    if(game_settings.volume_music_in_game > 0){
+                        game_settings.volume_music_in_game -= 10;
+                        if(game_settings.volume_music_in_game < 0){
+                            game_settings.volume_music_in_game = 0;
+                        }
+                    }
+
+                    SDL_DestroyTexture(volumen_text_game_texture);
+
+                    char volumen_text_in_game[64];
+                    snprintf(volumen_text_in_game, sizeof(volumen_text_in_game), "Volumen de la musica del juego: %d", game_settings.volume_music_in_game);
+
+                    /*CLEAN UP AND RECREATE TEXTURE*/
+                    SDL_Surface* volumen_text_game = TTF_RenderText_Solid(font, volumen_text_in_game, (SDL_Color){255, 255, 255, 255});
+                    volumen_text_game_texture = SDL_CreateTextureFromSurface(renderer, volumen_text_game);
+                    SDL_FreeSurface(volumen_text_game);
+                }
+
                 if(mx >= save_settings_rect.x && mx <= save_settings_rect.x + save_settings_rect.w &&
                    my >= save_settings_rect.y && my <= save_settings_rect.y + save_settings_rect.h)
                 {
@@ -304,6 +388,9 @@ int State_Config(){
         SDL_RenderCopy(renderer, volumen_text_menu_texture, NULL, &volumen_text_menu_rect); /*VOLUMEN TEXT MENU*/
         SDL_RenderCopy(renderer, plus_texture, NULL, &plus_rect); /*+*/
         SDL_RenderCopy(renderer, minus_texture, NULL, &minus_rect); /*-*/
+        SDL_RenderCopy(renderer, volumen_text_game_texture, NULL, &volumen_text_game_rect); /*VOLUMEN GAME TEXT*/
+        SDL_RenderCopy(renderer, plus_game_texture, NULL, &plus_game_rect); /*+ GAME*/
+        SDL_RenderCopy(renderer, minus_game_texture, NULL, &minus_game_rect); /*- GAME*/
         SDL_RenderCopy(renderer, save_settings_texture, NULL, &save_settings_rect); /*SAVE SETTINGS TEXT*/
         SDL_RenderCopy(renderer, arrow_texture, NULL, &arrow_rect); /*ARROW*/
 
