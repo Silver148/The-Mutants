@@ -425,8 +425,8 @@ int State_Skins(){
     SDL_QueryTexture(default_skin_texture, NULL, NULL, &default_skinW, &default_skinH);
     default_skin_rect.x = 640 / 2 - (default_skinW / 4) / 2;
     default_skin_rect.y = 100;
-    default_skin_rect.w = default_skinW / 4;
-    default_skin_rect.h = default_skinH / 4;
+    default_skin_rect.w = default_skinW;
+    default_skin_rect.h = default_skinH;
 
     /*SKINS TEXT*/
     SDL_Surface* skins_text_surface = TTF_RenderText_Solid(font, "Skins", (SDL_Color){255, 255, 255, 255});
@@ -474,14 +474,21 @@ int State_Skins(){
                 switch(e.key.keysym.sym)
                 {
                     case SDLK_LEFT:
+                        /*/
                         SDL_DestroyTexture(huehuehue_texture);
-                        SDL_RenderCopy(renderer, default_skin_texture, NULL, &default_skin_rect); /*DEFAULT SKIN PREVIEW*/
+                        SDL_RenderCopy(renderer, default_skin_texture, NULL, &default_skin_rect); /*DEFAULT SKIN PREVIEW
                         SDL_RenderPresent(renderer);
                         break;
+                        /*/
                     case SDLK_RIGHT:
-                        SDL_DestroyTexture(default_skin_texture);
-                        SDL_RenderCopy(renderer, huehuehue_texture, NULL, &huehuehue_rect); /*HUEHUEHUE SKIN PREVIEW*/
+
+                        /*/SDL_DestroyTexture(default_skin_texture);
+                        default_skin_surface = IMG_Load("sprites/gif/idle_player.gif");
+                        default_skin_texture = SDL_CreateTextureFromSurface(renderer, default_skin_surface);
+                        SDL_FreeSurface(default_skin_surface);
+                        SDL_RenderCopy(renderer, huehuehue_texture, NULL, &huehuehue_rect); /*HUEHUEHUE SKIN PREVIEW
                         SDL_RenderPresent(renderer);
+                        /*/
                         break;
                     default:
                         break;
@@ -512,6 +519,7 @@ int State_Skins(){
 
         SDL_RenderCopy(renderer, skins_text_texture, NULL, &skins_text_rect); /*SKINS TEXT*/
         SDL_RenderCopy(renderer, arrow_texture, NULL, &arrow_rect); /*ARROW*/
+        SDL_RenderCopy(renderer, default_skin_texture, NULL, &default_skin_rect); /*DEFAULT SKIN PREVIEW*/
 
         SDL_RenderPresent(renderer);
     }
