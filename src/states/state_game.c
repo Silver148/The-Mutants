@@ -23,6 +23,7 @@ STATE GAME :D by Juan Yaguaro And Abel Ferrer
 #include "anim_manager.h"
 #include "music.h"
 #include "projectiles.h"
+#include "zombie_waves.h"
 
 #include <stdio.h>
 #include <SDL2/SDL.h>
@@ -103,8 +104,8 @@ int Init_State_Game()
 
     LoadSpritesPlayer(); //Load player sprites
     LoadSpritesZombies(); //Load zombies sprites
-    /* init a test zombie (x,y) */
-    InitZombie(150.0f, 250.0f);
+    /* init Zombie system */
+    InitZombieSys();
     InitProjectiles();
 
     return 0;

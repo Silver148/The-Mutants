@@ -15,6 +15,7 @@ Copyright 2025
 #include "zombies.h"
 #include "global_vars.h"
 #include "player.h"
+#include "zombie_waves.h"
 #include <stdio.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
@@ -39,9 +40,10 @@ int next_zombie_id = 0;
 extern float deltaTime;       /* provided by delta_time.c */
 extern int health;            /* player health (player.c) */
 
+int wave_counter = 0;
+
 #define INITIAL_ZOMBIES 3
 #define SPAWN_COOLDOWN 5.0f
-float spawn_timer = 0.0f;
 
 
 static int find_free_zombie_slot() {
@@ -134,23 +136,16 @@ void SpawnZombieRandom() {
     SpawnZombie(x, y);
 }
 
-void InitZombie(float x, float y)
+void InitZombieSys()
 {
     num_zombies = 0;
     next_zombie_id = 0;
-    spawn_timer = 0.0f;
 
     /*INICIALIZAR ZOMBIES*/
     for (int i = 0; i < MAX_ZOMBIES; i++) {
         zombies[i].alive = 0;
-        zombies[i].id = -2;
+        zombies[i].id = 0;
     }
-    
-    /*SPAWNEAR LOS PRIMEROS ZOMBIES*/
-    for (int i = 0; i < INITIAL_ZOMBIES; i++) {
-        SpawnZombieRandom();
-    }
-
 }
 
 void KillZombie(int zombie_id) {
@@ -192,65 +187,34 @@ static void zombie_wander(ZOMBIE* z) {
     z->y = z->base_y;
 }
 
-bool wave1_finished = false;
-bool wave2_finished = false;
-
-int Wave1() {
-    spawn_timer += deltaTime;
-    int slot = find_free_zombie_slot();
-    ZOMBIE* z = &zombies[slot];
-    
-    if(spawn_timer >= SPAWN_COOLDOWN - (rand() % 4) && num_zombies < MAX_ZOMBIES) {
-        SpawnZombieRandom();
-        spawn_timer = 0.0f;
-        SDL_Log("ID: %d\n", z->id);
-    }else if(z->id >= MAX_ZOMBIES){
-        SDL_Log("Max zombies reached\n");
-        wave1_finished = true;
-        return 1;
-    }
-    
-    return 0;
-}
-
-int Wave2(){ //VERY ALPHA(no funciona bien)
-
-    static float wait = 0.0f;
-
-    int slot = find_free_zombie_slot();
-    ZOMBIE* z = &zombies[slot];
-    
-    wait+=deltaTime;
-
-    if(wait >= 10.0f)
-    {
-        wait = 0;
-        spawn_timer += deltaTime;
-
-        if(spawn_timer >= SPAWN_COOLDOWN - (rand() % 4) && num_zombies < MAX_ZOMBIES) {
-            SpawnZombieRandom();
-            SpawnZombieRandom();
-            spawn_timer = 0.0f;
-            SDL_Log("ID: %d\n", z->id);
-        }else if(z->id >= MAX_ZOMBIES){
-            SDL_Log("Max zombies reached\n");
-            wave2_finished = true;
-        return -1;
-        } 
-    }
-
-    
-    return 0;
-}
+bool w1_ready = false;
+bool w1_finish = false;
 
 void UpdateZombies() {
     float player_x = GetPositionPlayerX();
     float player_y = GetPositionPlayerY();
 
-    if(!wave1_finished)
-        Wave1();
-    else
-        SDL_Log("Finisheeeed!\n");
+    int slot = find_free_zombie_slot();
+
+    ZOMBIE* z = &zombies[slot];
+
+    WAVE* w;
+
+    if(!w1_ready){
+        InitWave(w, 30, 2);
+        w1_ready = true;
+    }
+
+    if(w1_ready && !w1_finish)
+    {
+        int r_update_w1 = UpdateWave(w,z);
+
+        if(r_update_w1 == -1)
+        {
+            SDL_Log("GAMEEEEEEEEEEEE FINISHEEEEED!!!\n");
+            w1_finish = true;
+        }
+    }
 
     for (int i = 0; i < MAX_ZOMBIES; i++) {
         ZOMBIE* z = &zombies[i];

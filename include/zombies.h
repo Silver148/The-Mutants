@@ -4,7 +4,7 @@
 #include <SDL2/SDL.h>
 #include "anim_manager.h"
 
-#define MAX_ZOMBIES 20
+#define MAX_ZOMBIES 50
 
 /* tuning */
 #define ZOMBIE_WIDTH 64
@@ -52,7 +52,9 @@ typedef struct {
 } ZOMBIE;
 
 void LoadSpritesZombies();
-void InitZombie(float x, float y);
+void InitZombieSys();
+int SpawnZombie(float x, float y);
+void SpawnZombieRandom();
 
 /*RENDER FUCTIONS*/
 void UpdateZombies();
