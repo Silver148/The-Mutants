@@ -20,7 +20,7 @@ Desarrolladores: Juan Yaguaro(aka silverhacker) and Abel Ferrer(aka The_Light)
 
 * Niveles
 
-* Oleadas de zombies
+* Oleadas de zombies ✅
 
 * Escena de créditos
 
