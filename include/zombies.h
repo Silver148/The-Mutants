@@ -4,7 +4,7 @@
 #include <SDL2/SDL.h>
 #include "anim_manager.h"
 
-#define MAX_ZOMBIES 50
+#define MAX_ZOMBIES 512
 
 /* tuning */
 #define ZOMBIE_WIDTH 64
