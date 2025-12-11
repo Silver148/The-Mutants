@@ -187,35 +187,74 @@ static void zombie_wander(ZOMBIE* z) {
     z->y = z->base_y;
 }
 
-bool w1_ready = false;
-bool w1_finish = false;
+int current_wave = 0;
 
 void UpdateZombies() {
     float player_x = GetPositionPlayerX();
     float player_y = GetPositionPlayerY();
 
-    int slot = find_free_zombie_slot();
+    static WAVE wave1, wave2;
+    static int wave_state = 0;
+    ZOMBIE* z = NULL;
 
-    ZOMBIE* z = &zombies[slot];
-
-    WAVE* w;
-
-    if(!w1_ready){
-        InitWave(w, 30, 2);
-        w1_ready = true;
-    }
-
-    if(w1_ready && !w1_finish)
+    for(int i = 0; i<MAX_ZOMBIES; i++)
     {
-        int r_update_w1 = UpdateWave(w,z);
-
-        if(r_update_w1 == -1)
+        if(zombies[i].alive)
         {
-            SDL_Log("GAMEEEEEEEEEEEE FINISHEEEEED!!!\n");
-            w1_finish = true;
+            z = &zombies[i];
+            break;
         }
     }
 
+    if(!z)
+    {
+        z = &zombies[0];
+    }
+
+    if(wave_state == 0)
+    {
+        InitWave(&wave1, 20, 2.0f, 5);
+        wave_state = 1;
+        SDL_Log("STARTING WAVE 1");
+    }
+
+    if(wave_state == 1)
+    {
+        int r = UpdateWave(&wave1, z);
+
+        if(r == -1)
+        {
+            wave_state = 2;
+            SDL_Log("WAVE 1 FINISHED");
+        }
+    }
+
+    if(wave_state == 2)
+    {
+        InitWave(&wave2, 40, 2 + rand() % 2, 10);
+
+        for(int i = 0; i<MAX_ZOMBIES; i++)
+        {
+            zombies[i].id = 0;
+            next_zombie_id = 0;
+        }
+
+        SDL_Log("STARTING WAVE 2");
+        wave_state = 3;
+    }
+
+    if(wave_state == 3)
+    {
+        int r = UpdateWave(&wave2, z);
+
+        if(r == -1)
+        {
+            SDL_Log("WAVE 2 FINISHED");
+            SDL_Log("GAME FINISHED!!!");
+            wave_state = -1;
+        }
+    }
+    
     for (int i = 0; i < MAX_ZOMBIES; i++) {
         ZOMBIE* z = &zombies[i];
         if (!z->alive) continue;
@@ -335,6 +374,7 @@ void ShowHitboxZombie(int zombie_index) {
 void CleanupZombieSystem() {
     for (int i = 0; i < MAX_ZOMBIES; i++) {
         zombies[i].alive = 0;
+        zombies[i].id = 0;
     }
     num_zombies = 0;
 }

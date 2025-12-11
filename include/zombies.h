@@ -55,6 +55,7 @@ void LoadSpritesZombies();
 void InitZombieSys();
 int SpawnZombie(float x, float y);
 void SpawnZombieRandom();
+void CleanupZombieSystem();
 
 /*RENDER FUCTIONS*/
 void UpdateZombies();

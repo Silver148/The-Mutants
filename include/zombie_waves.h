@@ -8,9 +8,11 @@ typedef struct{
     int zombies_speed;
     float spawn_timer;
     float spawn_cooldown;
+    float delay_time_start;
+    float timer;
 } WAVE;
 
-int InitWave(WAVE *w, int n_zombies, float spawn_cooldown);
+int InitWave(WAVE *w, int n_zombies, float spawn_cooldown, float delay_time_start);
 int UpdateWave(WAVE* w, ZOMBIE *z);
 
 #endif
