@@ -6,14 +6,14 @@ CFLAGS = -Wall -Iinclude
 LIBS = -lSDL2 -lSDL2_image -lSDL2_mixer -lSDL2_ttf -lm
 SOURCES = src/main.c src/player.c src/states/state_menu.c \
 			src/states/state_game.c src/zombies.c src/delta_time.c src/anim_manager.c \
-			src/music.c src/settings.c src/projectiles.c src/zombie_waves.c
+			src/music.c src/settings.c src/projectiles.c src/zombie_waves.c src/update_system.c
 OBJECTS = $(SOURCES:src/%.c=obj/%.o)
 
 # Windows x64 build settings
 WIN_NAME = The_Mutants.exe
 WIN_CC = x86_64-w64-mingw32-gcc
-WIN_CFLAGS = -Iinclude -LSDL2-Mingw/x86_64-w64-mingw32/lib -ISDL2-Mingw/x86_64-w64-mingw32/include
-WIN_LIBS = -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_mixer -lSDL2_ttf -mwindows \
+WIN_CFLAGS = -Iinclude -Icurl/include -Lcurl/lib -LSDL2-Mingw/x86_64-w64-mingw32/lib -ISDL2-Mingw/x86_64-w64-mingw32/include
+WIN_LIBS = -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_mixer -lSDL2_ttf -lcurl -mwindows \
 			-Wl,--dynamicbase -Wl,--nxcompat \
 			-Wl,--high-entropy-va -lm -ldinput8 -ldxguid -ldxerr8 -luser32 -lgdi32 \
 			-lwinmm -limm32 -lole32 -loleaut32 -lshell32 -lsetupapi -lversion -luuid
@@ -21,8 +21,8 @@ WIN_LIBS = -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_mixer -lSDL2_ttf -mwi
 # Windows x32 build settings
 WIN32_NAME = The_Mutants_32.exe
 WIN32_CC = i686-w64-mingw32-gcc
-WIN32_CFLAGS = -Iinclude -LSDL2-Mingw/i686-w64-mingw32/lib -ISDL2-Mingw/i686-w64-mingw32/include
-WIN32_LIBS = -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_mixer -lSDL2_ttf -mwindows \
+WIN32_CFLAGS = -Iinclude -Icurl/include -Lcurl/lib -LSDL2-Mingw/i686-w64-mingw32/lib -ISDL2-Mingw/i686-w64-mingw32/include
+WIN32_LIBS = -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_mixer -lSDL2_ttf -lcurl -mwindows \
 			-Wl,--dynamicbase -Wl,--nxcompat -Wl,-lm -ldinput8 -ldxguid -ldxerr8 -luser32 -lgdi32 \
 			-lwinmm -limm32 -lole32 -loleaut32 -lshell32 -lsetupapi -lversion -luuid
 
@@ -51,7 +51,8 @@ Windows_NT-x86_64:
 	cp SDL2-Mingw/x86_64-w64-mingw32/bin/libtiff-5.dll libtiff-5.dll
 	cp SDL2-Mingw/x86_64-w64-mingw32/bin/SDL2_mixer.dll SDL2_mixer.dll
 	cp SDL2-Mingw/x86_64-w64-mingw32/bin/SDL2_ttf.dll SDL2_ttf.dll
-	zip -r The_Mutants_windows.zip $(WIN_NAME) SDL2.dll libpng16-16.dll zlib1.dll libjpeg-9.dll SDL2_image.dll libtiff-5.dll SDL2_mixer.dll SDL2_ttf.dll sprites music fonts skins
+	cp curl/bin/libcurl-x64.dll libcurl-x64.dll
+	zip -r The_Mutants_windows.zip $(WIN_NAME) SDL2.dll libpng16-16.dll zlib1.dll libjpeg-9.dll SDL2_image.dll libtiff-5.dll SDL2_mixer.dll SDL2_ttf.dll libcurl-x64.dll sprites music fonts skins
 	rm -f *.dll
 	rm -f $(WIN_NAME)
 	@echo "BUILD COMPLETE... Compiled from the $(OS)-$(ARCH)"
@@ -66,7 +67,7 @@ Windows_NT-i686:
 	cp SDL2-Mingw/i686-w64-mingw32/bin/libtiff-5.dll libtiff-5.dll
 	cp SDL2-Mingw/i686-w64-mingw32/bin/SDL2_mixer.dll SDL2_mixer.dll
 	cp SDL2-Mingw/i686-w64-mingw32/bin/SDL2_ttf.dll SDL2_ttf.dll
-	zip -r The_Mutants_windows32.zip $(WIN32_NAME) SDL2.dll libpng16-16.dll zlib1.dll libjpeg-9.dll SDL2_image.dll libtiff-5.dll SDL2_mixer.dll SDL2_ttf.dll sprites music fonts skins
+	zip -r The_Mutants_windows32.zip $(WIN32_NAME) SDL2.dll libpng16-16.dll zlib1.dll libjpeg-9.dll SDL2_image.dll libtiff-5.dll SDL2_mixer.dll SDL2_ttf.dll libcurl-x64.dll sprites music fonts skins
 	rm -f *.dll
 	rm -f $(WIN32_NAME)
 	@echo "BUILD COMPLETE... Compiled from the $(OS)-$(ARCH)"
@@ -81,7 +82,8 @@ debug-windows-x64:
 	cp SDL2-Mingw/x86_64-w64-mingw32/bin/libtiff-5.dll libtiff-5.dll
 	cp SDL2-Mingw/x86_64-w64-mingw32/bin/SDL2_mixer.dll SDL2_mixer.dll
 	cp SDL2-Mingw/x86_64-w64-mingw32/bin/SDL2_ttf.dll SDL2_ttf.dll
-	zip -r The_Mutants_windows-debug.zip $(WIN_NAME) SDL2.dll libpng16-16.dll zlib1.dll libjpeg-9.dll SDL2_image.dll libtiff-5.dll SDL2_mixer.dll SDL2_ttf.dll sprites music fonts skins
+	cp curl/bin/libcurl-x64.dll libcurl-x64.dll
+	zip -r The_Mutants_windows-debug.zip $(WIN_NAME) SDL2.dll libpng16-16.dll zlib1.dll libjpeg-9.dll SDL2_image.dll libtiff-5.dll SDL2_mixer.dll SDL2_ttf.dll libcurl-x64.dll sprites music fonts skins
 	rm -f *.dll
 	rm -f $(WIN_NAME)
 	@echo "DEBUG BUILD COMPLETE... Compiled from the $(OS)-$(ARCH)"
@@ -96,7 +98,7 @@ debug-windows-x32:
 	cp SDL2-Mingw/i686-w64-mingw32/bin/libtiff-5.dll libtiff-5.dll
 	cp SDL2-Mingw/i686-w64-mingw32/bin/SDL2_mixer.dll SDL2_mixer.dll
 	cp SDL2-Mingw/i686-w64-mingw32/bin/SDL2_ttf.dll SDL2_ttf.dll
-	zip -r The_Mutants_windows32-debug.zip $(WIN32_NAME) SDL2.dll libpng16-16.dll zlib1.dll libjpeg-9.dll SDL2_image.dll libtiff-5.dll SDL2_mixer.dll SDL2_ttf.dll sprites music fonts skins
+	zip -r The_Mutants_windows32-debug.zip $(WIN32_NAME) SDL2.dll libpng16-16.dll zlib1.dll libjpeg-9.dll SDL2_image.dll libtiff-5.dll SDL2_mixer.dll SDL2_ttf.dll libcurl-x64.dll sprites music fonts skins
 	rm -f *.dll
 	rm -f $(WIN32_NAME)
 	@echo "DEBUG BUILD COMPLETE... Compiled from the $(OS)-$(ARCH)"

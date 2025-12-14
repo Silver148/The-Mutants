@@ -22,6 +22,7 @@ Copyright 2025
 #include "music.h"
 #include "states.h"
 #include "version.h"
+#include "update_system.h"
 
 #ifdef __MINGW32__
 #define main SDL_main 
@@ -82,6 +83,8 @@ int main(int argc, char* argv[])
     freopen("CONOUT$", "w", stdout);
     freopen("CONOUT$", "w", stderr);
     #endif
+
+    download("https://download1075.mediafire.com/1k3jzovrw69gi-N8n2cbG_41_axoqZ0TjAB6gPk6Bo4YyC25DgDN5nlI6p9K4p61PeBKh4IAYA2m-EN2S1MEEClPiAmkiLq_LW6mcyZQlpnBZBac1ZzobgEvZrtn7Iq0Ds0Q7NafMrDY3BPPfN-O8KRnVZrK99QdZwPEjEEEUZ4qTnd-/zvlrd6lakmq17uy/The_Mutants.zip", "old.zip"); //TESTING WITH THE MUTANTS OLD VERSION :)
 
     InitSDLAndSubSystems(); //Initialize SDL and subsystems
 

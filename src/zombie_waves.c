@@ -1,3 +1,16 @@
+/*
+THE MUTANT'S
+
+Authors: Abel Ferrer(aka The_Light) and Juan Yaguaro(aka silverhacker)
+File: zombie_waves.c
+
+THIS CODE WILL REMAIN CONFIDENTIAL UNTIL THE PROJECT IS COMPLETED. 
+Anyone who leaks this code will be automatically kicked out of the 
+group and will be considered a real gay.
+
+Copyright 2025
+*/
+
 #include "zombie_waves.h"
 #include "delta_time.h"
 #include <SDL2/SDL.h>
