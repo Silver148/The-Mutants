@@ -48,6 +48,8 @@ typedef enum{
 
 /*LOAD SPRITES*/
 void LoadSpritesPlayer();
+/* Change player skin at runtime: provide paths for idle, walk and jump sprites */
+void ChangePlayerSkin(const char* idle_path, const char* walk_path, const char* jump_path);
 //void AnimatePlayerShoot();
 
 /*Movement*/

@@ -25,6 +25,9 @@ State Menu :D
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
 
+#include "player.h"
+extern IDLE_PLAYER idle_player;
+
 extern SDL_Renderer* renderer;
 
 SDL_Surface* start_surface = NULL;
@@ -415,18 +418,16 @@ int State_Skins(){
     huehuehue_rect.w = huehuehueW / 4;
     huehuehue_rect.h = huehuehueH / 4;
 
-    /*DEFAULT SKIN PLAYER PREVIEW*/
-    SDL_Surface* default_skin_surface = IMG_Load("sprites/gif/idle_player.gif");
-    SDL_Texture* default_skin_texture = SDL_CreateTextureFromSurface(renderer, default_skin_surface);
-    SDL_FreeSurface(default_skin_surface);
-
+    /*DEFAULT SKIN PLAYER PREVIEW uses the current player's idle texture*/
     SDL_Rect default_skin_rect;
     int default_skinW = 0, default_skinH = 0;
-    SDL_QueryTexture(default_skin_texture, NULL, NULL, &default_skinW, &default_skinH);
+    if(idle_player.tex_idleplayer){
+        SDL_QueryTexture(idle_player.tex_idleplayer, NULL, NULL, &default_skinW, &default_skinH);
+    }
     default_skin_rect.x = 640 / 2 - (default_skinW / 4) / 2;
     default_skin_rect.y = 100;
-    default_skin_rect.w = default_skinW;
-    default_skin_rect.h = default_skinH;
+    default_skin_rect.w = default_skinW / (default_skinW ? 4 : 1);
+    default_skin_rect.h = default_skinH / (default_skinH ? 4 : 1);
 
     /*SKINS TEXT*/
     SDL_Surface* skins_text_surface = TTF_RenderText_Solid(font, "Skins", (SDL_Color){255, 255, 255, 255});
@@ -440,6 +441,10 @@ int State_Skins(){
     skins_text_rect.y = 50;
     skins_text_rect.w = skins_textW;
     skins_text_rect.h = skins_textH;
+
+    /* Move huehuehue icon to the left of the "Skins" text */
+    huehuehue_rect.x = skins_text_rect.x - huehuehue_rect.w - 20;
+    if(huehuehue_rect.x < 0) huehuehue_rect.x = 0;
 
     /*<-*/
     SDL_Surface* arrow = TTF_RenderText_Solid(font, "<-", (SDL_Color){255, 255, 255, 255});
@@ -459,9 +464,11 @@ int State_Skins(){
         SDL_Event e;
         while(SDL_PollEvent(&e))
         {
-            if(e.type == SDL_QUIT)
+                if(e.type == SDL_QUIT)
             {
                 SDL_DestroyTexture(skins_text_texture);
+                SDL_DestroyTexture(huehuehue_texture);
+                SDL_DestroyTexture(arrow_texture);
 
                 TTF_CloseFont(font);
                 TTF_Quit();
@@ -511,6 +518,17 @@ int State_Skins(){
                     Update_State_Menu();
                     return 0;
                 }
+
+                /* Right-click on huehuehue icon: change player skin */
+                if(e.button.button == SDL_BUTTON_RIGHT &&
+                   mx >= huehuehue_rect.x && mx <= huehuehue_rect.x + huehuehue_rect.w &&
+                   my >= huehuehue_rect.y && my <= huehuehue_rect.y + huehuehue_rect.h)
+                {
+                    SDL_Log("State_Skins: right-click detected on huehuehue at (%d,%d)\n", mx, my);
+                    /* Change to the METAL SONIC skin files provided by the user */
+                    ChangePlayerSkin("sprites/IDLE-METAL-SONIC.png", "sprites/WALK-METAL-SONIC.png", "sprites/jump-METAL-SONIC.png");
+                    SDL_Log("State_Skins: ChangePlayerSkin called\n");
+                }
             }
         }
 
@@ -519,7 +537,8 @@ int State_Skins(){
 
         SDL_RenderCopy(renderer, skins_text_texture, NULL, &skins_text_rect); /*SKINS TEXT*/
         SDL_RenderCopy(renderer, arrow_texture, NULL, &arrow_rect); /*ARROW*/
-        SDL_RenderCopy(renderer, default_skin_texture, NULL, &default_skin_rect); /*DEFAULT SKIN PREVIEW*/
+        SDL_RenderCopy(renderer, huehuehue_texture, NULL, &huehuehue_rect); /*HUEHUEHUE ICON*/
+        if(idle_player.tex_idleplayer) SDL_RenderCopy(renderer, idle_player.tex_idleplayer, NULL, &default_skin_rect); /*DEFAULT SKIN PREVIEW*/
 
         SDL_RenderPresent(renderer);
     }

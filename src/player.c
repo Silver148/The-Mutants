@@ -19,6 +19,8 @@ Copyright 2025
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 
+extern SDL_Renderer* renderer;
+
 #define POS_Y 350
 #define POS_X 100
 
@@ -98,6 +100,55 @@ void LoadSpritesPlayer() {
     jump_player.tex_jumpplayer = SDL_CreateTextureFromSurface(renderer, jump_player.tmp_surf_jumpplayer);
     SDL_FreeSurface(jump_player.tmp_surf_jumpplayer);
     Animation_Init(&jump_player.jump_anim, PLAYER_WIDTH, PLAYER_HEIGHT, JUMP_FRAMES, FRAME_DURATION_PLAYER);
+}
+
+/* Replace current player sprites with provided file paths. Frees old textures. */
+void ChangePlayerSkin(const char* idle_path, const char* walk_path, const char* jump_path)
+{
+    if(idle_path && *idle_path){
+        if(idle_player.tex_idleplayer){ SDL_DestroyTexture(idle_player.tex_idleplayer); idle_player.tex_idleplayer = NULL; }
+        if(idle_player.tmp_surf_idleplayer) { SDL_FreeSurface(idle_player.tmp_surf_idleplayer); idle_player.tmp_surf_idleplayer = NULL; }
+        idle_player.tmp_surf_idleplayer = IMG_Load(idle_path);
+        if(idle_player.tmp_surf_idleplayer){
+            idle_player.tex_idleplayer = SDL_CreateTextureFromSurface(renderer, idle_player.tmp_surf_idleplayer);
+            SDL_FreeSurface(idle_player.tmp_surf_idleplayer);
+            idle_player.tmp_surf_idleplayer = NULL;
+            Animation_Init(&idle_player.idle_anim, PLAYER_WIDTH, PLAYER_HEIGHT, IDLE_FRAMES, FRAME_DURATION_PLAYER);
+            SDL_Log("ChangePlayerSkin: loaded idle skin '%s'\n", idle_path);
+        } else {
+            SDL_Log("Failed to load idle skin: %s\n", idle_path);
+        }
+    }
+
+    if(walk_path && *walk_path){
+        if(walk_player.tex_walkplayer){ SDL_DestroyTexture(walk_player.tex_walkplayer); walk_player.tex_walkplayer = NULL; }
+        if(walk_player.tmp_surf_walkplayer) { SDL_FreeSurface(walk_player.tmp_surf_walkplayer); walk_player.tmp_surf_walkplayer = NULL; }
+        walk_player.tmp_surf_walkplayer = IMG_Load(walk_path);
+        if(walk_player.tmp_surf_walkplayer){
+            walk_player.tex_walkplayer = SDL_CreateTextureFromSurface(renderer, walk_player.tmp_surf_walkplayer);
+            SDL_FreeSurface(walk_player.tmp_surf_walkplayer);
+            walk_player.tmp_surf_walkplayer = NULL;
+            Animation_Init(&walk_player.walk_anim, PLAYER_WIDTH, PLAYER_HEIGHT, WALK_FRAMES, FRAME_DURATION_PLAYER);
+            SDL_Log("ChangePlayerSkin: loaded walk skin '%s'\n", walk_path);
+        } else {
+            SDL_Log("Failed to load walk skin: %s\n", walk_path);
+        }
+    }
+
+    if(jump_path && *jump_path){
+        if(jump_player.tex_jumpplayer){ SDL_DestroyTexture(jump_player.tex_jumpplayer); jump_player.tex_jumpplayer = NULL; }
+        if(jump_player.tmp_surf_jumpplayer) { SDL_FreeSurface(jump_player.tmp_surf_jumpplayer); jump_player.tmp_surf_jumpplayer = NULL; }
+        jump_player.tmp_surf_jumpplayer = IMG_Load(jump_path);
+        if(jump_player.tmp_surf_jumpplayer){
+            jump_player.tex_jumpplayer = SDL_CreateTextureFromSurface(renderer, jump_player.tmp_surf_jumpplayer);
+            SDL_FreeSurface(jump_player.tmp_surf_jumpplayer);
+            jump_player.tmp_surf_jumpplayer = NULL;
+            Animation_Init(&jump_player.jump_anim, PLAYER_WIDTH, PLAYER_HEIGHT, JUMP_FRAMES, FRAME_DURATION_PLAYER);
+            SDL_Log("ChangePlayerSkin: loaded jump skin '%s'\n", jump_path);
+        } else {
+            SDL_Log("Failed to load jump skin: %s\n", jump_path);
+        }
+    }
 }
 
 void AnimatePlayerShoot()
