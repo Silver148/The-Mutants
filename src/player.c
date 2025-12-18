@@ -223,27 +223,27 @@ void ChangePlayerSkin(const char* idle_path, const char* walk_path, const char* 
 
     /* Auto-adjust base speed based on skin name keywords (simple heuristic).
        If you want explicit control, call SetPlayerBaseSpeed() from UI after ChangePlayerSkin. */
-    float suggested_speed = base_player_speed; /* default keep current base :b*/
+    float suggested_speed = default_base_player_speed; /* default: base relative to original default */
     const char* paths[] = { idle_path, walk_path, jump_path };
     bool found_metal = false;
     for (int i = 0; i < 3; ++i) {
         const char* p = paths[i];
         if (!p) continue;
         if (strstr(p, "METAL-SONIC") || strstr(p, "METALSONIC")) {
-            suggested_speed = base_player_speed * 2.2f; /* much faster */
+            suggested_speed = default_base_player_speed * 2.2f; /* much faster */
             found_metal = true;
             break;
         }
         if (strstr(p, "SONIC")) {
-            suggested_speed = base_player_speed * 2.0f; /* very fast */
+            suggested_speed = default_base_player_speed * 2.0f; /* very fast */
             break;
         }
         if (strstr(p, "FAST")) {
-            suggested_speed = base_player_speed * 1.7f; /* faster */
+            suggested_speed = default_base_player_speed * 1.7f; /* faster */
             break;
         }
         if (strstr(p, "SLOW") || strstr(p, "HEAVY")) {
-            suggested_speed = base_player_speed * 0.8f; /* slower */
+            suggested_speed = default_base_player_speed * 0.8f; /* slower */
             break;
         }
     }
