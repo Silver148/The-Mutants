@@ -266,7 +266,11 @@ int Update_State_Game()
             float py = GetPositionPlayerY() + (PLAYER_HEIGHT / 2);
             float speed = 320.0f;
             float vx = (player_flip == SDL_FLIP_NONE) ? speed : -speed;
-            SpawnProjectile(px, py, vx, 0.0f, 25); /* 25 damage */
+            {
+                int base_damage = 25;
+                int dmg = (int)(base_damage * GetProjectileDamageMultiplier());
+                SpawnProjectile(px, py, vx, 0.0f, dmg); /* damage varies with skin */
+            }
             shoot_timer = 0.3f; /* 300ms between shots */
         }
 

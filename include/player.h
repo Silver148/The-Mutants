@@ -59,6 +59,8 @@ void ChangePlayerSkin(const char* idle_path, const char* walk_path, const char* 
 void SetPlayerBaseSpeed(float new_base_speed);
 /* Returns the shift (sprint) multiplier appropriate for the current skin. */
 float GetShiftMultiplierForSkin(void);
+/* Returns projectile damage multiplier for the current skin (1.0 = normal). */
+float GetProjectileDamageMultiplier(void);
 //void AnimatePlayerShoot();
 
 /*Movement*/

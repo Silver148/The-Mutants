@@ -259,6 +259,8 @@ void ChangePlayerSkin(const char* idle_path, const char* walk_path, const char* 
     skin_is_metal = found_metal;
     /* expose skin_is_metal by storing in skin_speed_multiplier > threshold is also possible */
 
+}
+
 void SetPlayerBaseSpeed(float new_base_speed)
 {
     if (new_base_speed <= 0.0f) return;
@@ -274,6 +276,13 @@ float GetShiftMultiplierForSkin(void)
     /* For metal skin allow stronger sprint; otherwise reduce sprint multiplier */
     if (skin_is_metal) return 1.8f;
     return 1.4f; /* reduced sprint multiplier for base/non-metal skins */
+}
+
+float GetProjectileDamageMultiplier(void)
+{
+    /* Metal sonic skin deals increased projectile damage */
+    if (skin_is_metal) return 1.5f; /* 50% more damage */
+    return 1.0f;
 }
 
 void AnimatePlayerShoot()
