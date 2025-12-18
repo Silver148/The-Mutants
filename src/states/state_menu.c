@@ -476,32 +476,6 @@ int State_Skins(){
                 return 0;
             }
 
-            if(e.type == SDL_KEYDOWN)
-            {
-                switch(e.key.keysym.sym)
-                {
-                    case SDLK_LEFT:
-                        /*/
-                        SDL_DestroyTexture(huehuehue_texture);
-                        SDL_RenderCopy(renderer, default_skin_texture, NULL, &default_skin_rect); /*DEFAULT SKIN PREVIEW
-                        SDL_RenderPresent(renderer);
-                        break;
-                        /*/
-                    case SDLK_RIGHT:
-
-                        /*/SDL_DestroyTexture(default_skin_texture);
-                        default_skin_surface = IMG_Load("sprites/gif/idle_player.gif");
-                        default_skin_texture = SDL_CreateTextureFromSurface(renderer, default_skin_surface);
-                        SDL_FreeSurface(default_skin_surface);
-                        SDL_RenderCopy(renderer, huehuehue_texture, NULL, &huehuehue_rect); /*HUEHUEHUE SKIN PREVIEW
-                        SDL_RenderPresent(renderer);
-                        /*/
-                        break;
-                    default:
-                        break;
-                }
-            }
-
             if(e.type == SDL_MOUSEBUTTONDOWN)
             {
                 int mx = e.button.x;
