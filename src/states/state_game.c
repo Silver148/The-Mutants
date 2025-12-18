@@ -206,7 +206,7 @@ int Update_State_Game()
 
         /* si shift esta pulsado, el jugador obtiene velocidad*/
         if ((state[SDL_SCANCODE_LSHIFT] || state[SDL_SCANCODE_RSHIFT]) && is_moving){
-            SetPlayerSpeedMultiplier(1.8f); /* boost: 80% faster (adjustable) */
+            SetPlayerSpeedMultiplier(GetShiftMultiplierForSkin()); /* boost depends on skin */
             stamina -= 6.0f * deltaTime;
             
             // Modificar solo la velocidad de animación de walk cuando está caminando

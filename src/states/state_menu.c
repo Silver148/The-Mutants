@@ -519,12 +519,12 @@ int State_Skins(){
                     return 0;
                 }
 
-                /* Right-click on huehuehue icon: change player skin */
-                if(e.button.button == SDL_BUTTON_RIGHT &&
+                /* Click on huehuehue icon: change player skin (accept left or right click to support touch) */
+                if((e.button.button == SDL_BUTTON_RIGHT || e.button.button == SDL_BUTTON_LEFT) &&
                    mx >= huehuehue_rect.x && mx <= huehuehue_rect.x + huehuehue_rect.w &&
                    my >= huehuehue_rect.y && my <= huehuehue_rect.y + huehuehue_rect.h)
                 {
-                    SDL_Log("State_Skins: right-click detected on huehuehue at (%d,%d)\n", mx, my);
+                    SDL_Log("State_Skins: click detected on huehuehue at (%d,%d), button=%d\n", mx, my, e.button.button);
                     /* Change to the METAL SONIC skin files provided by the user */
                     ChangePlayerSkin("sprites/IDLE-METAL-SONIC.png", "sprites/WALK-METAL-SONIC.png", "sprites/jump-METAL-SONIC.png");
                     SDL_Log("State_Skins: ChangePlayerSkin called\n");

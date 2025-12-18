@@ -33,6 +33,11 @@ typedef struct{
     Animation jump_anim;
 } JUMP_PLAYER;
 
+/* Global player instances (defined in player.c) */
+extern IDLE_PLAYER idle_player;
+extern WALK_PLAYER walk_player;
+extern JUMP_PLAYER jump_player;
+
 typedef enum{
     IDLE,
     WALK,
@@ -50,6 +55,10 @@ typedef enum{
 void LoadSpritesPlayer();
 /* Change player skin at runtime: provide paths for idle, walk and jump sprites */
 void ChangePlayerSkin(const char* idle_path, const char* walk_path, const char* jump_path);
+/* Adjust base player speed (pixels/sec). Use this to change speed when skin changes. */
+void SetPlayerBaseSpeed(float new_base_speed);
+/* Returns the shift (sprint) multiplier appropriate for the current skin. */
+float GetShiftMultiplierForSkin(void);
 //void AnimatePlayerShoot();
 
 /*Movement*/

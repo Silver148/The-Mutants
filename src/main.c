@@ -23,6 +23,7 @@ Copyright 2025
 #include "states.h"
 #include "version.h"
 #include "update_system.h"
+#include "player.h"
 
 #ifdef __MINGW32__
 #define main SDL_main 
@@ -102,6 +103,12 @@ int main(int argc, char* argv[])
     */
 
     PlayMusicStateGame(); //Play music for game state
+
+        /* Debug: report whether player textures were loaded from menu selections */
+        SDL_Log("Main: idle tex=%p walk tex=%p jump tex=%p\n",
+            (void*)idle_player.tex_idleplayer,
+            (void*)walk_player.tex_walkplayer,
+            (void*)jump_player.tex_jumpplayer);
 
     Init_State_Game(); //Initialize game state
     Update_State_Game(); //Update game state
