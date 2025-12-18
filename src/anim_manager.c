@@ -16,9 +16,6 @@ Copyright 2025
 #include "anim_manager.h"
 #include <SDL2/SDL.h>
 
-/* Enable to log animation updates for debugging */
-#define ANIM_DEBUG 1
-
 void Animation_Init(Animation* anim, int frame_width, int frame_height, int total_frames, int frame_duration) {
     anim->current_frame = 0;
     anim->last_update_time = SDL_GetTicks();
