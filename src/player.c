@@ -275,7 +275,7 @@ float GetShiftMultiplierForSkin(void)
 {
     /* For metal skin allow stronger sprint; otherwise reduce sprint multiplier */
     if (skin_is_metal) return 1.8f;
-    return 1.4f; /* reduced sprint multiplier for base/non-metal skins */
+    return 2.0f; /* reduced sprint multiplier for base/non-metal skins */
 }
 
 float GetProjectileDamageMultiplier(void)

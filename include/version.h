@@ -2,7 +2,7 @@
 #define VERSION_H
 
 #define GAME_VERSION_MAJOR 0
-#define GAME_VERSION_MINOR 23
+#define GAME_VERSION_MINOR 24
 #define GAME_VERSION_PATCH 0
 
 #endif // VERSION_H

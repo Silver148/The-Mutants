@@ -405,6 +405,8 @@ int State_Config(){
 
 int State_Skins(){
 
+    int index_selected_skin = 1;
+
     /*HUEHUEHUEHUE XDDDDDDDD*/
     SDL_Surface* huehuehue_surface = IMG_Load("skins/huehuehue.png");
     SDL_Texture* huehuehue_texture = SDL_CreateTextureFromSurface(renderer, huehuehue_surface);
@@ -413,10 +415,10 @@ int State_Skins(){
     SDL_Rect huehuehue_rect;
     int huehuehueW = 0, huehuehueH = 0;
     SDL_QueryTexture(huehuehue_texture, NULL, NULL, &huehuehueW, &huehuehueH);
-    huehuehue_rect.x = 640 / 2 - (huehuehueW / 4) / 2;
+    huehuehue_rect.x = 320;
     huehuehue_rect.y = 100;
-    huehuehue_rect.w = huehuehueW / 4;
-    huehuehue_rect.h = huehuehueH / 4;
+    huehuehue_rect.w = huehuehueW / 6;
+    huehuehue_rect.h = huehuehueH / 6;
 
     SDL_Surface* default_skin_surface = IMG_Load("sprites/gif/idle_player.gif");
     SDL_Texture* default_skin_texture = SDL_CreateTextureFromSurface(renderer, default_skin_surface);
@@ -425,7 +427,7 @@ int State_Skins(){
     int default_skinW = 0, default_skinH = 0;
     SDL_QueryTexture(default_skin_texture, NULL, NULL, &default_skinW, &default_skinH);
 
-    default_skin_rect.x = 640 / 2;
+    default_skin_rect.x = 0;
     default_skin_rect.y = 100;
     default_skin_rect.w = default_skinW * 4;
     default_skin_rect.h = default_skinH * 4;
@@ -443,10 +445,6 @@ int State_Skins(){
     skins_text_rect.w = skins_textW;
     skins_text_rect.h = skins_textH;
 
-    /* Move huehuehue icon to the left of the "Skins" text */
-    huehuehue_rect.x = skins_text_rect.x - huehuehue_rect.w - 20;
-    if(huehuehue_rect.x < 0) huehuehue_rect.x = 0;
-
     /*<-*/
     SDL_Surface* arrow = TTF_RenderText_Solid(font, "<-", (SDL_Color){255, 255, 255, 255});
     SDL_Texture* arrow_texture = SDL_CreateTextureFromSurface(renderer, arrow);
@@ -460,12 +458,25 @@ int State_Skins(){
     arrow_rect.w = arrowW;
     arrow_rect.h = arrowH;
 
+    /*->*/
+    SDL_Surface* arrow2 = TTF_RenderText_Solid(font, "->", (SDL_Color){255, 255, 255, 255});
+    SDL_Texture* arrow2_texture = SDL_CreateTextureFromSurface(renderer, arrow2);
+    SDL_FreeSurface(arrow2);
+
+    SDL_Rect arrow2_rect;
+    int arrow2W = 0, arrow2H = 0;
+    SDL_QueryTexture(arrow2_texture, NULL, NULL, &arrow2W, &arrow2H);
+    arrow2_rect.x = default_skin_rect.x;
+    arrow2_rect.y = 150;
+    arrow2_rect.w = arrow2W;
+    arrow2_rect.h = arrow2H;
+
     while(1)
     {
         SDL_Event e;
         while(SDL_PollEvent(&e))
         {
-                if(e.type == SDL_QUIT)
+            if(e.type == SDL_QUIT)
             {
                 SDL_DestroyTexture(skins_text_texture);
                 SDL_DestroyTexture(huehuehue_texture);
@@ -475,6 +486,45 @@ int State_Skins(){
                 TTF_Quit();
                 SDL_Quit();
                 return 0;
+            }
+
+            /* Handle keyboard presses so arrow keys select and apply skins immediately */
+            if(e.type == SDL_KEYDOWN)
+            {
+                if(e.key.keysym.scancode == SDL_SCANCODE_RIGHT)
+                {
+                    if(index_selected_skin < 2)
+                    {
+                        index_selected_skin++;
+                        arrow2_rect.x += 280;
+                        SDL_Log("State_Skins: keyboard selected skin %d (RIGHT)\n", index_selected_skin);
+                        if(index_selected_skin == 1)
+                        {
+                            ChangePlayerSkin("sprites/idle_player_spritesheet.png", "sprites/walk_player_spritesheet.png", "sprites/jump_player-spritesheet.png");
+                        }
+                        else if(index_selected_skin == 2)
+                        {
+                            ChangePlayerSkin("sprites/IDLE-METAL-SONIC.png", "sprites/WALK-METAL-SONIC.png", "sprites/jump-METAL-SONIC.png");
+                        }
+                    }
+                }
+                else if(e.key.keysym.scancode == SDL_SCANCODE_LEFT)
+                {
+                    if(index_selected_skin > 1)
+                    {
+                        index_selected_skin--;
+                        arrow2_rect.x -= 280;
+                        SDL_Log("State_Skins: keyboard selected skin %d (LEFT)\n", index_selected_skin);
+                        if(index_selected_skin == 1)
+                        {
+                            ChangePlayerSkin("sprites/idle_player_spritesheet.png", "sprites/walk_player_spritesheet.png", "sprites/jump_player-spritesheet.png");
+                        }
+                        else if(index_selected_skin == 2)
+                        {
+                            ChangePlayerSkin("sprites/IDLE-METAL-SONIC.png", "sprites/WALK-METAL-SONIC.png", "sprites/jump-METAL-SONIC.png");
+                        }
+                    }
+                }
             }
 
             if(e.type == SDL_MOUSEBUTTONDOWN)
@@ -494,32 +544,13 @@ int State_Skins(){
                     return 0;
                 }
 
-                /* Click on huehuehue icon: change player skin (accept left or right click to support touch) */
-                if((e.button.button == SDL_BUTTON_RIGHT || e.button.button == SDL_BUTTON_LEFT) &&
-                   mx >= huehuehue_rect.x && mx <= huehuehue_rect.x + huehuehue_rect.w &&
-                   my >= huehuehue_rect.y && my <= huehuehue_rect.y + huehuehue_rect.h)
-                {
-                    SDL_Log("State_Skins: click detected on huehuehue at (%d,%d), button=%d\n", mx, my, e.button.button);
-                    /* Change to the METAL SONIC skin files provided by the user */
-                    ChangePlayerSkin("sprites/IDLE-METAL-SONIC.png", "sprites/WALK-METAL-SONIC.png", "sprites/jump-METAL-SONIC.png");
-                    SDL_Log("State_Skins: ChangePlayerSkin called\n");
-                }
-
-                if((e.button.button == SDL_BUTTON_RIGHT || e.button.button == SDL_BUTTON_LEFT) &&
-                   mx >= default_skin_rect.x && mx <= default_skin_rect.x + default_skin_rect.w &&
-                   my >= default_skin_rect.y && my <= default_skin_rect.y + default_skin_rect.h)
-                {
-                    SDL_Log("State_Skins: click detected on huehuehue at (%d,%d), button=%d\n", mx, my, e.button.button);
-                    /* Change to the METAL SONIC skin files provided by the user */
-                    ChangePlayerSkin("sprites/idle_player_spritesheet.png", "sprites/walk_player_spritesheet.png", "sprites/jump_player-spritesheet.png");
-                    SDL_Log("State_Skins: ChangePlayerSkin called\n");
-                }
             }
         }
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
 
+        SDL_RenderCopy(renderer, arrow2_texture, NULL, &arrow2_rect);
         SDL_RenderCopy(renderer, skins_text_texture, NULL, &skins_text_rect); /*SKINS TEXT*/
         SDL_RenderCopy(renderer, default_skin_texture, NULL, &default_skin_rect); /*DEFAULT SKIN PREVIEW*/
         SDL_RenderCopy(renderer, arrow_texture, NULL, &arrow_rect); /*ARROW*/
