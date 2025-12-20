@@ -34,6 +34,85 @@ WALK_PLAYER walk_player;
 /*JUMP PLAYER*/
 JUMP_PLAYER jump_player;
 
+/*SHOOT PLAYER*/
+SHOOT_PLAYER shoot_player;
+/*SHOOT WALK PLAYER*/
+SHOOT_WALK_PLAYER shoot_walk_player;
+
+/* shoot animation playing flag and previous state */
+static bool shoot_anim_playing = false;
+static bool shoot_looping = false; /* true while Z is held and we should loop the anim */
+static StatesPlayer shoot_prev_state = IDLE;
+static int shoot_anim_type = 0; /* 0 = normal shoot, 1 = walk-shoot */
+
+/* Query helper for other modules to know if shoot animation is playing */
+bool IsPlayerShooting(void)
+{
+    return shoot_anim_playing;
+}
+
+/* Start continuous shoot animation (loop while held) */
+extern StatesPlayer states_player; /* forward declaration to satisfy functions above */
+void StartPlayerShooting(void)
+{
+    if (!shoot_player.tex_shootplayer) return;
+    if (shoot_anim_playing) { shoot_looping = true; return; }
+    shoot_anim_type = 0;
+    shoot_prev_state = states_player;
+    states_player = SHOOT;
+    Animation* anim = &shoot_player.shoot_anim;
+    anim->current_frame = 0;
+    anim->last_update_time = SDL_GetTicks();
+    anim->src_rect.x = 0;
+    anim->src_rect.y = 0;
+    anim->src_rect.w = anim->frame_width;
+    anim->src_rect.h = anim->frame_height;
+    shoot_anim_playing = true;
+    shoot_looping = true;
+}
+
+/* Start continuous shoot-walking animation (loop while held) */
+void StartPlayerShootingWalk(void)
+{
+    if (!shoot_walk_player.tex_shootwalkplayer) {
+        /* fallback to normal shoot if walk-shoot not available */
+        StartPlayerShooting();
+        return;
+    }
+    if (shoot_anim_playing) { shoot_looping = true; return; }
+    shoot_anim_type = 1;
+    shoot_prev_state = states_player;
+    states_player = SHOOT; /* state is SHOOT, but anim type indicates walk variant */
+    Animation* anim = &shoot_walk_player.shootwalk_anim;
+    anim->current_frame = 0;
+    anim->last_update_time = SDL_GetTicks();
+    anim->src_rect.x = 0;
+    anim->src_rect.y = 0;
+    anim->src_rect.w = anim->frame_width;
+    anim->src_rect.h = anim->frame_height;
+    shoot_anim_playing = true;
+    shoot_looping = true;
+}
+
+/* Stop continuous shoot animation and restore previous state */
+void StopPlayerShooting(void)
+{
+    if (!shoot_anim_playing) return;
+    shoot_looping = false;
+    shoot_anim_playing = false;
+    states_player = shoot_prev_state;
+    /* reset animation frame */
+    if (shoot_anim_type == 1) {
+        shoot_walk_player.shootwalk_anim.current_frame = 0;
+        shoot_walk_player.shootwalk_anim.src_rect.x = 0;
+    } else {
+        shoot_player.shoot_anim.current_frame = 0;
+        shoot_player.shoot_anim.src_rect.x = 0;
+    }
+    shoot_anim_type = 0;
+}
+
+
 /*POSITION X AND Y OF THE PLAYER*/
 float position_x = POS_X;
 float position_y = POS_Y;
@@ -126,6 +205,10 @@ void LoadSpritesPlayer() {
             SDL_Log("LoadSpritesPlayer: failed to load default jump sprite: %s\n", "sprites/jump_player-spritesheet.png");
         }
     }
+
+    /* shoot spritesheet not auto-loaded by default; use ChangePlayerShootSkin(path) to set it */
+    /* shoot-walk spritesheet not auto-loaded by default; use ChangePlayerShootWalkSkin(path) to set it */
+
 }
 
 /* Replace current player sprites with provided file paths. Frees old textures. */
@@ -258,8 +341,58 @@ void ChangePlayerSkin(const char* idle_path, const char* walk_path, const char* 
     /* remember whether the current skin is metal for shift behavior */
     skin_is_metal = found_metal;
     /* expose skin_is_metal by storing in skin_speed_multiplier > threshold is also possible */
+    /* If metal skin detected, try to load the provided shoot spritesheet */
+    if (found_metal) {
+        ChangePlayerShootSkin("sprites/atake-METAL-SONIC.png");
+        ChangePlayerShootWalkSkin("sprites/atake2-METAL-SONIC.png");
+        SDL_Log("ChangePlayerSkin: auto-loaded shoot spritesheets for metal skin\n");
+    }
 
 }
+
+/* Load/replace the shoot-walking spritesheet to be used when player shoots while walking */
+void ChangePlayerShootWalkSkin(const char* shoot_walk_path)
+{
+    if (!shoot_walk_path || !*shoot_walk_path) return;
+    if (shoot_walk_player.tex_shootwalkplayer) { SDL_DestroyTexture(shoot_walk_player.tex_shootwalkplayer); shoot_walk_player.tex_shootwalkplayer = NULL; }
+    if (shoot_walk_player.tmp_surf_shootwalkplayer) { SDL_FreeSurface(shoot_walk_player.tmp_surf_shootwalkplayer); shoot_walk_player.tmp_surf_shootwalkplayer = NULL; }
+    shoot_walk_player.tmp_surf_shootwalkplayer = IMG_Load(shoot_walk_path);
+    if (shoot_walk_player.tmp_surf_shootwalkplayer) {
+        shoot_walk_player.tex_shootwalkplayer = SDL_CreateTextureFromSurface(renderer, shoot_walk_player.tmp_surf_shootwalkplayer);
+        SDL_FreeSurface(shoot_walk_player.tmp_surf_shootwalkplayer);
+        shoot_walk_player.tmp_surf_shootwalkplayer = NULL;
+        int w=0,h=0; SDL_QueryTexture(shoot_walk_player.tex_shootwalkplayer, NULL, NULL, &w, &h);
+        int frames = (PLAYER_WIDTH > 0) ? (w / PLAYER_WIDTH) : 1;
+        if (frames <= 0) frames = 1;
+        Animation_Init(&shoot_walk_player.shootwalk_anim, PLAYER_WIDTH, PLAYER_HEIGHT, frames, FRAME_DURATION_PLAYER/2);
+        SDL_Log("ChangePlayerShootWalkSkin: loaded shoot-walk skin '%s' frames=%d\n", shoot_walk_path, frames);
+    } else {
+        SDL_Log("ChangePlayerShootWalkSkin: failed to load '%s'\n", shoot_walk_path);
+    }
+}
+
+/* Load/replace the shoot spritesheet to be used when player shoots */
+void ChangePlayerShootSkin(const char* shoot_path)
+{
+    if (!shoot_path || !*shoot_path) return;
+    if (shoot_player.tex_shootplayer) { SDL_DestroyTexture(shoot_player.tex_shootplayer); shoot_player.tex_shootplayer = NULL; }
+    if (shoot_player.tmp_surf_shootplayer) { SDL_FreeSurface(shoot_player.tmp_surf_shootplayer); shoot_player.tmp_surf_shootplayer = NULL; }
+    shoot_player.tmp_surf_shootplayer = IMG_Load(shoot_path);
+    if (shoot_player.tmp_surf_shootplayer) {
+        shoot_player.tex_shootplayer = SDL_CreateTextureFromSurface(renderer, shoot_player.tmp_surf_shootplayer);
+        SDL_FreeSurface(shoot_player.tmp_surf_shootplayer);
+        shoot_player.tmp_surf_shootplayer = NULL;
+        int w=0,h=0; SDL_QueryTexture(shoot_player.tex_shootplayer, NULL, NULL, &w, &h);
+        int frames = (PLAYER_WIDTH > 0) ? (w / PLAYER_WIDTH) : 1;
+        if (frames <= 0) frames = 1;
+        Animation_Init(&shoot_player.shoot_anim, PLAYER_WIDTH, PLAYER_HEIGHT, frames, FRAME_DURATION_PLAYER/2);
+        SDL_Log("ChangePlayerShootSkin: loaded shoot skin '%s' frames=%d\n", shoot_path, frames);
+    } else {
+        SDL_Log("ChangePlayerShootSkin: failed to load '%s'\n", shoot_path);
+    }
+}
+
+/* shoot spritesheet support removed */
 
 void SetPlayerBaseSpeed(float new_base_speed)
 {
@@ -269,6 +402,51 @@ void SetPlayerBaseSpeed(float new_base_speed)
     skin_speed_multiplier = base_player_speed / default_base_player_speed;
     player_speed = base_player_speed; /* reset current speed to new base */
     SDL_Log("SetPlayerBaseSpeed: base_player_speed=%.2f player_speed=%.2f skin_multiplier=%.2f\n", base_player_speed, player_speed, skin_speed_multiplier);
+}
+
+/* Start the shoot animation: switch player state to SHOOT and initialize animation */
+/* single-play keep for compatibility: start single animation (non-looping) */
+void AnimatePlayerShoot()
+{
+    if (!shoot_player.tex_shootplayer) return;
+    shoot_prev_state = states_player;
+    states_player = SHOOT;
+    Animation* anim = &shoot_player.shoot_anim;
+    anim->current_frame = 0;
+    anim->last_update_time = SDL_GetTicks();
+    anim->src_rect.x = 0;
+    anim->src_rect.y = 0;
+    anim->src_rect.w = anim->frame_width;
+    anim->src_rect.h = anim->frame_height;
+    shoot_anim_playing = true;
+    shoot_looping = false;
+}
+
+void UpdatePlayerShootAnim(void)
+{
+    if (!shoot_anim_playing) return;
+    Animation* anim = (shoot_anim_type == 1) ? &shoot_walk_player.shootwalk_anim : &shoot_player.shoot_anim;
+    Uint32 now = SDL_GetTicks();
+    if (now > anim->last_update_time + anim->frame_duration) {
+        anim->current_frame++;
+        if (anim->current_frame >= anim->total_frames) {
+            if (shoot_looping) {
+                /* loop */
+                anim->current_frame = 0;
+                anim->src_rect.x = 0;
+                anim->last_update_time = now;
+            } else {
+                /* finished single-play */
+                shoot_anim_playing = false;
+                states_player = shoot_prev_state;
+                anim->current_frame = 0;
+                anim->src_rect.x = 0;
+            }
+        } else {
+            anim->src_rect.x = anim->current_frame * anim->frame_width;
+            anim->last_update_time = now;
+        }
+    }
 }
 
 float GetShiftMultiplierForSkin(void)
@@ -285,10 +463,7 @@ float GetProjectileDamageMultiplier(void)
     return 1.0f;
 }
 
-void AnimatePlayerShoot()
-{
-    //NOTHING YET :D
-}
+/* shoot animation functions removed */
 
 void RenderIdlePlayerAnim(SDL_RendererFlip flip_type) {
     Animation_Update(&idle_player.idle_anim);
@@ -364,6 +539,42 @@ void PlayerJumpAnim(SDL_RendererFlip flip_type)
 
 void RenderPlayer(SDL_RendererFlip flip_type)
 {
+    if (states_player == SHOOT) {
+        /* choose appropriate shoot texture/anim based on type */
+        Animation* anim = (shoot_anim_type == 1) ? &shoot_walk_player.shootwalk_anim : &shoot_player.shoot_anim;
+        SDL_Texture* tex = (shoot_anim_type == 1) ? shoot_walk_player.tex_shootwalkplayer : shoot_player.tex_shootplayer;
+        if (tex) {
+            SDL_Rect* src_rect = Animation_GetSourceRect(anim);
+            /* target display size = slightly smaller than idle frame size */
+            SDL_Rect* idle_src = Animation_GetSourceRect(&idle_player.idle_anim);
+            const float SHOOT_SCALE = 1.00f; /* normal shoot scale */
+            const float SHOOT_WALK_SCALE = 0.98f; /* larger for walk-shoot */
+            float scale = (shoot_anim_type == 1) ? SHOOT_WALK_SCALE : SHOOT_SCALE;
+            int target_w = idle_src ? (int)(idle_src->w * scale) : (int)(PLAYER_WIDTH * scale);
+            int target_h = idle_src ? (int)(idle_src->h * scale) : (int)(PLAYER_HEIGHT * scale);
+            if (target_w < 1) target_w = 1;
+            if (target_h < 1) target_h = 1;
+
+            /* Set destination rect to scaled target size */
+            if (shoot_anim_type == 1) {
+                shoot_walk_player.dest_shootwalkplayer.w = target_w;
+                shoot_walk_player.dest_shootwalkplayer.h = target_h;
+                shoot_walk_player.dest_shootwalkplayer.x = (int)(position_x + (PLAYER_WIDTH - target_w) / 2);
+                shoot_walk_player.dest_shootwalkplayer.y = position_y + (PLAYER_HEIGHT - target_h);
+                SDL_RenderCopyEx(renderer, tex, src_rect,
+                                 &shoot_walk_player.dest_shootwalkplayer, 0.0, NULL, flip_type);
+            } else {
+                shoot_player.dest_shootplayer.w = target_w;
+                shoot_player.dest_shootplayer.h = target_h;
+                shoot_player.dest_shootplayer.x = (int)(position_x + (PLAYER_WIDTH - target_w) / 2);
+                shoot_player.dest_shootplayer.y = position_y + (PLAYER_HEIGHT - target_h);
+                SDL_RenderCopyEx(renderer, tex, src_rect,
+                                 &shoot_player.dest_shootplayer, 0.0, NULL, flip_type);
+            }
+            return;
+        }
+    }
+
     if(states_player == IDLE){
         RenderIdlePlayerAnim(flip_type);
     }else if(states_player == WALK){

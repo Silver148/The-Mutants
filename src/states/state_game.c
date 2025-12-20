@@ -114,6 +114,8 @@ int Init_State_Game()
 void UpdateAnimsPLAYER()
 {
     CheckChangeStatePlayer();
+    /* update player shoot animation if active */
+    UpdatePlayerShootAnim();
 }
 
 void UpdateJump(){
@@ -271,14 +273,30 @@ int Update_State_Game()
                 int dmg = (int)(base_damage * GetProjectileDamageMultiplier());
                 SpawnProjectile(px, py, vx, 0.0f, dmg); /* damage varies with skin */
             }
+            /* spawn projectile, keep shoot animation started in continuous handler below */
             shoot_timer = 0.3f; /* 300ms between shots */
         }
 
-        // Decide el estado final del jugador
+        /* Start/stop continuous shooting animation based on Z key held
+           Use walk-shoot when moving (A or D pressed) */
+        if (state[SDL_SCANCODE_Z]) {
+            if (state[SDL_SCANCODE_A] || state[SDL_SCANCODE_D]) {
+                StartPlayerShootingWalk();
+            } else {
+                StartPlayerShooting();
+            }
+        } else {
+            StopPlayerShooting();
+        }
+
+        // Decide el estado final del jugador (no sobrescribir SHOOT mientras se reproduce)
         if (is_jumping) {
             states_player = JUMP; // Mantiene JUMP si está saltando
         } else {
-            states_player = input_state; // Usa el estado de entrada
+            if (!IsPlayerShooting()) {
+                states_player = input_state; // Usa el estado de entrada
+            }
+            // if shooting, keep SHOOT until animation finishes
         }
 
     UpdateAnimsPLAYER();
