@@ -586,22 +586,15 @@ typedef struct {
     const char* filename;
 } DownloadArgs;
 
-/* download_result holds the CURLcode cast to int (-1 while pending) */
 static volatile int download_result = -1;
 
 static int download_thread(void* data)
 {
     DownloadArgs* args = (DownloadArgs*)data;
-
-    if(!args) return -1;
-
-    SDL_SetThreadPriority(SDL_THREAD_PRIORITY_LOW);
-
-    CURLcode cres = download(args->url, args->filename);
-
-    download_result = (int)cres;
+    int res = download(args->url, args->filename);
+    download_result = res;
     free(args);
-    return (int)cres;
+    return res;
 }
 
 int StateUpdate()
@@ -635,94 +628,40 @@ int StateUpdate()
         /* start download in background thread */
         if(!start_texture && !quit_texture && !version_texture && !settings_texture && !skins_texture && !Check_for_updates_texture)
         {
-            static int download_started = 0;
-            static SDL_Thread* download_thread_handle = NULL;
-    
-            if(!download_started) {
-                download_started = 1;
-        
             DownloadArgs* args = (DownloadArgs*)malloc(sizeof(DownloadArgs));
-            if(!args) {
-                fprintf(stderr, "Error: No memory for DownloadArgs\n");
-                return -1;
-            }
-        
             args->url = "https://the-mutants-updates.firebaseapp.com/update";
             args->filename = "Update.exe";
-        
             download_result = -1;
-            
-            download_thread_handle = SDL_CreateThread(download_thread, "Downloader", (void*)args);
-        
-            if(download_thread_handle == NULL) {
-                fprintf(stderr, "Error: No se pudo crear thread de descarga\n");
+            SDL_Thread* thr = SDL_CreateThread(download_thread, "downloader", (void*)args);
+            if(thr == NULL)
+            {
                 /* fallback to synchronous download if thread creation fails */
                 download_result = download(args->url, args->filename);
                 free(args);
-                download_started = 0;
-            } else {
-                SDL_DetachThread(download_thread_handle);
             }
         }
-    }
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
         SDL_RenderCopy(renderer, dl_texture, NULL, &dl_rect);
         SDL_RenderPresent(renderer);
         SDL_DestroyTexture(dl_texture);
-        SDL_Delay(1);
 
                 /* Wait for download to finish while keeping UI responsive
                  * and render percentage + animated dots
                  */
-                while(1)
+                while(download_result == -1)
                 {
-                    if(download_result == CURLE_COULDNT_RESOLVE_HOST)
+                    SDL_Event ev;
+                    while(SDL_PollEvent(&ev))
                     {
-                        SDL_Log("Update failed, no internet connection :(");
-
-                        SDL_Surface* dl_error_surface = TTF_RenderText_Solid(font, "Update failed: no internet or timeout", (SDL_Color){255, 255, 255, 255});
-                        SDL_Texture* dl_error_texture = SDL_CreateTextureFromSurface(renderer, dl_error_surface);
-                        SDL_FreeSurface(dl_error_surface);
-
-                        SDL_Rect dl_error_rect;
-                        int dl_errorW = 0, dl_errorH = 0;
-                        SDL_QueryTexture(dl_error_texture, NULL, NULL, &dl_errorW, &dl_errorH);
-                        dl_error_rect.x = (640 - dl_errorW) / 2;
-                        dl_error_rect.y = 220;
-                        dl_error_rect.w = dl_errorW;
-                        dl_error_rect.h = dl_errorH;
-
-                        Uint32 start = SDL_GetTicks();
-                        while(SDL_GetTicks() - start < 2000)
+                        if(ev.type == SDL_QUIT)
                         {
-                            SDL_Event ev;
-                            while(SDL_PollEvent(&ev))
-                            {
-                                if(ev.type == SDL_QUIT)
-                                {
-                                    SDL_DestroyTexture(dl_error_texture);
-                                    TTF_CloseFont(font);
-                                    TTF_Quit();
-                                    SDL_Quit();
-                                    return 0;
-                                }
-                            }
-
-                            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-                            SDL_RenderClear(renderer);
-                            SDL_RenderCopy(renderer, dl_error_texture, NULL, &dl_error_rect);
-                            SDL_RenderPresent(renderer);
-                            SDL_Delay(50);
+                            TTF_CloseFont(font);
+                            TTF_Quit();
+                            SDL_Quit();
+                            return 0;
                         }
-
-                        SDL_DestroyTexture(dl_error_texture);
-
-                        /* Recreate menu state and return to caller (menu will continue) */
-                        Init_State_Menu();
-                        Update_State_Menu();
-                        return 0;
                     }
 
                     /* compute percentage */
