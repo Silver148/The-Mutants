@@ -37,7 +37,8 @@ static size_t write_data(void *ptr, size_t size, size_t nmemb, FILE *stream) {
     return written;
 }
 
-int download(const char *url, const char *filename) {
+/* Return value: CURLcode (CURLE_OK == 0 on success) */
+CURLcode download(const char *url, const char *filename) {
     CURL *curl;
     FILE *fp;
     CURLcode res;
@@ -54,8 +55,11 @@ int download(const char *url, const char *filename) {
         curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
+        curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1L);
+
+        curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 10L);
+
         curl_easy_setopt(curl, CURLOPT_USERAGENT, "TheMutants-Updater/1.0");
-        curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
         /* enable progress and set callback */
         curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, xferinfo);
         curl_easy_setopt(curl, CURLOPT_XFERINFODATA, NULL);
@@ -74,7 +78,7 @@ int download(const char *url, const char *filename) {
         fclose(fp);
         curl_easy_cleanup(curl);
         
-        return (res == CURLE_OK) ? 0 : 1;
+        return res;
     }
-    return 1;
+    return CURLE_FAILED_INIT;
 }

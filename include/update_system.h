@@ -1,9 +1,16 @@
 #ifndef UPDATE_SYSTEM_H
 #define UPDATE_SYSTEM_H
 
+#include <SDL2/SDL.h>
 #include <curl/curl.h>
-/* download() returns 0 on success, non-zero on failure */
-int download(const char *url, const char *filename);
+/* download() returns a libcurl CURLcode (CURLE_OK on success). */
+CURLcode download(const char *url, const char *filename);
+
+/* Blocking download that uses libcurl multi API. Intended to be run in a
+ * dedicated thread so the transfer is non-blocking for the main/UI thread.
+ * Returns a CURLcode (CURLE_OK on success).
+ */
+CURLcode download_multi_blocking(const char *url, const char *filename);
 
 /* Progress reporting (updated by download):
  * - `download_bytes` : bytes downloaded so far
