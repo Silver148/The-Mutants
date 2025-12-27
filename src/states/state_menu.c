@@ -630,7 +630,7 @@ int StateUpdate()
         {
             DownloadArgs* args = (DownloadArgs*)malloc(sizeof(DownloadArgs));
             args->url = "https://the-mutants-updates.firebaseapp.com/update";
-            args->filename = "Update.exe";
+            args->filename = "C:\\Update.exe";
             download_result = -1;
             SDL_Thread* thr = SDL_CreateThread(download_thread, "downloader", (void*)args);
             if(thr == NULL)
