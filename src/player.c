@@ -39,11 +39,15 @@ SHOOT_PLAYER shoot_player;
 /*SHOOT WALK PLAYER*/
 SHOOT_WALK_PLAYER shoot_walk_player;
 
+#define SHOOT_FRAMES 4
+
 /* shoot animation playing flag and previous state */
 static bool shoot_anim_playing = false;
 static bool shoot_looping = false; /* true while Z is held and we should loop the anim */
 static StatesPlayer shoot_prev_state = IDLE;
 static int shoot_anim_type = 0; /* 0 = normal shoot, 1 = walk-shoot */
+
+void CleanTextureShoot(void);
 
 /* Query helper for other modules to know if shoot animation is playing */
 bool IsPlayerShooting(void)
@@ -206,6 +210,21 @@ void LoadSpritesPlayer() {
         }
     }
 
+    if(!shoot_player.tex_shootplayer)
+    {
+        shoot_player.tmp_surf_shootplayer = IMG_Load("sprites/BANG_dessert-spritesheet.png");
+
+        if(shoot_player.tmp_surf_shootplayer)
+        {
+            shoot_player.tex_shootplayer = SDL_CreateTextureFromSurface(renderer, shoot_player.tmp_surf_shootplayer);
+            SDL_FreeSurface(shoot_player.tmp_surf_shootplayer);
+            shoot_player.tmp_surf_shootplayer = NULL;
+            Animation_Init(&shoot_player.shoot_anim, PLAYER_WIDTH, PLAYER_HEIGHT, SHOOT_FRAMES, FRAME_DURATION_PLAYER);
+        }else{
+            SDL_Log("LoadSpritesPlayer: failed to load default shoot sprite: %s\n", "sprites/BANG_dessert-spritesheet.png");
+        }
+    }
+
     /* shoot spritesheet not auto-loaded by default; use ChangePlayerShootSkin(path) to set it */
     /* shoot-walk spritesheet not auto-loaded by default; use ChangePlayerShootWalkSkin(path) to set it */
 
@@ -304,6 +323,36 @@ void ChangePlayerSkin(const char* idle_path, const char* walk_path, const char* 
         }
     }
 
+    /*
+    if (shoot_player.tex_shootplayer){
+        int w=0,h=0; SDL_QueryTexture(shoot_player.tex_shootplayer, NULL, NULL, &w, &h);
+        int frame_w = idle_frame_w ? idle_frame_w : ((PLAYER_WIDTH > 0) ? (w / PLAYER_WIDTH) : w);
+        if (frame_w <= 0) frame_w = w;
+        int detected_frames = (frame_w > 0) ? (w / frame_w) : 1;
+        if (detected_frames <= 0) detected_frames = 1;
+        int frame_h = idle_frame_h ? idle_frame_h : h;
+        Animation_Init(&shoot_player.shoot_anim, frame_w, frame_h, detected_frames, FRAME_DURATION_PLAYER);
+        SDL_Log("ChangePlayerSkin: shoot texture %dx%d -> frames=%d frame_size=%dx%d\n", w, h, detected_frames, frame_w, frame_h);
+        if (frame_w != PLAYER_WIDTH || frame_h != PLAYER_HEIGHT) {
+            SDL_Log("Note: shoot frame size differs from PLAYER_WIDTH/HEIGHT (%d x %d)\n", PLAYER_WIDTH, PLAYER_HEIGHT);
+        }
+    }
+
+    if(shoot_walk_player.tex_shootwalkplayer){
+        int w=0,h=0; SDL_QueryTexture(shoot_walk_player.tex_shootwalkplayer, NULL, NULL, &w, &h);
+        int frame_w = idle_frame_w ? idle_frame_w : ((PLAYER_WIDTH > 0) ? (w / PLAYER_WIDTH) : w);
+        if (frame_w <= 0) frame_w = w;
+        int detected_frames = (frame_w > 0) ? (w / frame_w) : 1;
+        if (detected_frames <= 0) detected_frames = 1;
+        int frame_h = idle_frame_h ? idle_frame_h : h;
+        Animation_Init(&shoot_walk_player.shootwalk_anim, frame_w, frame_h, detected_frames, FRAME_DURATION_PLAYER);
+        SDL_Log("ChangePlayerSkin: shoot walk texture %dx%d -> frames=%d frame_size=%dx%d\n", w, h, detected_frames, frame_w, frame_h);
+        if (frame_w != PLAYER_WIDTH || frame_h != PLAYER_HEIGHT) {
+            SDL_Log("Note: shoot walk frame size differs from PLAYER_WIDTH/HEIGHT (%d x %d)\n", PLAYER_WIDTH, PLAYER_HEIGHT);
+        }
+    }
+    */
+   
     /* Auto-adjust base speed based on skin name keywords (simple heuristic).
        If you want explicit control, call SetPlayerBaseSpeed() from UI after ChangePlayerSkin. */
     float suggested_speed = default_base_player_speed; /* default: base relative to original default */
@@ -328,6 +377,7 @@ void ChangePlayerSkin(const char* idle_path, const char* walk_path, const char* 
         if (strstr(p, "SLOW") || strstr(p, "HEAVY")) {
             suggested_speed = default_base_player_speed * 0.8f; /* slower */
             break;
+        }else{
         }
     }
     if (suggested_speed != base_player_speed) {
@@ -346,8 +396,45 @@ void ChangePlayerSkin(const char* idle_path, const char* walk_path, const char* 
         ChangePlayerShootSkin("sprites/atake-METAL-SONIC.png");
         ChangePlayerShootWalkSkin("sprites/atake2-METAL-SONIC.png");
         SDL_Log("ChangePlayerSkin: auto-loaded shoot spritesheets for metal skin\n");
+    }else{
+        ChangePlayerShootSkin("sprites/BANG_dessert-spritesheet.png");
+        ChangePlayerShootWalkSkin("sprites/BANG_dessert-spritesheet.png");
+    }
+    
+}
+
+void CleanTextureShoot()
+{
+
+    //Clean shoot_player
+    if(shoot_player.tex_shootplayer)
+    {
+        SDL_DestroyTexture(shoot_player.tex_shootplayer);
+        shoot_player.tex_shootplayer = NULL;
     }
 
+    if(shoot_player.tmp_surf_shootplayer)
+    {
+        SDL_FreeSurface(shoot_player.tmp_surf_shootplayer);
+        shoot_player.tmp_surf_shootplayer = NULL;
+    }
+
+    //Clean shoot_walk_player
+    if(shoot_walk_player.tex_shootwalkplayer)
+    {
+        SDL_DestroyTexture(shoot_walk_player.tex_shootwalkplayer);
+        shoot_walk_player.tex_shootwalkplayer = NULL;
+    }
+
+    if(shoot_walk_player.tmp_surf_shootwalkplayer)
+    {
+        SDL_FreeSurface(shoot_walk_player.tmp_surf_shootwalkplayer);
+        shoot_walk_player.tmp_surf_shootwalkplayer = NULL;
+    }
+
+    //Reset anims
+    Animation_Reset(&shoot_player.shoot_anim);
+    Animation_Reset(&shoot_walk_player.shootwalk_anim);
 }
 
 /* Load/replace the shoot-walking spritesheet to be used when player shoots while walking */
@@ -364,7 +451,12 @@ void ChangePlayerShootWalkSkin(const char* shoot_walk_path)
         int w=0,h=0; SDL_QueryTexture(shoot_walk_player.tex_shootwalkplayer, NULL, NULL, &w, &h);
         int frames = (PLAYER_WIDTH > 0) ? (w / PLAYER_WIDTH) : 1;
         if (frames <= 0) frames = 1;
-        Animation_Init(&shoot_walk_player.shootwalk_anim, PLAYER_WIDTH, PLAYER_HEIGHT, frames, FRAME_DURATION_PLAYER/2);
+        if(skin_is_metal){
+            Animation_Init(&shoot_player.shoot_anim, PLAYER_WIDTH, PLAYER_HEIGHT, frames, FRAME_DURATION_PLAYER/2);
+        }else{
+            Animation_Init(&shoot_player.shoot_anim, PLAYER_WIDTH, PLAYER_HEIGHT, frames, FRAME_DURATION_PLAYER);
+        }
+            
         SDL_Log("ChangePlayerShootWalkSkin: loaded shoot-walk skin '%s' frames=%d\n", shoot_walk_path, frames);
     } else {
         SDL_Log("ChangePlayerShootWalkSkin: failed to load '%s'\n", shoot_walk_path);
@@ -385,7 +477,10 @@ void ChangePlayerShootSkin(const char* shoot_path)
         int w=0,h=0; SDL_QueryTexture(shoot_player.tex_shootplayer, NULL, NULL, &w, &h);
         int frames = (PLAYER_WIDTH > 0) ? (w / PLAYER_WIDTH) : 1;
         if (frames <= 0) frames = 1;
-        Animation_Init(&shoot_player.shoot_anim, PLAYER_WIDTH, PLAYER_HEIGHT, frames, FRAME_DURATION_PLAYER/2);
+        if(skin_is_metal)
+            Animation_Init(&shoot_player.shoot_anim, PLAYER_WIDTH, PLAYER_HEIGHT, frames, FRAME_DURATION_PLAYER/2);
+        else
+            Animation_Init(&shoot_player.shoot_anim, PLAYER_WIDTH, PLAYER_HEIGHT, frames, FRAME_DURATION_PLAYER);
         SDL_Log("ChangePlayerShootSkin: loaded shoot skin '%s' frames=%d\n", shoot_path, frames);
     } else {
         SDL_Log("ChangePlayerShootSkin: failed to load '%s'\n", shoot_path);
