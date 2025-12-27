@@ -452,9 +452,9 @@ void ChangePlayerShootWalkSkin(const char* shoot_walk_path)
         int frames = (PLAYER_WIDTH > 0) ? (w / PLAYER_WIDTH) : 1;
         if (frames <= 0) frames = 1;
         if(skin_is_metal){
-            Animation_Init(&shoot_player.shoot_anim, PLAYER_WIDTH, PLAYER_HEIGHT, frames, FRAME_DURATION_PLAYER/2);
+            Animation_Init(&shoot_walk_player.shootwalk_anim, PLAYER_WIDTH, PLAYER_HEIGHT, frames, FRAME_DURATION_PLAYER/2);
         }else{
-            Animation_Init(&shoot_player.shoot_anim, PLAYER_WIDTH, PLAYER_HEIGHT, frames, FRAME_DURATION_PLAYER);
+            Animation_Init(&shoot_walk_player.shootwalk_anim, PLAYER_WIDTH, PLAYER_HEIGHT, frames, FRAME_DURATION_PLAYER);
         }
             
         SDL_Log("ChangePlayerShootWalkSkin: loaded shoot-walk skin '%s' frames=%d\n", shoot_walk_path, frames);
