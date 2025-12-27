@@ -111,6 +111,9 @@ tools_dev:
 	$(WIN32_CC) new_commit.c -o new_commit_32.exe
 	$(WIN32_CC) convert_gif_to_sequencePNG.c -o convert_gif_to_sequencePNG_32.exe
 
+create_icon_exe:
+	windres resource.rc -o resource.o
+
 clean:
 	rm -rf obj $(NAME) $(WIN_NAME) $(WIN32_NAME) *.zip new_commit *.exe
 
@@ -120,11 +123,11 @@ $(NAME): $(OBJECTS)
 
 #RULE WINDOWS X64
 $(WIN_NAME): $(OBJECTS)
-	$(WIN_CC) $(WIN_CFLAGS) $(OBJECTS) -o $(WIN_NAME) $(WIN_LIBS)
+	$(WIN_CC) $(WIN_CFLAGS) $(OBJECTS) resource.o -o $(WIN_NAME) $(WIN_LIBS)
 
 # RULE WINDOWS 32-BIT
 $(WIN32_NAME): $(OBJECTS)
-	$(WIN32_CC) $(WIN32_CFLAGS) $(OBJECTS) -o $(WIN32_NAME) $(WIN32_LIBS)
+	$(WIN32_CC) $(WIN32_CFLAGS) $(OBJECTS) resource.o -o $(WIN32_NAME) $(WIN32_LIBS)
 
 obj/%.o: src/%.c
 	mkdir -p obj
