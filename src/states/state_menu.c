@@ -727,7 +727,7 @@ int StateUpdate()
                     SDL_DestroyTexture(percent_tex);
                     SDL_Delay(50);
                 }
-
+        }
         /* Launch installer and exit */
         #ifdef _WIN32
         if(download_result == 0){
@@ -745,7 +745,6 @@ int StateUpdate()
 
         }
         #endif
-    }
 
     return 0;
 }
