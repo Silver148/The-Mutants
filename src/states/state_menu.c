@@ -737,13 +737,6 @@ int StateUpdate()
             sei.nShow = SW_SHOWNORMAL;
 
             if(ShellExecuteEx(&sei)){
-                WaitForSingleObject(sei.hProcess, INFINITE);
-                CloseHandle(sei.hProcess);
-
-                Sleep(2000);
-
-                DeleteFile(download_path);
-
                 TTF_CloseFont(font);
                 TTF_Quit();
                 SDL_Quit();
