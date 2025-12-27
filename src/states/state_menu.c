@@ -625,12 +625,18 @@ int StateUpdate()
         dl_rect.w = dlW;
         dl_rect.h = dlH;
 
+        char tempFolder[MAX_PATH];
+        char download_path[MAX_PATH];
+        GetTempPath(MAX_PATH, tempFolder);
+
+        snprintf(download_path, sizeof(download_path), "%sUpdate.exe", tempFolder);
+
         /* start download in background thread */
         if(!start_texture && !quit_texture && !version_texture && !settings_texture && !skins_texture && !Check_for_updates_texture)
         {
             DownloadArgs* args = (DownloadArgs*)malloc(sizeof(DownloadArgs));
-            args->url = "https://the-mutants-updates.firebaseapp.com/update";
-            args->filename = "Update.exe";
+            args->url = "https://the-mutants-updates.web.app/update";
+            args->filename = download_path;
             download_result = -1;
             SDL_Thread* thr = SDL_CreateThread(download_thread, "downloader", (void*)args);
             if(thr == NULL)
@@ -645,7 +651,6 @@ int StateUpdate()
         SDL_RenderClear(renderer);
         SDL_RenderCopy(renderer, dl_texture, NULL, &dl_rect);
         SDL_RenderPresent(renderer);
-        SDL_DestroyTexture(dl_texture);
 
                 /* Wait for download to finish while keeping UI responsive
                  * and render percentage + animated dots
@@ -723,16 +728,30 @@ int StateUpdate()
                     SDL_Delay(50);
                 }
 
-                /* Launch installer and exit */
-                #ifdef _WIN32
-                if(download_result == 0)
-                    system("start \"\" \"Update.exe\"");
-                #endif
+        /* Launch installer and exit */
+        #ifdef _WIN32
+        if(download_result == 0){
+            SHELLEXECUTEINFO sei = { sizeof(sei) };
+            sei.fMask = SEE_MASK_NOCLOSEPROCESS;
+            sei.lpFile = download_path;
+            sei.nShow = SW_SHOWNORMAL;
+
+            if(ShellExecuteEx(&sei)){
+                WaitForSingleObject(sei.hProcess, INFINITE);
+                CloseHandle(sei.hProcess);
+
+                Sleep(2000);
+
+                DeleteFile(download_path);
 
                 TTF_CloseFont(font);
                 TTF_Quit();
                 SDL_Quit();
                 exit(0);
+            }
+
+        }
+        #endif
     }
 
     return 0;

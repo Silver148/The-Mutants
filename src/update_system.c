@@ -56,13 +56,14 @@ CURLcode download(const char *url, const char *filename) {
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
 
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
+
         curl_easy_setopt(curl, CURLOPT_USERAGENT, "TheMutants-Updater/1.0");
         /* enable progress and set callback */
         curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, xferinfo);
         curl_easy_setopt(curl, CURLOPT_XFERINFODATA, NULL);
         curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
-        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
-        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
         
         res = curl_easy_perform(curl);
         if(res != CURLE_OK) {
