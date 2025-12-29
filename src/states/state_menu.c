@@ -29,6 +29,8 @@ State Menu :D
 
 #include <math.h>
 
+char download_path[MAX_PATH];
+
 /* Pi constant for spinner math */
 static const double PI = 3.14159265358979323846;
 
@@ -437,7 +439,7 @@ int State_Skins(){
     int huehuehueW = 0, huehuehueH = 0;
     SDL_QueryTexture(huehuehue_texture, NULL, NULL, &huehuehueW, &huehuehueH);
     huehuehue_rect.x = 320;
-    huehuehue_rect.y = 100;
+    huehuehue_rect.y = 150;
     huehuehue_rect.w = huehuehueW / 6;
     huehuehue_rect.h = huehuehueH / 6;
 
@@ -452,6 +454,19 @@ int State_Skins(){
     default_skin_rect.y = 100;
     default_skin_rect.w = default_skinW * 4;
     default_skin_rect.h = default_skinH * 4;
+
+    /*GOKU SKIN*/
+    SDL_Surface* goku_surface = IMG_Load("skins/goku.png");
+    SDL_Texture* goku_texture = SDL_CreateTextureFromSurface(renderer, goku_surface);
+    SDL_FreeSurface(goku_surface);
+
+    SDL_Rect goku_rect;
+    int gokuW = 0, gokuH = 0;
+    SDL_QueryTexture(goku_texture, NULL, NULL, &gokuW, &gokuH);
+    goku_rect.x = huehuehue_rect.x + 100;
+    goku_rect.y = 150 - huehuehue_rect.h;
+    goku_rect.w = gokuW / 50;
+    goku_rect.h = gokuH / 50;
 
     /*SKINS TEXT*/
     SDL_Surface* skins_text_surface = TTF_RenderText_Solid(font, "Skins", (SDL_Color){255, 255, 255, 255});
@@ -514,7 +529,7 @@ int State_Skins(){
             {
                 if(e.key.keysym.scancode == SDL_SCANCODE_RIGHT)
                 {
-                    if(index_selected_skin < 2)
+                    if(index_selected_skin < 3)
                     {
                         index_selected_skin++;
                         arrow2_rect.x += 280;
@@ -526,6 +541,10 @@ int State_Skins(){
                         else if(index_selected_skin == 2)
                         {
                             ChangePlayerSkin("sprites/IDLE-METAL-SONIC.png", "sprites/WALK-METAL-SONIC.png", "sprites/jump-METAL-SONIC.png");
+                        }
+                        else if(index_selected_skin == 3)
+                        {
+                            ChangePlayerSkin("sprites/IDLEGOKU.png", "sprites/WALKGOKU.png", "sprites/JUMPGOKU.png");
                         }
                     }
                 }
@@ -571,7 +590,8 @@ int State_Skins(){
 
         SDL_RenderCopy(renderer, arrow2_texture, NULL, &arrow2_rect);
         SDL_RenderCopy(renderer, skins_text_texture, NULL, &skins_text_rect); /*SKINS TEXT*/
-        SDL_RenderCopy(renderer, default_skin_texture, NULL, &default_skin_rect); /*DEFAULT SKIN PREVIEW*/
+        SDL_RenderCopy(renderer, default_skin_texture, NULL, &default_skin_rect); /*DEFAULT ICON*/
+        SDL_RenderCopy(renderer, goku_texture, NULL, &goku_rect); /*GOKU ICON*/
         SDL_RenderCopy(renderer, arrow_texture, NULL, &arrow_rect); /*ARROW*/
         SDL_RenderCopy(renderer, huehuehue_texture, NULL, &huehuehue_rect); /*HUEHUEHUE ICON*/
 
@@ -626,7 +646,6 @@ int StateUpdate()
         dl_rect.h = dlH;
 
         char tempFolder[MAX_PATH];
-        char download_path[MAX_PATH];
         GetTempPath(MAX_PATH, tempFolder);
 
         snprintf(download_path, sizeof(download_path), "%sUpdate.exe", tempFolder);
@@ -727,7 +746,6 @@ int StateUpdate()
                     SDL_DestroyTexture(percent_tex);
                     SDL_Delay(50);
                 }
-        }
         /* Launch installer and exit */
         #ifdef _WIN32
         if(download_result == 0){
@@ -737,6 +755,7 @@ int StateUpdate()
             sei.nShow = SW_SHOWNORMAL;
 
             if(ShellExecuteEx(&sei)){
+                MoveFileEx(download_path, NULL, MOVEFILE_DELAY_UNTIL_REBOOT);
                 TTF_CloseFont(font);
                 TTF_Quit();
                 SDL_Quit();
@@ -745,6 +764,7 @@ int StateUpdate()
 
         }
         #endif
+        }
 
     return 0;
 }

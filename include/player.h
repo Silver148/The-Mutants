@@ -57,6 +57,8 @@ extern WALK_PLAYER walk_player;
 extern JUMP_PLAYER jump_player;
 extern SHOOT_PLAYER shoot_player;
 extern SHOOT_WALK_PLAYER shoot_walk_player;
+extern int PLAYER_WIDTH;
+extern int PLAYER_HEIGHT;
 
 typedef enum{
     IDLE,
@@ -64,9 +66,6 @@ typedef enum{
     JUMP,
     SHOOT
 } StatesPlayer;
-
-#define PLAYER_WIDTH 64
-#define PLAYER_HEIGHT 64
 
 #define IDLE_FRAMES 2
 #define WALK_FRAMES 11
