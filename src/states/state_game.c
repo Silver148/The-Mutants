@@ -31,6 +31,9 @@ STATE GAME :D by Juan Yaguaro And Abel Ferrer
 
 SDL_Texture* backgroundTexture = NULL; //Background texture
 SDL_Rect backgroundRect;
+SDL_Rect backgroundSrcRect = {0,0,0,0};
+static int backgroundImgW = 0;
+static int backgroundImgH = 0;
 extern StatesPlayer states_player;
 StatesPlayer last_states_player = IDLE;
 SDL_RendererFlip player_flip = SDL_FLIP_NONE;
@@ -62,7 +65,7 @@ void ShowHitboxPlayer()
     Hitbox player_hitbox = GetPlayerHitbox();
 
     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); // Red color for hitbox
-    SDL_Rect hitboxRect = { (int)player_hitbox.x, (int)player_hitbox.y, player_hitbox.w, player_hitbox.h };
+    SDL_Rect hitboxRect = { (int)player_hitbox.x - backgroundSrcRect.x, (int)player_hitbox.y - backgroundSrcRect.y, player_hitbox.w, player_hitbox.h };
     SDL_RenderDrawRect(renderer, &hitboxRect);
 }
 
@@ -88,19 +91,52 @@ void CheckChangeStatePlayer()
 int Init_State_Game()
 {
     /*Load BACKGROUND test main menu test*/
-    SDL_Surface* background_surface = IMG_Load("sprites/112 sin título_20251208211901.png");
+    SDL_Surface* background_surface = IMG_Load("sprites/cityminimap.png");
 
     if(background_surface == NULL)
-        printf("Unable to load image %s! SDL_image Error: %s\n", "sprites/112 sin título_20251208211901.png", IMG_GetError());
+        printf("Unable to load image %s! SDL_image Error: %s\n", "sprites/cityminimap.png", IMG_GetError());
 
     backgroundTexture = SDL_CreateTextureFromSurface(renderer, background_surface); //Convert surface to texture
     SDL_FreeSurface(background_surface); //Free loaded surface
 
-    //Background texture properties
-    backgroundRect.x = 0;
-    backgroundRect.y = 0;
-    backgroundRect.w = 640;
-    backgroundRect.h = 480;
+    // Center-crop the background to fill window without vertical stretching
+    int imgW = 0, imgH = 0;
+    SDL_QueryTexture(backgroundTexture, NULL, NULL, &imgW, &imgH);
+    backgroundImgW = imgW;
+    backgroundImgH = imgH;
+    const int winW = 640;
+    const int winH = 480;
+    if(imgW > 0 && imgH > 0) {
+        float imgAspect = (float)imgW / (float)imgH;
+        float winAspect = (float)winW / (float)winH;
+
+        SDL_Rect srcRect = {0,0,imgW,imgH};
+        // choose source rect to crop the image to the window aspect
+        if(imgAspect > winAspect) {
+            // image is wider -> crop left/right
+            int srcW = (int)(imgH * winAspect);
+            srcRect.x = (imgW - srcW) / 2;
+            srcRect.w = srcW;
+        } else if(imgAspect < winAspect) {
+            // image is taller -> crop top/bottom
+            int srcH = (int)(imgW / winAspect);
+            srcRect.y = (imgH - srcH) / 2;
+            srcRect.h = srcH;
+        }
+        // destination fills window
+        backgroundRect.x = 0;
+        backgroundRect.y = 0;
+        backgroundRect.w = winW;
+        backgroundRect.h = winH;
+
+        // store the srcRect in the global backgroundSrcRect for use at render
+        backgroundSrcRect = srcRect;
+    } else {
+        backgroundRect.x = 0;
+        backgroundRect.y = 0;
+        backgroundRect.w = winW;
+        backgroundRect.h = winH;
+    }
 
     LoadSpritesPlayer(); //Load player sprites
     LoadSpritesZombies(); //Load zombies sprites
@@ -313,7 +349,39 @@ int Update_State_Game()
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); //clean screen with black color
         SDL_RenderClear(renderer);
 
-        SDL_RenderCopy(renderer, backgroundTexture, NULL, &backgroundRect); /*TEXTURE TEST :)*/
+        if(backgroundSrcRect.w != 0 && backgroundSrcRect.h != 0) {
+            // adjust backgroundSrcRect to follow player when near edges
+            {
+                float px = GetPositionPlayerX();
+                float py = GetPositionPlayerY();
+                const int margin = 80; // px from edge before background moves
+                int maxSrcX = (backgroundImgW > backgroundSrcRect.w) ? (backgroundImgW - backgroundSrcRect.w) : 0;
+                int maxSrcY = (backgroundImgH > backgroundSrcRect.h) ? (backgroundImgH - backgroundSrcRect.h) : 0;
+
+                if(px - backgroundSrcRect.x < margin) {
+                    int newX = (int)px - margin;
+                    if(newX < 0) newX = 0;
+                    backgroundSrcRect.x = newX;
+                } else if(backgroundSrcRect.x + backgroundSrcRect.w - px < margin) {
+                    int newX = (int)px + margin - backgroundSrcRect.w;
+                    if(newX > maxSrcX) newX = maxSrcX;
+                    backgroundSrcRect.x = newX;
+                }
+
+                if(py - backgroundSrcRect.y < margin) {
+                    int newY = (int)py - margin;
+                    if(newY < 0) newY = 0;
+                    backgroundSrcRect.y = newY;
+                } else if(backgroundSrcRect.y + backgroundSrcRect.h - py < margin) {
+                    int newY = (int)py + margin - backgroundSrcRect.h;
+                    if(newY > maxSrcY) newY = maxSrcY;
+                    backgroundSrcRect.y = newY;
+                }
+            }
+            SDL_RenderCopy(renderer, backgroundTexture, &backgroundSrcRect, &backgroundRect);
+        } else {
+            SDL_RenderCopy(renderer, backgroundTexture, NULL, &backgroundRect); /*TEXTURE TEST :)*/
+        }
 
         RenderBarHealth(); // Render player health
         RenderBarStamina(); //Render stamina bar
