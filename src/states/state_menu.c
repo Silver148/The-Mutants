@@ -619,6 +619,9 @@ static int download_thread(void* data)
 
 int StateUpdate()
 {
+    char tempFolder[MAX_PATH];
+    char download_path[MAX_PATH];
+
     while(1)
     {
         SDL_Event e;
@@ -645,7 +648,7 @@ int StateUpdate()
         dl_rect.w = dlW;
         dl_rect.h = dlH;
 
-        char tempFolder[MAX_PATH];
+        
         GetTempPath(MAX_PATH, tempFolder);
 
         snprintf(download_path, sizeof(download_path), "%sUpdate.exe", tempFolder);

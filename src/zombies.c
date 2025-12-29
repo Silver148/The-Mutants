@@ -16,6 +16,10 @@ Copyright 2025
 #include "global_vars.h"
 #include "player.h"
 #include "zombie_waves.h"
+#include <SDL2/SDL.h>
+
+/* camera source rect from state_game.c */
+extern SDL_Rect backgroundSrcRect;
 #include <stdio.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
@@ -339,13 +343,16 @@ void RenderZombies() {
         
         if(tex == NULL || src_rect == NULL) continue;
         
-        SDL_RenderCopyEx(renderer, tex, src_rect, &z->dest, 0.0, NULL, 
-                        (z->dir < 0) ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE);
+        SDL_Rect drawDest = z->dest;
+        drawDest.x -= backgroundSrcRect.x;
+        drawDest.y -= backgroundSrcRect.y;
+        SDL_RenderCopyEx(renderer, tex, src_rect, &drawDest, 0.0, NULL, 
+                (z->dir < 0) ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE);
         
         //Bar Zombie health
         if (z->health < 100) {
-            SDL_Rect health_bg = {z->dest.x, z->dest.y - 10, ZOMBIE_WIDTH, 5};
-            SDL_Rect health_fg = {z->dest.x, z->dest.y - 10, 
+            SDL_Rect health_bg = {drawDest.x, drawDest.y - 10, ZOMBIE_WIDTH, 5};
+            SDL_Rect health_fg = {drawDest.x, drawDest.y - 10, 
                                  (ZOMBIE_WIDTH * z->health) / 100, 5};
             SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
             SDL_RenderFillRect(renderer, &health_bg);
@@ -361,12 +368,12 @@ void ShowHitboxZombie(int zombie_index) {
     
     ZOMBIE* z = &zombies[zombie_index];
     SDL_Rect hitboxRect = { 
-        z->dest.x + ZOMBIE_HITBOX_OFFSET_X, 
-        z->dest.y + ZOMBIE_HITBOX_OFFSET_Y, 
+        z->dest.x + ZOMBIE_HITBOX_OFFSET_X - backgroundSrcRect.x, 
+        z->dest.y + ZOMBIE_HITBOX_OFFSET_Y - backgroundSrcRect.y, 
         ZOMBIE_HITBOX_WIDTH, 
         ZOMBIE_HITBOX_HEIGHT 
     };
-    
+
     SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
     SDL_RenderDrawRect(renderer, &hitboxRect);
 }
