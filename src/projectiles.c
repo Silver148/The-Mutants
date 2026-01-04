@@ -56,8 +56,10 @@ void UpdateProjectiles()
         projectiles[i].x += projectiles[i].vx * deltaTime;
         projectiles[i].y += projectiles[i].vy * deltaTime;
 
-        if(projectiles[i].x < -50 || projectiles[i].x > 700 || 
-           projectiles[i].y < -50 || projectiles[i].y > 530) {
+          extern int backgroundImgW;
+          extern int backgroundImgH;
+          if(projectiles[i].x < -50 || projectiles[i].x > backgroundImgW + 50 || 
+              projectiles[i].y < -50 || projectiles[i].y > backgroundImgH + 50) {
             projectiles[i].active = 0;
             continue;
         }
@@ -129,7 +131,8 @@ void RenderProjectiles()
     SDL_SetRenderDrawColor(renderer, 255, 220, 0, 255);
     for(int i=0;i<MAX_PROJECTILES;i++){
         if(!projectiles[i].active) continue;
-        SDL_Rect r = { (int)projectiles[i].x, (int)projectiles[i].y, projectiles[i].w, projectiles[i].h };
+        extern SDL_Rect backgroundSrcRect; /* declared in state_game.c */
+        SDL_Rect r = { (int)projectiles[i].x - backgroundSrcRect.x, (int)projectiles[i].y - backgroundSrcRect.y, projectiles[i].w, projectiles[i].h };
         SDL_RenderFillRect(renderer, &r);
     }
 }
