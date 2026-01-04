@@ -621,14 +621,52 @@ int StateUpdate()
 {
     char tempFolder[MAX_PATH];
     char download_path[MAX_PATH];
+    
+    /* Get temp path and prepare filename outside the loop to avoid repeating work */
+    GetTempPath(MAX_PATH, tempFolder);
+    snprintf(download_path, sizeof(download_path), "%sUpdate.exe", tempFolder);
 
-    while(1)
+    /* Render "Downloading..." text once to avoid memory leaks */
+    SDL_Surface* dl_surface = TTF_RenderText_Solid(font, "Downloading update...", (SDL_Color){255, 255, 255, 255});
+    SDL_Texture* dl_texture = SDL_CreateTextureFromSurface(renderer, dl_surface);
+    SDL_FreeSurface(dl_surface);
+
+    SDL_Rect dl_rect;
+    int dlW = 0, dlH = 0;
+    SDL_QueryTexture(dl_texture, NULL, NULL, &dlW, &dlH);
+    dl_rect.x = (640 - dlW) / 2;
+    dl_rect.y = 220;
+    dl_rect.w = dlW;
+    dl_rect.h = dlH;
+
+    /* start download in background thread - MOVED OUTSIDE OF LOOP to prevent infinite threads */
+    if(!start_texture && !quit_texture && !version_texture && !settings_texture && !skins_texture && !Check_for_updates_texture)
     {
-        SDL_Event e;
-        while(SDL_PollEvent(&e))
+        DownloadArgs* args = (DownloadArgs*)malloc(sizeof(DownloadArgs));
+        args->url = "https://the-mutants-updates.web.app/update";
+        args->filename = strdup(download_path); // Use strdup to ensure string safety
+        download_result = -1;
+        
+        SDL_Thread* thr = SDL_CreateThread(download_thread, "downloader", (void*)args);
+        if(thr == NULL)
         {
-            if(e.type == SDL_QUIT)
+            /* fallback to synchronous download if thread creation fails */
+            download_result = download(args->url, args->filename);
+            free(args);
+        }
+    }
+
+    /* Wait for download to finish while keeping UI responsive
+     * and render percentage + animated dots
+     */
+    while(download_result == -1)
+    {
+        SDL_Event ev;
+        while(SDL_PollEvent(&ev))
+        {
+            if(ev.type == SDL_QUIT)
             {
+                SDL_DestroyTexture(dl_texture);
                 TTF_CloseFont(font);
                 TTF_Quit();
                 SDL_Quit();
@@ -636,138 +674,85 @@ int StateUpdate()
             }
         }
 
-        SDL_Surface* dl_surface = TTF_RenderText_Solid(font, "Downloading update...", (SDL_Color){255, 255, 255, 255});
-        SDL_Texture* dl_texture = SDL_CreateTextureFromSurface(renderer, dl_surface);
-        SDL_FreeSurface(dl_surface);
+        /* compute percentage */
+        int percent = 0;
+        curl_off_t total = download_total;
+        curl_off_t done = download_bytes;
+        if(total > 0) percent = (int)((done * 100) / total);
 
-        SDL_Rect dl_rect;
-        int dlW = 0, dlH = 0;
-        SDL_QueryTexture(dl_texture, NULL, NULL, &dlW, &dlH);
-        dl_rect.x = (640 - dlW) / 2;
-        dl_rect.y = 220;
-        dl_rect.w = dlW;
-        dl_rect.h = dlH;
+        /* render downloading + percentage */
+        char percent_text[64];
+        if(total > 0)
+            snprintf(percent_text, sizeof(percent_text), "%d%%", percent);
+        else
+            snprintf(percent_text, sizeof(percent_text), "--%%");
 
-        
-        GetTempPath(MAX_PATH, tempFolder);
+        SDL_Surface* percent_surf = TTF_RenderText_Solid(font, percent_text, (SDL_Color){255,255,255,255});
+        SDL_Texture* percent_tex = SDL_CreateTextureFromSurface(renderer, percent_surf);
+        SDL_FreeSurface(percent_surf);
 
-        snprintf(download_path, sizeof(download_path), "%sUpdate.exe", tempFolder);
+        int pW=0,pH=0;
+        SDL_QueryTexture(percent_tex, NULL, NULL, &pW, &pH);
+        SDL_Rect pRect = { (640 - pW)/2, 260, pW, pH };
 
-        /* start download in background thread */
-        if(!start_texture && !quit_texture && !version_texture && !settings_texture && !skins_texture && !Check_for_updates_texture)
+        /* animate dots (4 dots around) */
+        Uint32 t = SDL_GetTicks();
+        int frame = (t / 250) % 8; /* 8 positions */
+        int dotRadius = 4;
+        int cx = 320; int cy = 320; int r = 14;
+
+        SDL_SetRenderDrawColor(renderer, 0,0,0,255);
+        SDL_RenderClear(renderer);
+
+        SDL_RenderCopy(renderer, dl_texture, NULL, &dl_rect);
+        SDL_RenderCopy(renderer, percent_tex, NULL, &pRect);
+
+        SDL_SetRenderDrawColor(renderer, 255,255,255,255);
+        for(int i=0;i<8;i++)
         {
-            DownloadArgs* args = (DownloadArgs*)malloc(sizeof(DownloadArgs));
-            args->url = "https://the-mutants-updates.web.app/update";
-            args->filename = download_path;
-            download_result = -1;
-            SDL_Thread* thr = SDL_CreateThread(download_thread, "downloader", (void*)args);
-            if(thr == NULL)
+            double ang = (i * M_PI * 2) / 8.0;
+            int dx = (int)(cx + cos(ang) * r);
+            int dy = (int)(cy + sin(ang) * r);
+            SDL_Rect dot = { dx - dotRadius, dy - dotRadius, dotRadius*2, dotRadius*2 };
+            
+            /* fade inactive dots */
+            if(((i + frame) % 8) < 3)
             {
-                /* fallback to synchronous download if thread creation fails */
-                download_result = download(args->url, args->filename);
-                free(args);
+                SDL_SetRenderDrawColor(renderer, 255,255,255,255);
+            } else {
+                SDL_SetRenderDrawColor(renderer, 180,180,180,255);
             }
+            SDL_RenderFillRect(renderer, &dot);
         }
 
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-        SDL_RenderClear(renderer);
-        SDL_RenderCopy(renderer, dl_texture, NULL, &dl_rect);
         SDL_RenderPresent(renderer);
 
-                /* Wait for download to finish while keeping UI responsive
-                 * and render percentage + animated dots
-                 */
-                while(download_result == -1)
-                {
-                    SDL_Event ev;
-                    while(SDL_PollEvent(&ev))
-                    {
-                        if(ev.type == SDL_QUIT)
-                        {
-                            TTF_CloseFont(font);
-                            TTF_Quit();
-                            SDL_Quit();
-                            return 0;
-                        }
-                    }
+        /* CRITICAL: Destroy percentage texture every frame to prevent memory leak */
+        SDL_DestroyTexture(percent_tex);
+        
+        SDL_Delay(16); // Prevent 100% CPU usage
+    }
 
-                    /* compute percentage */
-                    int percent = 0;
-                    curl_off_t total = download_total;
-                    curl_off_t done = download_bytes;
-                    if(total > 0) percent = (int)((done * 100) / total);
+    /* Destroy main texture after loop ends */
+    SDL_DestroyTexture(dl_texture);
 
-                    /* render downloading + percentage */
-                    char percent_text[64];
-                    if(total > 0)
-                        snprintf(percent_text, sizeof(percent_text), "%d%%", percent);
-                    else
-                        snprintf(percent_text, sizeof(percent_text), "--%%");
+    /* Launch installer and exit */
+    #ifdef _WIN32
+    if(download_result == 0){
+        SHELLEXECUTEINFO sei = { sizeof(sei) };
+        sei.fMask = SEE_MASK_NOCLOSEPROCESS;
+        sei.lpFile = download_path;
+        sei.nShow = SW_SHOWNORMAL;
 
-                    SDL_Surface* percent_surf = TTF_RenderText_Solid(font, percent_text, (SDL_Color){255,255,255,255});
-                    SDL_Texture* percent_tex = SDL_CreateTextureFromSurface(renderer, percent_surf);
-                    SDL_FreeSurface(percent_surf);
-
-                    int pW=0,pH=0;
-                    SDL_QueryTexture(percent_tex, NULL, NULL, &pW, &pH);
-                    int display_w = pW;
-                    int display_h = pH;
-
-                    SDL_Rect pRect = { (640 - display_w)/2, 260, display_w, display_h };
-
-                    /* animate dots (4 dots around) */
-                    Uint32 t = SDL_GetTicks();
-                    int frame = (t / 250) % 8; /* 8 positions */
-                    int dotRadius = 4;
-                    int cx = 320; int cy = 320; int r = 14;
-
-                    SDL_SetRenderDrawColor(renderer, 0,0,0,255);
-                    SDL_RenderClear(renderer);
-
-                    SDL_RenderCopy(renderer, dl_texture, NULL, &dl_rect);
-                    SDL_RenderCopy(renderer, percent_tex, NULL, &pRect);
-
-                    SDL_SetRenderDrawColor(renderer, 255,255,255,255);
-                    for(int i=0;i<8;i++)
-                    {
-                        double ang = (i * M_PI * 2) / 8.0;
-                        int dx = (int)(cx + cos(ang) * r);
-                        int dy = (int)(cy + sin(ang) * r);
-                        SDL_Rect dot = { dx - dotRadius, dy - dotRadius, dotRadius*2, dotRadius*2 };
-                        /* fade inactive dots */
-                        if(((i + frame) % 8) < 3)
-                        {
-                            SDL_SetRenderDrawColor(renderer, 255,255,255,255);
-                        } else {
-                            SDL_SetRenderDrawColor(renderer, 180,180,180,255);
-                        }
-                        SDL_RenderFillRect(renderer, &dot);
-                    }
-
-                    SDL_RenderPresent(renderer);
-
-                    SDL_DestroyTexture(percent_tex);
-                    SDL_Delay(50);
-                }
-        /* Launch installer and exit */
-        #ifdef _WIN32
-        if(download_result == 0){
-            SHELLEXECUTEINFO sei = { sizeof(sei) };
-            sei.fMask = SEE_MASK_NOCLOSEPROCESS;
-            sei.lpFile = download_path;
-            sei.nShow = SW_SHOWNORMAL;
-
-            if(ShellExecuteEx(&sei)){
-                MoveFileEx(download_path, NULL, MOVEFILE_DELAY_UNTIL_REBOOT);
-                TTF_CloseFont(font);
-                TTF_Quit();
-                SDL_Quit();
-                exit(0);
-            }
-
+        if(ShellExecuteEx(&sei)){
+            MoveFileEx(download_path, NULL, MOVEFILE_DELAY_UNTIL_REBOOT);
+            TTF_CloseFont(font);
+            TTF_Quit();
+            SDL_Quit();
+            exit(0);
         }
-        #endif
-        }
+    }
+    #endif
 
     return 0;
 }
