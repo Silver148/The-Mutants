@@ -359,8 +359,10 @@ int Update_State_Game()
         if(backgroundSrcRect.w != 0 && backgroundSrcRect.h != 0) {
             // adjust backgroundSrcRect to follow player when near edges
             {
-                float px = GetPositionPlayerX();
-                float py = GetPositionPlayerY();
+                     /* use player's logical center for camera tracking to avoid
+                         visual jumps when animation frame widths change */
+                     float px = GetPositionPlayerX() + (PLAYER_WIDTH / 2.0f);
+                     float py = GetPositionPlayerY();
                 const int margin = 80; // px from edge before background moves
                 int maxSrcX = (backgroundImgW > backgroundSrcRect.w) ? (backgroundImgW - backgroundSrcRect.w) : 0;
                 int maxSrcY = (backgroundImgH > backgroundSrcRect.h) ? (backgroundImgH - backgroundSrcRect.h) : 0;
@@ -389,7 +391,7 @@ int Update_State_Game()
         } else {
             SDL_RenderCopy(renderer, backgroundTexture, NULL, &backgroundRect); /*TEXTURE TEST :)*/
         }
-
+        
         /* world barriers exist in logic but are invisible (no rendering) */
 
         RenderBarHealth(); // Render player health

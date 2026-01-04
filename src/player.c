@@ -28,6 +28,8 @@ extern int backgroundImgH;
 extern int worldBarrierX;
 extern int worldBarrierLeftX;
 
+/* track last flip to log direction changes for debugging */
+static SDL_RendererFlip last_player_flip = SDL_FLIP_NONE;
 #define POS_Y 350
 #define POS_X 100
 
@@ -673,8 +675,12 @@ void PlayerWalkAnim(SDL_RendererFlip flip_type)
         walk_player.dest_walkplayer.w = src_mod.w;
         walk_player.dest_walkplayer.h = src_mod.h;
 
+        SDL_Rect drawDest = walk_player.dest_walkplayer;
+        drawDest.x -= backgroundSrcRect.x;
+        drawDest.y -= backgroundSrcRect.y;
+
         SDL_RenderCopyEx(renderer, walk_player.tex_walkplayer, &src_mod,
-                         &walk_player.dest_walkplayer, 0.0, NULL, flip_type);
+                 &drawDest, 0.0, NULL, flip_type);
     } else {
         /* Lógica original para otras skins */
         walk_player.dest_walkplayer.x = (int)(position_x + (PLAYER_WIDTH - src_rect->w) / 2);
@@ -685,6 +691,7 @@ void PlayerWalkAnim(SDL_RendererFlip flip_type)
 
     SDL_RenderCopyEx(renderer, walk_player.tex_walkplayer, src_rect,
                      &walk_player.dest_walkplayer, 0.0, NULL, flip_type);
+    }
 }
 
 void PlayerJumpAnim(SDL_RendererFlip flip_type)
@@ -717,8 +724,12 @@ void PlayerJumpAnim(SDL_RendererFlip flip_type)
         jump_player.dest_jumpplayer.w = src_mod.w;
         jump_player.dest_jumpplayer.h = src_mod.h;
 
+        SDL_Rect drawDest = jump_player.dest_jumpplayer;
+        drawDest.x -= backgroundSrcRect.x;
+        drawDest.y -= backgroundSrcRect.y;
+
         SDL_RenderCopyEx(renderer, jump_player.tex_jumpplayer, &src_mod,
-                         &jump_player.dest_jumpplayer, 0.0, NULL, flip_type);
+                 &drawDest, 0.0, NULL, flip_type);
     } else {
         /* Add a bit on the left and crop a bit on the right to adjust framing (inverted):3 */
         SDL_Rect src_mod = *src_rect;
@@ -744,8 +755,13 @@ void PlayerJumpAnim(SDL_RendererFlip flip_type)
         jump_player.dest_jumpplayer.w = src_mod.w;
         jump_player.dest_jumpplayer.h = src_mod.h;
 
+        SDL_Rect drawDest = jump_player.dest_jumpplayer;
+        drawDest.x -= backgroundSrcRect.x;
+        drawDest.y -= backgroundSrcRect.y;
+
     SDL_RenderCopyEx(renderer, jump_player.tex_jumpplayer, &src_mod,
-                     &jump_player.dest_jumpplayer, 0.0, NULL, flip_type);
+                     &drawDest, 0.0, NULL, flip_type);
+    }
 }
 
 void RenderPlayer(SDL_RendererFlip flip_type)

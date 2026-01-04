@@ -42,6 +42,7 @@ void SpawnProjectile(float x, float y, float vx, float vy, int damage)
             projectiles[i].w = 12;
             projectiles[i].h = 6;
             projectiles[i].damage = damage;
+            SDL_Log("SpawnProjectile: world=(%.1f,%.1f) vx=%.1f vy=%.1f dmg=%d slot=%d", x, y, vx, vy, damage, i);
             return;
         }
     }
@@ -133,6 +134,7 @@ void RenderProjectiles()
         if(!projectiles[i].active) continue;
         extern SDL_Rect backgroundSrcRect; /* declared in state_game.c */
         SDL_Rect r = { (int)projectiles[i].x - backgroundSrcRect.x, (int)projectiles[i].y - backgroundSrcRect.y, projectiles[i].w, projectiles[i].h };
+        SDL_Log("RenderProjectile[%d]: world=(%.1f,%.1f) screen=(%d,%d) active=%d", i, projectiles[i].x, projectiles[i].y, r.x, r.y, projectiles[i].active);
         SDL_RenderFillRect(renderer, &r);
     }
 }
