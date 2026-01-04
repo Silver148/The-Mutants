@@ -196,8 +196,8 @@ void LoadSpritesPlayer() {
             walk_player.tex_walkplayer = SDL_CreateTextureFromSurface(renderer, walk_player.tmp_surf_walkplayer);
             SDL_FreeSurface(walk_player.tmp_surf_walkplayer);
             walk_player.tmp_surf_walkplayer = NULL;
-            if(skin_is_goku) Animation_Init(&jump_player.jump_anim, PLAYER_WIDTH, PLAYER_HEIGHT, JUMP_FRAMES, FRAME_DURATION_PLAYER/2);
-            else Animation_Init(&jump_player.jump_anim, PLAYER_WIDTH, PLAYER_HEIGHT, JUMP_FRAMES, FRAME_DURATION_PLAYER);
+            if(skin_is_goku) Animation_Init(&walk_player.walk_anim, PLAYER_WIDTH, PLAYER_HEIGHT, WALK_FRAMES, FRAME_DURATION_PLAYER/2);
+            else Animation_Init(&walk_player.walk_anim, PLAYER_WIDTH, PLAYER_HEIGHT, WALK_FRAMES, FRAME_DURATION_PLAYER);
         } else {
             SDL_Log("LoadSpritesPlayer: failed to load default walk sprite: %s\n", "sprites/walk_player_spritesheet.png");
         }
@@ -347,7 +347,6 @@ void ChangePlayerSkin(const char* idle_path, const char* walk_path, const char* 
 
     if (walk_player.tex_walkplayer) {
         int w=0,h=0; SDL_QueryTexture(walk_player.tex_walkplayer, NULL, NULL, &w, &h);
-        if(skin_is_goku) {PLAYER_WIDTH = 31; PLAYER_HEIGHT = 49;}
         int frame_w = idle_frame_w ? idle_frame_w : ((PLAYER_WIDTH > 0) ? (w / PLAYER_WIDTH) : w);
         if (frame_w <= 0) frame_w = w;
         int detected_frames = (frame_w > 0) ? (w / frame_w) : 1;
