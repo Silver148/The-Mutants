@@ -21,6 +21,12 @@ Copyright 2025
 #include <string.h>
 
 extern SDL_Renderer* renderer;
+/* camera source rect from state_game.c */
+extern SDL_Rect backgroundSrcRect;
+extern int backgroundImgW;
+extern int backgroundImgH;
+extern int worldBarrierX;
+extern int worldBarrierLeftX;
 
 #define POS_Y 350
 #define POS_X 100
@@ -570,16 +576,23 @@ void RenderIdlePlayerAnim(SDL_RendererFlip flip_type) {
     idle_player.dest_idleplayer.h = src_rect->h;
     idle_player.dest_idleplayer.y = position_y + (PLAYER_HEIGHT - src_rect->h);
 
+    SDL_Rect drawDest = idle_player.dest_idleplayer;
+    drawDest.x -= backgroundSrcRect.x;
+    drawDest.y -= backgroundSrcRect.y;
     SDL_RenderCopyEx(renderer, idle_player.tex_idleplayer, src_rect, 
-                    &idle_player.dest_idleplayer, 0.0, NULL, flip_type);
+                    &drawDest, 0.0, NULL, flip_type);
 }
 
 void PlayerForward()
 {
     position_x += player_speed * deltaTime;
-
-    if(position_x > 640 - PLAYER_WIDTH){
-        position_x = 640 - PLAYER_WIDTH;
+    int rightLimit = backgroundImgW - PLAYER_WIDTH;
+    if (worldBarrierX > 0) {
+        int barrierLimit = worldBarrierX - PLAYER_WIDTH;
+        if (barrierLimit < rightLimit) rightLimit = barrierLimit;
+    }
+    if(position_x > rightLimit){
+        position_x = rightLimit;
     }
     UpdatePlayerHitbox();
 }
@@ -595,8 +608,11 @@ void PlayerWalkAnim(SDL_RendererFlip flip_type)
     walk_player.dest_walkplayer.w = src_rect->w;
     walk_player.dest_walkplayer.h = src_rect->h;
 
+    SDL_Rect drawDest = walk_player.dest_walkplayer;
+    drawDest.x -= backgroundSrcRect.x;
+    drawDest.y -= backgroundSrcRect.y;
     SDL_RenderCopyEx(renderer, walk_player.tex_walkplayer, src_rect,
-                     &walk_player.dest_walkplayer, 0.0, NULL, flip_type);
+                     &drawDest, 0.0, NULL, flip_type);
 }
 
 void PlayerJumpAnim(SDL_RendererFlip flip_type)
@@ -628,8 +644,11 @@ void PlayerJumpAnim(SDL_RendererFlip flip_type)
     jump_player.dest_jumpplayer.w = src_mod.w;
     jump_player.dest_jumpplayer.h = src_mod.h;
 
+    SDL_Rect drawDest = jump_player.dest_jumpplayer;
+    drawDest.x -= backgroundSrcRect.x;
+    drawDest.y -= backgroundSrcRect.y;
     SDL_RenderCopyEx(renderer, jump_player.tex_jumpplayer, &src_mod,
-                     &jump_player.dest_jumpplayer, 0.0, NULL, flip_type);
+                     &drawDest, 0.0, NULL, flip_type);
 }
 
 void RenderPlayer(SDL_RendererFlip flip_type)
@@ -656,15 +675,21 @@ void RenderPlayer(SDL_RendererFlip flip_type)
                 shoot_walk_player.dest_shootwalkplayer.h = target_h;
                 shoot_walk_player.dest_shootwalkplayer.x = (int)(position_x + (PLAYER_WIDTH - target_w) / 2);
                 shoot_walk_player.dest_shootwalkplayer.y = position_y + (PLAYER_HEIGHT - target_h);
+                SDL_Rect drawDest = shoot_walk_player.dest_shootwalkplayer;
+                drawDest.x -= backgroundSrcRect.x;
+                drawDest.y -= backgroundSrcRect.y;
                 SDL_RenderCopyEx(renderer, tex, src_rect,
-                                 &shoot_walk_player.dest_shootwalkplayer, 0.0, NULL, flip_type);
+                                 &drawDest, 0.0, NULL, flip_type);
             } else {
                 shoot_player.dest_shootplayer.w = target_w;
                 shoot_player.dest_shootplayer.h = target_h;
                 shoot_player.dest_shootplayer.x = (int)(position_x + (PLAYER_WIDTH - target_w) / 2);
                 shoot_player.dest_shootplayer.y = position_y + (PLAYER_HEIGHT - target_h);
+                SDL_Rect drawDest = shoot_player.dest_shootplayer;
+                drawDest.x -= backgroundSrcRect.x;
+                drawDest.y -= backgroundSrcRect.y;
                 SDL_RenderCopyEx(renderer, tex, src_rect,
-                                 &shoot_player.dest_shootplayer, 0.0, NULL, flip_type);
+                                 &drawDest, 0.0, NULL, flip_type);
             }
             return;
         }
@@ -697,9 +722,12 @@ void PlayerJump()
 void PlayerBackward()
 {
     position_x -= player_speed * deltaTime;
-
-    if(position_x < 0){
-        position_x = 0;
+    int leftLimit = 0;
+    if (worldBarrierLeftX >= 0) {
+        leftLimit = worldBarrierLeftX + WORLD_BARRIER_WIDTH;
+    }
+    if(position_x < leftLimit){
+        position_x = leftLimit;
     }
     UpdatePlayerHitbox();
 }

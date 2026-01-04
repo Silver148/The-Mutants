@@ -32,8 +32,11 @@ STATE GAME :D by Juan Yaguaro And Abel Ferrer
 SDL_Texture* backgroundTexture = NULL; //Background texture
 SDL_Rect backgroundRect;
 SDL_Rect backgroundSrcRect = {0,0,0,0};
-static int backgroundImgW = 0;
-static int backgroundImgH = 0;
+int backgroundImgW = 0;
+int backgroundImgH = 0;
+/* world barrier (right-side) */
+int worldBarrierX = 0;
+int worldBarrierLeftX = 0;
 extern StatesPlayer states_player;
 StatesPlayer last_states_player = IDLE;
 SDL_RendererFlip player_flip = SDL_FLIP_NONE;
@@ -104,6 +107,10 @@ int Init_State_Game()
     SDL_QueryTexture(backgroundTexture, NULL, NULL, &imgW, &imgH);
     backgroundImgW = imgW;
     backgroundImgH = imgH;
+    /* place the world barrier at the far right edge of the background */
+    worldBarrierX = backgroundImgW - WORLD_BARRIER_WIDTH;
+    /* left barrier at the far left (inside the image) */
+    worldBarrierLeftX = 0; /* could be WORLD_BARRIER_WIDTH to inset */
     const int winW = 640;
     const int winH = 480;
     if(imgW > 0 && imgH > 0) {
@@ -382,6 +389,8 @@ int Update_State_Game()
         } else {
             SDL_RenderCopy(renderer, backgroundTexture, NULL, &backgroundRect); /*TEXTURE TEST :)*/
         }
+
+        /* world barriers exist in logic but are invisible (no rendering) */
 
         RenderBarHealth(); // Render player health
         RenderBarStamina(); //Render stamina bar

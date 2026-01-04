@@ -20,6 +20,8 @@ Copyright 2025
 
 /* camera source rect from state_game.c */
 extern SDL_Rect backgroundSrcRect;
+extern int backgroundImgW;
+extern int backgroundImgH;
 #include <stdio.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
@@ -92,12 +94,22 @@ void LoadSpritesZombies()
 
 static void get_random_spawn_position(float* x, float* y) {
     float player_x = GetPositionPlayerX();
-    
+    float player_y = GetPositionPlayerY();
+
+    int margin = 100; /* minimum distance from player on X */
+    int min_x = 50;
+    int max_x = backgroundImgW - 50;
+    if (max_x <= min_x) max_x = min_x + 1;
+
     do {
-        *x = 50 + rand() % (640 - 100);
-    } while (fabsf(*x - player_x) < 100.0f); 
-    
-    *y = 350.0f;
+        *x = (float)(min_x + rand() % (max_x - min_x));
+    } while (fabsf(*x - player_x) < (float)margin);
+
+    /* spawn so zombie feet align with player feet */
+    *y = player_y + PLAYER_HEIGHT - ZOMBIE_HEIGHT;
+    if (*y < 0.0f) *y = 0.0f;
+    if (*y > (float)(backgroundImgH - ZOMBIE_HEIGHT))
+        *y = (float)(backgroundImgH - ZOMBIE_HEIGHT);
 }
 
 int SpawnZombie(float x, float y) {
@@ -108,10 +120,9 @@ int SpawnZombie(float x, float y) {
     }
     
     ZOMBIE* z = &zombies[slot];
-    
     z->x = x;
-    z->y = 350.0f;
-    z->base_y = 350.0f;
+    z->y = y;
+    z->base_y = y;
     z->speed = 30.0f + (rand() % 20);
     z->dir = (rand() % 2) ? 1 : -1;
     z->wander_timer = 0.5f + (rand() % 200) / 100.0f;
@@ -128,8 +139,11 @@ int SpawnZombie(float x, float y) {
     z->id = next_zombie_id++;
     
     num_zombies++;
-    printf("Zombie %d spawn in (%.1f, %.1f) HP: %d\n", 
-           z->id, x, y, z->health);
+        z->dest.x = (int)z->x;
+        z->dest.y = (int)z->base_y;
+
+        printf("Zombie %d spawn in (%.1f, %.1f) HP: %d\n", 
+            z->id, x, y, z->health);
     
     return z->id;
 }
@@ -278,10 +292,12 @@ void UpdateZombies() {
             if(z->attack_timer < 0.0f) z->attack_timer = 0.0f;
         }
         
+        extern int backgroundImgW;
+        extern int backgroundImgH;
         if(z->x < 0) z->x = 0;
-        if(z->x > 640 - ZOMBIE_WIDTH) z->x = 640 - ZOMBIE_WIDTH;
+        if(z->x > backgroundImgW - ZOMBIE_WIDTH) z->x = backgroundImgW - ZOMBIE_WIDTH;
         if(z->base_y < 0) z->base_y = 0;
-        if(z->base_y > 480 - ZOMBIE_HEIGHT) z->base_y = 480 - ZOMBIE_HEIGHT;
+        if(z->base_y > backgroundImgH - ZOMBIE_HEIGHT) z->base_y = backgroundImgH - ZOMBIE_HEIGHT;
         z->y = z->base_y;
         
         z->dest.x = (int)z->x;
