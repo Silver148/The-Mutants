@@ -196,8 +196,12 @@ void LoadSpritesPlayer() {
             walk_player.tex_walkplayer = SDL_CreateTextureFromSurface(renderer, walk_player.tmp_surf_walkplayer);
             SDL_FreeSurface(walk_player.tmp_surf_walkplayer);
             walk_player.tmp_surf_walkplayer = NULL;
-            if(skin_is_goku) Animation_Init(&walk_player.walk_anim, PLAYER_WIDTH, PLAYER_HEIGHT, WALK_FRAMES, FRAME_DURATION_PLAYER/2);
-            else Animation_Init(&walk_player.walk_anim, PLAYER_WIDTH, PLAYER_HEIGHT, WALK_FRAMES, FRAME_DURATION_PLAYER);
+            if (skin_is_goku) {
+                /* Goku frames are 31x49, keep frame count constant (WALK_FRAMES) */
+                Animation_Init(&walk_player.walk_anim, 31, 49, WALK_FRAMES, FRAME_DURATION_PLAYER/2);
+            } else {
+                Animation_Init(&walk_player.walk_anim, PLAYER_WIDTH, PLAYER_HEIGHT, WALK_FRAMES, FRAME_DURATION_PLAYER);
+            }
         } else {
             SDL_Log("LoadSpritesPlayer: failed to load default walk sprite: %s\n", "sprites/walk_player_spritesheet.png");
         }
@@ -634,7 +638,7 @@ void PlayerWalkAnim(SDL_RendererFlip flip_type)
         /* Aplicamos parche para evitar pixel bleeding en los frames pegados de Goku */
         SDL_Rect src_mod = *src_rect;
         int tex_w = 0, tex_h = 0;
-        if (jump_player.tex_jumpplayer) SDL_QueryTexture(jump_player.tex_jumpplayer, NULL, NULL, &tex_w, &tex_h);
+        if (walk_player.tex_walkplayer) SDL_QueryTexture(walk_player.tex_walkplayer, NULL, NULL, &tex_w, &tex_h);
         
         const int left_extra = 0;  /* pixels to include to the left of frame */
         const int right_crop = 0;  /* pixels to remove from right of frame */
@@ -648,6 +652,7 @@ void PlayerWalkAnim(SDL_RendererFlip flip_type)
         src_mod.w = src_rect->w + applied_left - right_crop;
         if (src_mod.w < 1) src_mod.w = 1;
         if (tex_w > 0 && src_mod.x + src_mod.w > tex_w) src_mod.w = tex_w - src_mod.x;
+        if (tex_h > 0 && src_mod.y + src_mod.h > tex_h) src_mod.h = tex_h - src_mod.y;
 
         walk_player.dest_walkplayer.x = (int)(position_x + (PLAYER_WIDTH - src_mod.w) / 2);
         /* align bottom of frame with player's base (position_y + PLAYER_HEIGHT) */
