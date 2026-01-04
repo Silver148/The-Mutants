@@ -1,0 +1,67 @@
+{
+  "hosting": {
+    "public": "public",
+    "ignore": [
+      "firebase-debug.log",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "headers": [
+      {
+        "source": "/update*",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "private, no-cache, no-store, must-revalidate, max-age=0, s-maxage=0"
+          },
+          {
+            "key": "Pragma",
+            "value": "no-cache"
+          },
+          {
+            "key": "Expires",
+            "value": "Fri, 01 Jan 1990 00:00:00 GMT"
+          },
+          {
+            "key": "Surrogate-Control",
+            "value": "no-store"
+          },
+          {
+            "key": "CDN-Cache-Control",
+            "value": "no-cache"
+          },
+          {
+            "key": "Vary",
+            "value": "User-Agent, Accept-Encoding"
+          }
+        ]
+      }
+    ],
+    "redirects": [
+      {
+        "source": "update/v0.24",
+        "destination": "https://github.com/HT14813/The-Mutants-updates/releases/download/0.24/The-Mutants-setup-0.24.exe",
+        "type": 302
+      },
+      
+      {
+        "source": "update/v0.25",
+        "destination": "https://github.com/HT14813/The-Mutants-updates/releases/download/0.25/The-Mutants-setup-0.25.exe",
+        "type": 302
+      },
+
+      {
+        "source": "update/v0.26.1",
+        "destination": "https://github.com/HT14813/The-Mutants-updates/releases/download/0.26.1/The-Mutants-setup.exe",
+        "type": 302
+      },
+
+      {
+        "source": "/update",
+        "destination": "update/v0.26.1",
+        "type": 302,
+        "comment": "It always changes every time a new version comes out :)"
+      }
+    ]
+  }
+}

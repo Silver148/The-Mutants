@@ -29,7 +29,7 @@ DisableProgramGroupPage=yes
 InfoBeforeFile=C:\Users\Juan Yaguaro\Desktop\The-Mutants-setup-inno\before_info_setup.txt
 InfoAfterFile=C:\Users\Juan Yaguaro\Desktop\The-Mutants-setup-inno\after_info_setup.txt
 ; Uncomment the following line to run in non administrative install mode (install for current user only).
-PrivilegesRequired=lowest
+;PrivilegesRequired=lowest
 OutputDir=C:\Users\Juan Yaguaro\Desktop
 OutputBaseFilename=The-Mutants-setup
 SetupIconFile=C:\Users\Juan Yaguaro\Desktop\The-Mutants-setup-inno\The-Mutants-ico.ico
