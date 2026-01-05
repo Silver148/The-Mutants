@@ -22,12 +22,21 @@ Copyright 2025
 extern SDL_Rect backgroundSrcRect;
 extern int backgroundImgW;
 extern int backgroundImgH;
+/* allow changing background from other modules */
+extern void SetBackgroundImage(const char* path);
 #include <stdio.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <math.h>
 #include <stdlib.h>
 #include <time.h>
+
+/* file-scope state so all functions can access it */
+static int wave_state = 0;
+static SDL_Surface* tmp_surf_winner = NULL;
+static SDL_Texture* winner_tex = NULL;
+/* when wave2 finishes, wait until all zombies are cleared before changing bg */
+static int pending_bg_change = 0;
 
 /* reuse the existing sprite containers */
 IDLE_ZOMBIE idle_zombie;
@@ -89,6 +98,17 @@ void LoadSpritesZombies()
     } else {
         fprintf(stderr, "Failed to load walk_zombie sprite\n");
         walk_zombie.tex_walk_zombie = NULL;
+    }
+
+    /* load winner image (shown when both waves finish) */
+    tmp_surf_winner = IMG_Load("sprites/winner.png");
+    if (tmp_surf_winner) {
+        winner_tex = SDL_CreateTextureFromSurface(renderer, tmp_surf_winner);
+        SDL_FreeSurface(tmp_surf_winner);
+        tmp_surf_winner = NULL;
+    } else {
+        fprintf(stderr, "Failed to load winner sprite\n");
+        winner_tex = NULL;
     }
 }
 
@@ -206,13 +226,13 @@ static void zombie_wander(ZOMBIE* z) {
 }
 
 int current_wave = 0;
+/* current_wave is kept for compatibility with other modules */
 
 void UpdateZombies() {
     float player_x = GetPositionPlayerX();
     float player_y = GetPositionPlayerY();
 
-    static WAVE wave1, wave2;
-    static int wave_state = 0;
+    static WAVE wave1, wave2, wave3, wave4;
     ZOMBIE* z = NULL;
 
     for(int i = 0; i<MAX_ZOMBIES; i++)
@@ -269,7 +289,9 @@ void UpdateZombies() {
         {
             SDL_Log("WAVE 2 FINISHED");
             SDL_Log("GAME FINISHED!!!");
-            wave_state = -1;
+            /* mark that initial waves finished; wait until all zombies are cleared */
+            wave_state = 4; /* waiting-for-clear state */
+            pending_bg_change = 1;
         }
     }
     
@@ -331,6 +353,42 @@ void UpdateZombies() {
             KillZombie(z->id);
         }
     }
+
+    /* If waves finished earlier and we're waiting for all zombies to be cleared,
+       perform the background change only once there are no active zombies. */
+    if (pending_bg_change && num_zombies == 0) {
+        SDL_Log("All zombies cleared after waves. Changing background now.");
+        /* change background, then start two additional waves */
+        SetBackgroundImage("sprites/113 sin título_20260104134157~2.png");
+        pending_bg_change = 0;
+        /* start wave 3 */
+        InitWave(&wave3, 30, 2 + rand() % 2, 8);
+        for(int i = 0; i<MAX_ZOMBIES; i++) { zombies[i].id = 0; next_zombie_id = 0; }
+        SDL_Log("STARTING WAVE 3");
+        wave_state = 5; /* wave3 running */
+    }
+
+    /* Additional waves logic (wave3 -> wave4 -> final) */
+    if (wave_state == 5) {
+        int r = UpdateWave(&wave3, z);
+        if (r == -1) {
+            SDL_Log("WAVE 3 FINISHED");
+            /* init wave4 */
+            InitWave(&wave4, 50, 2 + rand() % 2, 12);
+            for(int i = 0; i<MAX_ZOMBIES; i++) { zombies[i].id = 0; next_zombie_id = 0; }
+            SDL_Log("STARTING WAVE 4");
+            wave_state = 6; /* wave4 running */
+        }
+    }
+
+    if (wave_state == 6) {
+        int r = UpdateWave(&wave4, z);
+        if (r == -1) {
+            SDL_Log("WAVE 4 FINISHED");
+            SDL_Log("ALL WAVES FINISHED!!!");
+            wave_state = -1; /* final state: show winner */
+        }
+    }
 }
 
 
@@ -376,6 +434,16 @@ void RenderZombies() {
             SDL_RenderFillRect(renderer, &health_fg);
         }
     }
+
+    /* If both waves finished, render the winner image centered on screen */
+    if (wave_state == -1 && winner_tex) {
+        int w = 0, h = 0;
+        SDL_QueryTexture(winner_tex, NULL, NULL, &w, &h);
+        if (w > 0 && h > 0) {
+            SDL_Rect dest = { backgroundSrcRect.w/2 - w/2, backgroundSrcRect.h/2 - h/2, w, h };
+            SDL_RenderCopy(renderer, winner_tex, NULL, &dest);
+        }
+    }
 }
 
 void ShowHitboxZombie(int zombie_index) {
@@ -400,6 +468,15 @@ void CleanupZombieSystem() {
         zombies[i].id = 0;
     }
     num_zombies = 0;
+
+    if (winner_tex) {
+        SDL_DestroyTexture(winner_tex);
+        winner_tex = NULL;
+    }
+    if (tmp_surf_winner) {
+        SDL_FreeSurface(tmp_surf_winner);
+        tmp_surf_winner = NULL;
+    }
 }
 
 /* kept for compatibility with existing calls */
