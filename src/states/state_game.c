@@ -154,6 +154,57 @@ int Init_State_Game()
     return 0;
 }
 
+/* Replace current background with image at `path` and recalc src/dest rects */
+void SetBackgroundImage(const char* path)
+{
+    if (!path) return;
+
+    if (backgroundTexture) {
+        SDL_DestroyTexture(backgroundTexture);
+        backgroundTexture = NULL;
+    }
+
+    SDL_Surface* background_surface = IMG_Load(path);
+    if (background_surface == NULL) {
+        SDL_Log("SetBackgroundImage: Unable to load image %s! SDL_image Error: %s", path, IMG_GetError());
+        return;
+    }
+
+    backgroundTexture = SDL_CreateTextureFromSurface(renderer, background_surface);
+    if (!backgroundTexture) {
+        SDL_Log("SetBackgroundImage: Failed to create texture from %s", path);
+        SDL_FreeSurface(background_surface);
+        return;
+    }
+
+    int imgW = 0, imgH = 0;
+    SDL_QueryTexture(backgroundTexture, NULL, NULL, &imgW, &imgH);
+    backgroundImgW = imgW;
+    backgroundImgH = imgH;
+    worldBarrierX = backgroundImgW - WORLD_BARRIER_WIDTH;
+
+    int winW = backgroundRect.w ? backgroundRect.w : 640;
+    int winH = backgroundRect.h ? backgroundRect.h : 480;
+
+    SDL_Rect srcRect = {0,0,imgW,imgH};
+    if (imgW > 0 && imgH > 0) {
+        float imgAspect = (float)imgW / (float)imgH;
+        float winAspect = (float)winW / (float)winH;
+        if (imgAspect > winAspect) {
+            int srcW = (int)(imgH * winAspect);
+            srcRect.x = (imgW - srcW) / 2;
+            srcRect.w = srcW;
+        } else if (imgAspect < winAspect) {
+            int srcH = (int)(imgW / winAspect);
+            srcRect.y = (imgH - srcH) / 2;
+            srcRect.h = srcH;
+        }
+    }
+    backgroundSrcRect = srcRect;
+
+    SDL_FreeSurface(background_surface);
+}
+
 void UpdateAnimsPLAYER()
 {
     CheckChangeStatePlayer();
