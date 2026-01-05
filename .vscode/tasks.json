@@ -6,7 +6,8 @@
         {
             "label": "make debug",
             "type": "shell",
-            "command": "make debug-windows-x64"
+            "command": "make debug-windows-x64",
+            "problemMatcher": []
         }
     ]
 }

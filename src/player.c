@@ -30,7 +30,7 @@ extern int worldBarrierLeftX;
 
 /* track last flip to log direction changes for debugging */
 static SDL_RendererFlip last_player_flip = SDL_FLIP_NONE;
-#define POS_Y 320
+#define POS_Y 350
 #define POS_X 100
 
 /*IDLE PLAYER*/
@@ -640,6 +640,7 @@ void PlayerForward()
 {
     position_x += player_speed * deltaTime;
     int rightLimit = backgroundImgW - PLAYER_WIDTH;
+ 
     if (worldBarrierX > 0) {
         int barrierLimit = worldBarrierX - PLAYER_WIDTH;
         if (barrierLimit < rightLimit) rightLimit = barrierLimit;
@@ -695,8 +696,12 @@ void PlayerWalkAnim(SDL_RendererFlip flip_type)
         walk_player.dest_walkplayer.w = src_rect->w;
         walk_player.dest_walkplayer.h = src_rect->h;
 
-    SDL_RenderCopyEx(renderer, walk_player.tex_walkplayer, src_rect,
-                     &walk_player.dest_walkplayer, 0.0, NULL, flip_type);
+        SDL_Rect drawDest = walk_player.dest_walkplayer;
+        drawDest.x -= backgroundSrcRect.x;
+        drawDest.y -= backgroundSrcRect.y;
+
+        SDL_RenderCopyEx(renderer, walk_player.tex_walkplayer, src_rect,
+                         &drawDest, 0.0, NULL, flip_type);
     }
 }
 
@@ -842,7 +847,7 @@ void PlayerJump()
 void PlayerBackward()
 {
     position_x -= player_speed * deltaTime;
-    
+
     int leftLimit = 0;
     if (worldBarrierLeftX >= 0) {
         leftLimit = worldBarrierLeftX + WORLD_BARRIER_WIDTH;

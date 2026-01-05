@@ -296,7 +296,7 @@ void UpdateZombies() {
         extern int backgroundImgH;
         if(z->x < 0) z->x = 0;
         if(z->base_y < 0) z->base_y = 0;
-        //if(z->base_y > backgroundImgH - ZOMBIE_HEIGHT) z->base_y = backgroundImgH - ZOMBIE_HEIGHT;
+        if(z->base_y > backgroundImgH - ZOMBIE_HEIGHT) z->base_y = 350;
         z->y = z->base_y;
         
         z->dest.x = (int)z->x;

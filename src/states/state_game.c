@@ -306,9 +306,18 @@ int Update_State_Game()
             static float shoot_timer = 0.0f;
             if(shoot_timer > 0.0f) shoot_timer -= deltaTime;
         if(state[SDL_SCANCODE_Z] && shoot_timer <= 0.0f){
-            /* spawn projectile from player's front */
+            /* spawn projectile from player's front
+               Use the currently-displayed sprite frame height so the
+               projectile originates from the visible sprite, preventing
+               vertical desync when frame heights differ. */
+            SDL_Rect* player_src = NULL;
+            if (states_player == WALK) player_src = Animation_GetSourceRect(&walk_player.walk_anim);
+            else if (states_player == JUMP) player_src = Animation_GetSourceRect(&jump_player.jump_anim);
+            else player_src = Animation_GetSourceRect(&idle_player.idle_anim);
+            int src_h = player_src ? player_src->h : PLAYER_HEIGHT;
+
             float px = GetPositionPlayerX() + (player_flip == SDL_FLIP_NONE ? PLAYER_WIDTH : -8);
-            float py = GetPositionPlayerY() + (PLAYER_HEIGHT / 2);
+            float py = GetPositionPlayerY() + (PLAYER_HEIGHT - src_h) + (src_h / 2.0f);
             float speed = 320.0f;
             float vx = (player_flip == SDL_FLIP_NONE) ? speed : -speed;
             {
@@ -387,7 +396,7 @@ int Update_State_Game()
                     backgroundSrcRect.y = newY;
                 }
             }
-            SDL_RenderCopy(renderer, backgroundTexture, &backgroundSrcRect, &backgroundRect);
+                SDL_RenderCopy(renderer, backgroundTexture, &backgroundSrcRect, &backgroundRect);
         } else {
             SDL_RenderCopy(renderer, backgroundTexture, NULL, &backgroundRect); /*TEXTURE TEST :)*/
         }
