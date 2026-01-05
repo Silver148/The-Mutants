@@ -296,7 +296,7 @@ void UpdateZombies() {
         extern int backgroundImgH;
         if(z->x < 0) z->x = 0;
         if(z->base_y < 0) z->base_y = 0;
-        if(z->base_y > backgroundImgH - ZOMBIE_HEIGHT) z->base_y = backgroundImgH - ZOMBIE_HEIGHT;
+        //if(z->base_y > backgroundImgH - ZOMBIE_HEIGHT) z->base_y = backgroundImgH - ZOMBIE_HEIGHT;
         z->y = z->base_y;
         
         z->dest.x = (int)z->x;
@@ -361,17 +361,6 @@ void RenderZombies() {
         SDL_Rect drawDest = z->dest;
         drawDest.x -= backgroundSrcRect.x;
         drawDest.y -= backgroundSrcRect.y;
-
-        /* If zombie base is far from player's base, override draw Y to
-           align feet visually (temporary visual fix). */
-        {
-            float player_base = GetPositionPlayerY() + PLAYER_HEIGHT;
-            int z_bottom_world = z->dest.y + ZOMBIE_HEIGHT;
-            if (fabsf((float)z_bottom_world - player_base) > 8.0f) {
-                int new_draw_y = (int)(player_base - ZOMBIE_HEIGHT) - backgroundSrcRect.y;
-                drawDest.y = new_draw_y;
-            }
-        }
 
         SDL_RenderCopyEx(renderer, tex, src_rect, &drawDest, 0.0, NULL, 
                 (z->dir < 0) ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE);
