@@ -21,6 +21,7 @@ State Menu :D
 #include "settings.h"
 #include "music.h"
 #include "update_system.h"
+#include "show_notifications.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <SDL2/SDL.h>
@@ -38,6 +39,7 @@ static const double PI = 3.14159265358979323846;
 extern IDLE_PLAYER idle_player;
 
 extern SDL_Renderer* renderer;
+extern SDL_Window* window;
 
 SDL_Surface* start_surface = NULL;
 SDL_Texture* start_texture = NULL;
@@ -743,6 +745,8 @@ int StateUpdate()
         sei.fMask = SEE_MASK_NOCLOSEPROCESS;
         sei.lpFile = download_path;
         sei.nShow = SW_SHOWNORMAL;
+
+        ShowWindowsNotification(window, "The Mutant's updater", "The setup will start now. The game will close.");
 
         if(ShellExecuteEx(&sei)){
             MoveFileEx(download_path, NULL, MOVEFILE_DELAY_UNTIL_REBOOT);

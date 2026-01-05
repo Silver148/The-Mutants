@@ -30,7 +30,7 @@ extern int worldBarrierLeftX;
 
 /* track last flip to log direction changes for debugging */
 static SDL_RendererFlip last_player_flip = SDL_FLIP_NONE;
-#define POS_Y 350
+#define POS_Y 320
 #define POS_X 100
 
 /*IDLE PLAYER*/
@@ -252,6 +252,11 @@ void LoadSpritesPlayer() {
 void ChangePlayerSkin(const char* idle_path, const char* walk_path, const char* jump_path)
 {
 
+    /* Use local logical frame size so we don't mutate global PLAYER_WIDTH/HEIGHT
+       which are used by physics and the camera. */
+    int logical_player_w = PLAYER_WIDTH;
+    int logical_player_h = PLAYER_HEIGHT;
+
         /* Auto-adjust base speed based on skin name keywords (simple heuristic).
        If you want explicit control, call SetPlayerBaseSpeed() from UI after ChangePlayerSkin. */
     float suggested_speed = default_base_player_speed; /* default: base relative to original default */
@@ -344,30 +349,30 @@ void ChangePlayerSkin(const char* idle_path, const char* walk_path, const char* 
     int idle_frame_w = 0, idle_frame_h = 0;
     if (idle_player.tex_idleplayer) {
         int w=0,h=0; SDL_QueryTexture(idle_player.tex_idleplayer, NULL, NULL, &w, &h);
-        if(skin_is_goku) {PLAYER_WIDTH = 31; PLAYER_HEIGHT = 49;}
-        int detected_frames = (PLAYER_WIDTH > 0) ? (w / PLAYER_WIDTH) : 1;
+        if(skin_is_goku) { logical_player_w = 31; logical_player_h = 49; }
+        int detected_frames = (logical_player_w > 0) ? (w / logical_player_w) : 1;
         if (detected_frames <= 0) detected_frames = 1;
         int frame_w = (w / detected_frames);
         int frame_h = h;
         Animation_Init(&idle_player.idle_anim, frame_w, frame_h, detected_frames, FRAME_DURATION_PLAYER);
         idle_frame_w = frame_w; idle_frame_h = frame_h;
         SDL_Log("ChangePlayerSkin: idle texture %dx%d -> frames=%d frame_size=%dx%d\n", w, h, detected_frames, frame_w, frame_h);
-        if (frame_w != PLAYER_WIDTH || frame_h != PLAYER_HEIGHT) {
-            SDL_Log("Note: idle frame size differs from PLAYER_WIDTH/HEIGHT (%d x %d)\n", PLAYER_WIDTH, PLAYER_HEIGHT);
+        if (frame_w != logical_player_w || frame_h != logical_player_h) {
+            SDL_Log("Note: idle frame size differs from logical player frame (%d x %d)\n", logical_player_w, logical_player_h);
         }
     }
 
     if (walk_player.tex_walkplayer) {
         int w=0,h=0; SDL_QueryTexture(walk_player.tex_walkplayer, NULL, NULL, &w, &h);
-        int frame_w = idle_frame_w ? idle_frame_w : ((PLAYER_WIDTH > 0) ? (w / PLAYER_WIDTH) : w);
+        int frame_w = idle_frame_w ? idle_frame_w : ((logical_player_w > 0) ? (w / logical_player_w) : w);
         if (frame_w <= 0) frame_w = w;
         int detected_frames = (frame_w > 0) ? (w / frame_w) : 1;
         if (detected_frames <= 0) detected_frames = 1;
         int frame_h = idle_frame_h ? idle_frame_h : h;
         Animation_Init(&walk_player.walk_anim, frame_w, frame_h, detected_frames, FRAME_DURATION_PLAYER);
         SDL_Log("ChangePlayerSkin: walk texture %dx%d -> frames=%d frame_size=%dx%d\n", w, h, detected_frames, frame_w, frame_h);
-        if (frame_w != PLAYER_WIDTH || frame_h != PLAYER_HEIGHT) {
-            SDL_Log("Note: walk frame size differs from PLAYER_WIDTH/HEIGHT (%d x %d)\n", PLAYER_WIDTH, PLAYER_HEIGHT);
+        if (frame_w != logical_player_w || frame_h != logical_player_h) {
+            SDL_Log("Note: walk frame size differs from logical player frame (%d x %d)\n", logical_player_w, logical_player_h);
         }
     }
 
@@ -378,8 +383,8 @@ void ChangePlayerSkin(const char* idle_path, const char* walk_path, const char* 
         int frame_h = 0;
         if(skin_is_goku)
         {
-            PLAYER_WIDTH = 31; 
-            PLAYER_HEIGHT = 49;
+            logical_player_w = 31;
+            logical_player_h = 49;
 
             detected_frames = 5;
 
@@ -387,8 +392,8 @@ void ChangePlayerSkin(const char* idle_path, const char* walk_path, const char* 
             frame_h = 49;
             Animation_Init(&jump_player.jump_anim, frame_w, frame_h, detected_frames, FRAME_DURATION_PLAYER);
             SDL_Log("ChangePlayerSkin: jump texture %dx%d -> frames=%d frame_size=%dx%d\n", w, h, detected_frames, frame_w, frame_h);
-                if (frame_w != PLAYER_WIDTH || frame_h != PLAYER_HEIGHT) {
-                SDL_Log("Note: jump frame size differs from PLAYER_WIDTH/HEIGHT (%d x %d)\n", PLAYER_WIDTH, PLAYER_HEIGHT);
+                if (frame_w != logical_player_w || frame_h != logical_player_h) {
+                SDL_Log("Note: jump frame size differs from logical player frame (%d x %d)\n", logical_player_w, logical_player_h);
             }
         } else {
         frame_w = idle_frame_w ? idle_frame_w : ((PLAYER_WIDTH > 0) ? (w / PLAYER_WIDTH) : w);
@@ -498,13 +503,14 @@ void ChangePlayerShootWalkSkin(const char* shoot_walk_path)
         SDL_FreeSurface(shoot_walk_player.tmp_surf_shootwalkplayer);
         shoot_walk_player.tmp_surf_shootwalkplayer = NULL;
         int w=0,h=0; SDL_QueryTexture(shoot_walk_player.tex_shootwalkplayer, NULL, NULL, &w, &h);
-        if(skin_is_goku) {PLAYER_WIDTH = 82 / 2; PLAYER_HEIGHT = 49;}
-        int frames = (PLAYER_WIDTH > 0) ? (w / PLAYER_WIDTH) : 1;
+        /* do not modify global PLAYER_WIDTH here; compute frames using intended frame width */
+        int frame_w = skin_is_goku ? (82 / 2) : PLAYER_WIDTH;
+        int frames = (frame_w > 0) ? (w / frame_w) : 1;
         if (frames <= 0) frames = 1;
         if(skin_is_metal || skin_is_goku){
-            Animation_Init(&shoot_walk_player.shootwalk_anim, PLAYER_WIDTH, PLAYER_HEIGHT, frames, FRAME_DURATION_PLAYER/2);
+            Animation_Init(&shoot_walk_player.shootwalk_anim, frame_w, PLAYER_HEIGHT, frames, FRAME_DURATION_PLAYER/2);
         }else{
-            Animation_Init(&shoot_walk_player.shootwalk_anim, PLAYER_WIDTH, PLAYER_HEIGHT, frames, FRAME_DURATION_PLAYER);
+            Animation_Init(&shoot_walk_player.shootwalk_anim, frame_w, PLAYER_HEIGHT, frames, FRAME_DURATION_PLAYER);
         }
             
         SDL_Log("ChangePlayerShootWalkSkin: loaded shoot-walk skin '%s' frames=%d\n", shoot_walk_path, frames);
@@ -525,13 +531,13 @@ void ChangePlayerShootSkin(const char* shoot_path)
         SDL_FreeSurface(shoot_player.tmp_surf_shootplayer);
         shoot_player.tmp_surf_shootplayer = NULL;
         int w=0,h=0; SDL_QueryTexture(shoot_player.tex_shootplayer, NULL, NULL, &w, &h);
-        if(skin_is_goku) {PLAYER_WIDTH = 41; PLAYER_HEIGHT = 49;}
-        int frames = (PLAYER_WIDTH > 0) ? (w / PLAYER_WIDTH) : 1;
+        int frame_w2 = skin_is_goku ? 41 : PLAYER_WIDTH;
+        int frames = (frame_w2 > 0) ? (w / frame_w2) : 1;
         if (frames <= 0) frames = 1;
         if(skin_is_metal || skin_is_goku)
-            Animation_Init(&shoot_player.shoot_anim, PLAYER_WIDTH, PLAYER_HEIGHT, frames, FRAME_DURATION_PLAYER/2);
+            Animation_Init(&shoot_player.shoot_anim, frame_w2, PLAYER_HEIGHT, frames, FRAME_DURATION_PLAYER/2);
         else
-            Animation_Init(&shoot_player.shoot_anim, PLAYER_WIDTH, PLAYER_HEIGHT, frames, FRAME_DURATION_PLAYER);
+            Animation_Init(&shoot_player.shoot_anim, frame_w2, PLAYER_HEIGHT, frames, FRAME_DURATION_PLAYER);
         SDL_Log("ChangePlayerShootSkin: loaded shoot skin '%s' frames=%d\n", shoot_path, frames);
     } else {
         SDL_Log("ChangePlayerShootSkin: failed to load '%s'\n", shoot_path);
@@ -766,6 +772,7 @@ void PlayerJumpAnim(SDL_RendererFlip flip_type)
 
 void RenderPlayer(SDL_RendererFlip flip_type)
 {
+    
     if (states_player == SHOOT) {
         /* choose appropriate shoot texture/anim based on type */
         Animation* anim = (shoot_anim_type == 1) ? &shoot_walk_player.shootwalk_anim : &shoot_player.shoot_anim;
@@ -835,6 +842,7 @@ void PlayerJump()
 void PlayerBackward()
 {
     position_x -= player_speed * deltaTime;
+    
     int leftLimit = 0;
     if (worldBarrierLeftX >= 0) {
         leftLimit = worldBarrierLeftX + WORLD_BARRIER_WIDTH;

@@ -1,18 +1,19 @@
 #MAKEFILE POR JUAN YAGUARO :D
 
-NAME = The_Mutants
-CC = gcc
-CFLAGS = -Wall -Iinclude
-LIBS = -lSDL2 -lSDL2_image -lSDL2_mixer -lSDL2_ttf -lm
+#NAME = The_Mutants
+#CC = gcc
+#CFLAGS = -Wall -Iinclude
+#LIBS = -lSDL2 -lSDL2_image -lSDL2_mixer -lSDL2_ttf -lm
 SOURCES = src/main.c src/player.c src/states/state_menu.c \
 			src/states/state_game.c src/zombies.c src/delta_time.c src/anim_manager.c \
-			src/music.c src/settings.c src/projectiles.c src/zombie_waves.c src/update_system.c
+			src/music.c src/settings.c src/projectiles.c src/zombie_waves.c src/update_system.c \
+			src/show_notifications.c
 OBJECTS = $(SOURCES:src/%.c=obj/%.o)
 
 # Windows x64 build settings
 WIN_NAME = The_Mutants.exe
 WIN_CC = x86_64-w64-mingw32-gcc
-WIN_CFLAGS = -Iinclude -Icurl/include -Lcurl/lib -LSDL2-Mingw/x86_64-w64-mingw32/lib -ISDL2-Mingw/x86_64-w64-mingw32/include
+WIN_CFLAGS = -Iinclude -Icurl/include -Lcurl/lib -LSDL2-Mingw/x86_64-w64-mingw32/lib -ISDL2-Mingw/x86_64-w64-mingw32/include -march=native -O2
 WIN_LIBS = -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_mixer -lSDL2_ttf -lcurl -mwindows \
 			-Wl,--dynamicbase -Wl,--nxcompat \
 			-Wl,--high-entropy-va -lm -ldinput8 -ldxguid -ldxerr8 -luser32 -lgdi32 \
@@ -21,7 +22,7 @@ WIN_LIBS = -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_mixer -lSDL2_ttf -lcu
 # Windows x32 build settings
 WIN32_NAME = The_Mutants_32.exe
 WIN32_CC = i686-w64-mingw32-gcc
-WIN32_CFLAGS = -Iinclude -Icurl/include -Lcurl/lib -LSDL2-Mingw/i686-w64-mingw32/lib -ISDL2-Mingw/i686-w64-mingw32/include
+WIN32_CFLAGS = -Iinclude -Icurl/include -Lcurl/lib -LSDL2-Mingw/i686-w64-mingw32/lib -ISDL2-Mingw/i686-w64-mingw32/include -O2
 WIN32_LIBS = -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_mixer -lSDL2_ttf -lcurl -mwindows \
 			-Wl,--dynamicbase -Wl,--nxcompat -Wl,-lm -ldinput8 -ldxguid -ldxerr8 -luser32 -lgdi32 \
 			-lwinmm -limm32 -lole32 -loleaut32 -lshell32 -lsetupapi -lversion -luuid
@@ -30,16 +31,6 @@ OS := $(shell uname -s)
 ARCH := $(shell uname -m)
 
 all: $(OS)-$(ARCH)
-
-Linux-x86_64:
-	make $(NAME)
-	zip -r The_Mutants_Linux.zip $(NAME) sprites
-	@echo "BUILD COMPLETE... Compiled from the $(OS)-$(ARCH)"
-
-Linux-i686:
-	make $(NAME) "CFLAGS=$(CFLAGS) -m32"
-	zip -r The_Mutants_Linux_32.zip $(NAME) sprites
-	@echo "BUILD COMPLETE... Compiled from the $(OS)-$(ARCH)"
 
 Windows_NT-x86_64:
 	make $(WIN_NAME) CC=$(WIN_CC)
@@ -104,8 +95,8 @@ debug-windows-x32:
 	@echo "DEBUG BUILD COMPLETE... Compiled from the $(OS)-$(ARCH)"
 
 tools_dev:
-	gcc new_commit.c -o new_commit
-	gcc convert_gif_to_sequencePNG.c -o convert_gif_to_sequencePNG
+#	gcc new_commit.c -o new_commit
+#	gcc convert_gif_to_sequencePNG.c -o convert_gif_to_sequencePNG
 	$(WIN_CC) new_commit.c -o new_commit.exe
 	$(WIN_CC) convert_gif_to_sequencePNG.c -o convert_gif_to_sequencePNG.exe
 	$(WIN32_CC) new_commit.c -o new_commit_32.exe
@@ -118,8 +109,8 @@ clean:
 	rm -rf obj $(NAME) $(WIN_NAME) $(WIN32_NAME) *.zip new_commit *.exe
 
 #RULE LINUX
-$(NAME): $(OBJECTS)
-	$(CC) $(CFLAGS) $(OBJECTS) -o $(NAME) $(LIBS)
+#$(NAME): $(OBJECTS)
+#	$(CC) $(CFLAGS) $(OBJECTS) -o $(NAME) $(LIBS)
 
 #RULE WINDOWS X64
 $(WIN_NAME): $(OBJECTS)
@@ -136,6 +127,6 @@ ifeq ($(CC), x86_64-w64-mingw32-gcc)
 	$(CC) $(WIN_CFLAGS) -c $< -o $@
 else ifeq ($(CC), i686-w64-mingw32-gcc)
 	$(CC) $(WIN32_CFLAGS) -c $< -o $@
-else
+#else
 	$(CC) $(CFLAGS) -c $< -o $@
 endif

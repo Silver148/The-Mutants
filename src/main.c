@@ -79,10 +79,12 @@ int InitSDLAndSubSystems()
 int main(int argc, char* argv[])
 {   
     #ifdef _WIN32
-    // Redirigir stdout/stderr a la consola de VS
-    AllocConsole();
-    freopen("CONOUT$", "w", stdout);
-    freopen("CONOUT$", "w", stderr);
+        #ifdef DEBUG
+        // Redirigir stdout/stderr a la consola de VS
+        AllocConsole();
+        freopen("CONOUT$", "w", stdout);
+        freopen("CONOUT$", "w", stderr);
+        #endif
     #endif
 
     InitSDLAndSubSystems(); //Initialize SDL and subsystems
@@ -113,5 +115,5 @@ int main(int argc, char* argv[])
 
     return 0;
 }
-
 // End func main
+

@@ -107,9 +107,6 @@ static void get_random_spawn_position(float* x, float* y) {
 
     /* spawn so zombie feet align with player feet */
     *y = player_y + PLAYER_HEIGHT - ZOMBIE_HEIGHT;
-    if (*y < 0.0f) *y = 0.0f;
-    if (*y > (float)(backgroundImgH - ZOMBIE_HEIGHT))
-        *y = (float)(backgroundImgH - ZOMBIE_HEIGHT);
 }
 
 int SpawnZombie(float x, float y) {
@@ -141,6 +138,9 @@ int SpawnZombie(float x, float y) {
     num_zombies++;
         z->dest.x = (int)z->x;
         z->dest.y = (int)z->base_y;
+
+        /* debug: always log spawn Y to help trace vertical issues */
+        SDL_Log("SpawnZombie: id=%d world=(%.1f,%.1f) base_y=%.1f dest_y=%d HP=%d", z->id, x, y, z->base_y, z->dest.y, z->health);
 
         printf("Zombie %d spawn in (%.1f, %.1f) HP: %d\n", 
             z->id, x, y, z->health);
@@ -295,7 +295,6 @@ void UpdateZombies() {
         extern int backgroundImgW;
         extern int backgroundImgH;
         if(z->x < 0) z->x = 0;
-        if(z->x > backgroundImgW - ZOMBIE_WIDTH) z->x = backgroundImgW - ZOMBIE_WIDTH;
         if(z->base_y < 0) z->base_y = 0;
         if(z->base_y > backgroundImgH - ZOMBIE_HEIGHT) z->base_y = backgroundImgH - ZOMBIE_HEIGHT;
         z->y = z->base_y;
@@ -362,6 +361,18 @@ void RenderZombies() {
         SDL_Rect drawDest = z->dest;
         drawDest.x -= backgroundSrcRect.x;
         drawDest.y -= backgroundSrcRect.y;
+
+        /* If zombie base is far from player's base, override draw Y to
+           align feet visually (temporary visual fix). */
+        {
+            float player_base = GetPositionPlayerY() + PLAYER_HEIGHT;
+            int z_bottom_world = z->dest.y + ZOMBIE_HEIGHT;
+            if (fabsf((float)z_bottom_world - player_base) > 8.0f) {
+                int new_draw_y = (int)(player_base - ZOMBIE_HEIGHT) - backgroundSrcRect.y;
+                drawDest.y = new_draw_y;
+            }
+        }
+
         SDL_RenderCopyEx(renderer, tex, src_rect, &drawDest, 0.0, NULL, 
                 (z->dir < 0) ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE);
         
