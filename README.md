@@ -8,10 +8,6 @@ Este juego está hecho en C con la librería SDL2.
 
 Para compilar el juego necesitas tener w64devkit en tu PC si usas Windows(O WSL en Windows modernos, pero se requieren las siguientes librerías: SDL2, SDL2-Mixer y SDL2-Image, y tambíen se requiere el compilador de C(en WSL está gcc) y también la herramienta Make). En el caso que uses Linux requieres las librería SDL2, SDL2-Mixer y SDL2-Image, y también tener el compilador de C para Linux(gcc) y la herramienta Make.
 
-## CREDITOS
-
-Desarrolladores: Juan Yaguaro(aka silverhacker) and Abel Ferrer(aka The_Light)
-
 ## Cosas que se quieren agregar :D
 
 * Menú ✅
@@ -61,5 +57,9 @@ El acceso y distribución del juego por los momentos están estrictamente contro
 - 🔓 CÓDIGO FUENTE completo (repositorio público)
 - 🔓 EJECUTABLES finales para distribución
 - 🔓 DOCUMENTACIÓN técnica
+
+# CREDITOS
+
+Desarrolladores: Juan Yaguaro(aka silverhacker) and Abel Ferrer(aka The_Light)
 
 PROYECTO EDUCATIVO CONFIDENCIAL ![CONFIDENTIAL LOGO](https://i.ibb.co/rK7JWn73/pngwing-com.png)
