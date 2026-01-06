@@ -802,6 +802,7 @@ int Update_State_Menu()
                     TTF_CloseFont(font);
                     TTF_Quit();
                     SDL_Quit();
+                    exit(0);
                     return 0;
                 }else if(mx >= settings_rect.x && mx <= settings_rect.x + settings_rect.w &&
                    my >= settings_rect.y && my <= settings_rect.y + settings_rect.h)

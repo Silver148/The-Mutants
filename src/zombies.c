@@ -18,6 +18,8 @@ Copyright 2025
 #include "zombie_waves.h"
 #include "system_cinematics.h"
 #include "states.h"
+#include "music.h"
+#include "projectiles.h"
 #include <SDL2/SDL.h>
 
 /* camera source rect from state_game.c */
@@ -29,6 +31,7 @@ extern void SetBackgroundImage(const char* path);
 #include <stdio.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
 #include <math.h>
 #include <stdlib.h>
 #include <time.h>
@@ -62,6 +65,7 @@ int wave_counter = 0;
 #define INITIAL_ZOMBIES 3
 #define SPAWN_COOLDOWN 5.0f
 
+extern TTF_Font* font_kills;
 
 static int find_free_zombie_slot() {
     for (int i = 0; i < MAX_ZOMBIES; i++) {
@@ -258,7 +262,7 @@ void UpdateZombies() {
 
     if(wave_state == 0)
     {
-        InitWave(&wave1, 20, 2.0f, 5);
+        InitWave(&wave1, 10, 2.0f, 5);
         wave_state = 1;
         SDL_Log("STARTING WAVE 1");
     }
@@ -276,7 +280,7 @@ void UpdateZombies() {
 
     if(wave_state == 2)
     {
-        InitWave(&wave2, 40, 2 + rand() % 2, 10);
+        InitWave(&wave2, 10, 2 + rand() % 2, 10);
 
         for(int i = 0; i<MAX_ZOMBIES; i++)
         {
@@ -373,7 +377,7 @@ void UpdateZombies() {
         SetBackgroundImage("sprites/113 sin título_20260104134157~2.png");
         pending_bg_change = 0;
         /* start wave 3 */
-        InitWave(&wave3, 20, 2 + rand() % 2, 8);
+        InitWave(&wave3, 10, 2 + rand() % 2, 8);
         for(int i = 0; i<MAX_ZOMBIES; i++) { zombies[i].id = 0; next_zombie_id = 0; }
         SDL_Log("STARTING WAVE 3");
         wave_state = 5; /* wave3 running */
@@ -385,7 +389,7 @@ void UpdateZombies() {
         if (r == -1) {
             SDL_Log("WAVE 3 FINISHED");
             /* init wave4 */
-            InitWave(&wave4, 30, 2 + rand() % 2, 12);
+            InitWave(&wave4, 10, 2 + rand() % 2, 12);
             for(int i = 0; i<MAX_ZOMBIES; i++) { zombies[i].id = 0; next_zombie_id = 0; }
             SDL_Log("STARTING WAVE 4");
             wave_state = 6; /* wave4 running */
@@ -404,6 +408,7 @@ void UpdateZombies() {
     if(wave_state == -1)
     {
         InitSystemCinematics();
+        SDL_SetWindowTitle(window, "The Mutant's");
         PlayCinematic("cinematics/level2_on_the_way_to_the_plane.mp4", renderer);
         ShutdownCinematicsSystem();
         SDL_RenderClear(renderer);
@@ -417,6 +422,11 @@ void UpdateZombies() {
         CleanupZombieSystem();
         CleanupPlayer();
         CleanupBackground();
+        CleanupProjectileSystem();
+        TTF_CloseFont(font_kills);
+        CloseMusic();
+        InitMusic();
+        PlayMusicStateMenu();
         Init_State_Menu();
         Update_State_Menu();
     }

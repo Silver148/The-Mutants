@@ -182,3 +182,8 @@ void RenderProjectiles()
         #endif
     }
 }
+
+void CleanupProjectileSystem()
+{
+    memset(projectiles, 0, sizeof(projectiles));
+}

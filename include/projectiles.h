@@ -28,6 +28,7 @@ void InitProjectiles();
 void SpawnProjectile(float x, float y, float vx, float vy, int damage);
 void UpdateProjectiles();
 void RenderProjectiles();
+void CleanupProjectileSystem();
 
 
 #endif // PROJECTILES_H

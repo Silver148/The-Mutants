@@ -30,6 +30,12 @@ int InitMusic()
     return 0;
 }
 
+int CloseMusic()
+{
+    Mix_CloseAudio();
+    return 0;
+}
+
 int PlayMusicStateGame()
 {
     Mix_Music* bgm = Mix_LoadMUS("music/Terminator 2 Judgment Day _ Guns N' Roses - You Could Be Mine (Terminator 2 Soundtrack) - Braindead Soundtracks.mp3");

@@ -348,7 +348,14 @@ int Update_State_Game()
         {
             if(e.type == SDL_QUIT)
             {
+                CleanupBackground();
+                CleanupZombieSystem();
+                CleanupPlayer();
+                CleanupProjectileSystem();
+                TTF_CloseFont(font_kills);
+                TTF_Quit();
                 SDL_Quit();
+                exit(0);
                 return 0;
             }
         }
