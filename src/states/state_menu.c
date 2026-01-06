@@ -786,6 +786,11 @@ int Update_State_Menu()
                 if(mx >= start_rect.x && mx <= start_rect.x + start_rect.w &&
                    my >= start_rect.y && my <= start_rect.y + start_rect.h)
                 {
+                    if(start_texture){ SDL_DestroyTexture(start_texture); start_texture = NULL; }
+                    if(quit_texture){ SDL_DestroyTexture(quit_texture); quit_texture = NULL; }
+                    if(version_texture){ SDL_DestroyTexture(version_texture); version_texture = NULL; }
+                    if(settings_texture){ SDL_DestroyTexture(settings_texture); settings_texture = NULL; }
+                    TTF_CloseFont(font);
                     return 1;
                 }else if(mx >= quit_rect.x && mx <= quit_rect.x + quit_rect.w &&
                    my >= quit_rect.y && my <= quit_rect.y + quit_rect.h)

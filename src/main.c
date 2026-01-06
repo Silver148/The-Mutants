@@ -93,6 +93,10 @@ int main(int argc, char* argv[])
     InitMusic(); //Initialize music subsystem
     LoadSettingsFromFile(&game_settings); //Load settings from file
 
+    InitSystemCinematics();
+    PlayCinematic("cinematics/win1.mp4", renderer); //Play intro cinematic 1
+    ShutdownCinematicsSystem();
+
     PlayMusicStateMenu(); //Play music for menu state
 
     /*STATES*/

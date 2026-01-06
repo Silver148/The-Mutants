@@ -122,4 +122,6 @@ typedef struct {
 Hitbox GetPlayerHitbox(void);
 void UpdatePlayerHitbox(void);
 
+void CleanupPlayer();
+
 #endif // PLAYER_H

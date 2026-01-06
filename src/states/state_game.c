@@ -209,6 +209,14 @@ int Init_State_Game()
     return 0;
 }
 
+void CleanupBackground()
+{
+    if(backgroundTexture) {
+        SDL_DestroyTexture(backgroundTexture);
+        backgroundTexture = NULL;
+    }
+}
+
 /* Replace current background with image at `path` and recalc src/dest rects */
 void SetBackgroundImage(const char* path)
 {
@@ -331,6 +339,8 @@ void RenderBarHealth()
 
 int Update_State_Game()
 {
+    Uint32 start_fps = SDL_GetTicks();
+    int frames = 0;
     while(1) //Main loop(TESTING)
     {
         SDL_Event e;
@@ -535,7 +545,15 @@ int Update_State_Game()
         }
         #endif
 
-        SDL_RenderPresent(renderer);    
+        SDL_RenderPresent(renderer);
+        frames++;
+        if (SDL_GetTicks() - start_fps >= 1000) {
+            char title[50];
+            sprintf(title, "The Mutant's - FPS: %d", frames);
+            SDL_SetWindowTitle(window, title);
+            frames = 0;
+            start_fps = SDL_GetTicks();
+        }  
     }
 
     return 0;

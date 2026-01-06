@@ -10,4 +10,6 @@ int Init_State_Game();
 int Update_State_Game();
 void UpdateKillsTexture(int kills);
 
+void CleanupBackground();
+
 #endif // STATES_H

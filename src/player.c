@@ -491,6 +491,35 @@ void CleanTextureShoot()
     Animation_Reset(&shoot_walk_player.shootwalk_anim);
 }
 
+void CleanupPlayer()
+{
+    //Clean shoot textures
+    CleanTextureShoot();
+
+    if(walk_player.tex_walkplayer)
+    {
+        SDL_DestroyTexture(walk_player.tex_walkplayer);
+        walk_player.tex_walkplayer = NULL;
+    }
+
+    if(idle_player.tex_idleplayer)
+    {
+        SDL_DestroyTexture(idle_player.tex_idleplayer);
+        idle_player.tex_idleplayer = NULL;
+    }
+
+    if(jump_player.tex_jumpplayer)
+    {
+        SDL_DestroyTexture(jump_player.tex_jumpplayer);
+        jump_player.tex_jumpplayer = NULL;
+    }
+
+    //Reset anims
+    Animation_Reset(&walk_player.walk_anim);
+    Animation_Reset(&idle_player.idle_anim);
+    Animation_Reset(&jump_player.jump_anim);
+}
+
 /* Load/replace the shoot-walking spritesheet to be used when player shoots while walking */
 void ChangePlayerShootWalkSkin(const char* shoot_walk_path)
 {

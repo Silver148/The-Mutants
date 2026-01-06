@@ -407,9 +407,20 @@ void UpdateZombies() {
         PlayCinematic("cinematics/level2_on_the_way_to_the_plane.mp4", renderer);
         ShutdownCinematicsSystem();
         SDL_RenderClear(renderer);
+        wave_state = -2; /* prevent replaying cinematic */
+    }
+
+    if(wave_state == -2)
+    {
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(renderer);
+        CleanupZombieSystem();
+        CleanupPlayer();
+        CleanupBackground();
+        Init_State_Menu();
+        Update_State_Menu();
     }
 }
-
 
 void RenderZombies() {
     for (int i = 0; i < MAX_ZOMBIES; i++) {
@@ -495,6 +506,14 @@ void CleanupZombieSystem() {
     if (tmp_surf_winner) {
         SDL_FreeSurface(tmp_surf_winner);
         tmp_surf_winner = NULL;
+    }
+    if(walk_zombie.tex_walk_zombie) {
+        SDL_DestroyTexture(walk_zombie.tex_walk_zombie);
+        walk_zombie.tex_walk_zombie = NULL;
+    }
+    if(idle_zombie.tex_zombie_idle) {
+        SDL_DestroyTexture(idle_zombie.tex_zombie_idle);
+        idle_zombie.tex_zombie_idle = NULL;
     }
 }
 

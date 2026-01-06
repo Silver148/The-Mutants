@@ -1,4 +1,5 @@
 #include "system_cinematics.h"
+extern SDL_Window* window;
 
 int InitSystemCinematics()
 {
@@ -81,11 +82,6 @@ int PlayCinematic(const char* filepath, SDL_Renderer* renderer)
                         SDL_RenderCopy(renderer, texture, NULL, NULL);
                         SDL_RenderPresent(renderer);
 
-                        SDL_Event e;
-                        while (SDL_PollEvent(&e)) {
-                            if (e.type == SDL_QUIT) { quit = 1; break; }
-                        }
-
 
                     }
                 }
@@ -101,6 +97,7 @@ int PlayCinematic(const char* filepath, SDL_Renderer* renderer)
         if (frame) av_frame_free(&frame);
         if (codec_ctx) { avcodec_free_context(&codec_ctx); }
         if (fmt_ctx) avformat_close_input(&fmt_ctx);
+        if (pkt) av_packet_free(&pkt);
 
         return ret;
 
