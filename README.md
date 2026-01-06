@@ -18,7 +18,7 @@ Desarrolladores: Juan Yaguaro(aka silverhacker) and Abel Ferrer(aka The_Light)
 
 * IA de zombies ✅
 
-* Niveles
+* Niveles (En proceso 🚧)
 
 * Oleadas de zombies ✅
 
