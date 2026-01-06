@@ -225,6 +225,11 @@ static void zombie_wander(ZOMBIE* z) {
         z->state = IDLE_Z;
     }
     z->y = z->base_y;
+
+    if(z->x >= backgroundImgW - ZOMBIE_WIDTH) {
+        z->x = backgroundImgW - ZOMBIE_WIDTH;
+        z->dir = -1;
+    }
 }
 
 int current_wave = 0;
