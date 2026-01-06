@@ -7,32 +7,23 @@
 #define MyAppPublisher "TheLightAndSilverhacker"
 #define MyAppExeName "The_Mutants.exe"
 
+#define MySourcePath "..\The_Mutants_windows"
+
 [Setup]
-; NOTE: The value of AppId uniquely identifies this application. Do not use the same AppId value in installers for other applications.
-; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
-AppId={{F57DF1EB-23AF-4F65-A98B-0DD29090429C}
+AppId={{F57DF1EB-23AF-4F65-A98B-0DD29090429C}}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
-;AppVerName={#MyAppName} {#MyAppVersion}
 AppPublisher={#MyAppPublisher}
 DefaultDirName={autopf}\The-Mutants
 UninstallDisplayIcon={app}\{#MyAppExeName}
-; "ArchitecturesAllowed=x64compatible" specifies that Setup cannot run
-; on anything but x64 and Windows 11 on Arm.
 ArchitecturesAllowed=x64compatible
-; "ArchitecturesInstallIn64BitMode=x64compatible" requests that the
-; install be done in "64-bit mode" on x64 or Windows 11 on Arm,
-; meaning it should use the native 64-bit Program Files directory and
-; the 64-bit view of the registry.
 ArchitecturesInstallIn64BitMode=x64compatible
 DisableProgramGroupPage=yes
-InfoBeforeFile=C:\Users\Juan Yaguaro\Desktop\The-Mutants-setup-inno\before_info_setup.txt
-InfoAfterFile=C:\Users\Juan Yaguaro\Desktop\The-Mutants-setup-inno\after_info_setup.txt
-; Uncomment the following line to run in non administrative install mode (install for current user only).
-;PrivilegesRequired=lowest
-OutputDir=C:\Users\Juan Yaguaro\Desktop
-OutputBaseFilename=The-Mutants-setup
-SetupIconFile=C:\Users\Juan Yaguaro\Desktop\The-Mutants-setup-inno\The-Mutants-ico.ico
+InfoBeforeFile=before_info_setup.txt
+InfoAfterFile=after_info_setup.txt
+OutputDir="..\"
+OutputBaseFilename=The-Mutants-setup-v{#MyAppVersion}
+SetupIconFile=The-Mutants-ico.ico
 SolidCompression=yes
 WizardStyle=modern polar
 
@@ -44,20 +35,12 @@ Name: "spanish"; MessagesFile: "compiler:Languages\Spanish.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "C:\Users\Juan Yaguaro\Desktop\The-Mutants\The_Mutants_windows\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\Juan Yaguaro\Desktop\The-Mutants\The_Mutants_windows\libcurl-x64.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\Juan Yaguaro\Desktop\The-Mutants\The_Mutants_windows\libjpeg-9.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\Juan Yaguaro\Desktop\The-Mutants\The_Mutants_windows\libpng16-16.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\Juan Yaguaro\Desktop\The-Mutants\The_Mutants_windows\libtiff-5.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\Juan Yaguaro\Desktop\The-Mutants\The_Mutants_windows\SDL2.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\Juan Yaguaro\Desktop\The-Mutants\The_Mutants_windows\SDL2_image.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\Juan Yaguaro\Desktop\The-Mutants\The_Mutants_windows\SDL2_mixer.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\Juan Yaguaro\Desktop\The-Mutants\The_Mutants_windows\SDL2_ttf.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\Juan Yaguaro\Desktop\The-Mutants\The_Mutants_windows\zlib1.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\Juan Yaguaro\Desktop\The-Mutants\The_Mutants_windows\skins\*"; DestDir: "{app}\skins"; Flags: ignoreversion recursesubdirs
-Source: "C:\Users\Juan Yaguaro\Desktop\The-Mutants\The_Mutants_windows\fonts\*"; DestDir: "{app}\fonts"; Flags: ignoreversion recursesubdirs
-Source: "C:\Users\Juan Yaguaro\Desktop\The-Mutants\The_Mutants_windows\music\*"; DestDir: "{app}\music"; Flags: ignoreversion recursesubdirs
-Source: "C:\Users\Juan Yaguaro\Desktop\The-Mutants\The_Mutants_windows\sprites\*"; DestDir: "{app}\sprites"; Flags: ignoreversion recursesubdirs
+Source: "{#MySourcePath}\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#MySourcePath}\*.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#MySourcePath}\skins\*"; DestDir: "{app}\skins"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#MySourcePath}\fonts\*"; DestDir: "{app}\fonts"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#MySourcePath}\music\*"; DestDir: "{app}\music"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#MySourcePath}\sprites\*"; DestDir: "{app}\sprites"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]

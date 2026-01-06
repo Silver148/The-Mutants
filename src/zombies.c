@@ -370,6 +370,7 @@ void UpdateZombies() {
         InitSystemCinematics();
         PlayCinematic("cinematics/win1.mp4", renderer);
         ShutdownCinematicsSystem();
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
 
         SDL_Log("All zombies cleared after waves. Changing background now.");
@@ -427,6 +428,8 @@ void UpdateZombies() {
         CloseMusic();
         InitMusic();
         PlayMusicStateMenu();
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(renderer);
         Init_State_Menu();
         Update_State_Menu();
     }
