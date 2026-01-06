@@ -3,7 +3,7 @@
 ; Non-commercial use only
 
 #define MyAppName "The Mutants"
-#define MyAppVersion "0.26.1"
+#define MyAppVersion "0.27"
 #define MyAppPublisher "TheLightAndSilverhacker"
 #define MyAppExeName "The_Mutants.exe"
 
