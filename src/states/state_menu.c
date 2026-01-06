@@ -772,9 +772,13 @@ int Update_State_Menu()
             if(e.type == SDL_QUIT)
             {
                 if(start_texture){ SDL_DestroyTexture(start_texture); start_texture = NULL; }
+                if(quit_texture){ SDL_DestroyTexture(quit_texture); quit_texture = NULL; }
+                if(version_texture){ SDL_DestroyTexture(version_texture); version_texture = NULL; }
+                if(settings_texture){ SDL_DestroyTexture(settings_texture); settings_texture = NULL; }
                 TTF_CloseFont(font);
                 TTF_Quit();
                 SDL_Quit();
+                exit(0);
                 return 0;
             }
 

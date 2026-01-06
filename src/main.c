@@ -92,9 +92,16 @@ int main(int argc, char* argv[])
     InitMusic(); //Initialize music subsystem
     LoadSettingsFromFile(&game_settings); //Load settings from file
 
-    //InitSystemCinematics();
-    //PlayCinematic("cinematics/win1.mp4", renderer); //Play intro cinematic 1
-    //ShutdownCinematicsSystem();
+    #if 0
+    /*SYSTEM CINEMATIC TESTING*/
+    InitSystemCinematics(); //Initialize cinematic system
+    PlayCinematic("cinematics/win1.mp4", renderer); //Play intro cinematic 1
+    ShutdownCinematicsSystem(); //Shutdown cinematic system
+
+    /* Clear the screen */
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderClear(renderer);
+    #endif
 
     PlayMusicStateMenu(); //Play music for menu state
 
@@ -108,11 +115,13 @@ int main(int argc, char* argv[])
 
     PlayMusicStateGame(); //Play music for game state
 
+        #ifdef DEBUG
         /* Debug: report whether player textures were loaded from menu selections */
         SDL_Log("Main: idle tex=%p walk tex=%p jump tex=%p\n",
             (void*)idle_player.tex_idleplayer,
             (void*)walk_player.tex_walkplayer,
             (void*)jump_player.tex_jumpplayer);
+        #endif
 
     Init_State_Game(); //Initialize game state
     Update_State_Game(); //Update game state

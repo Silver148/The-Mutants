@@ -8,7 +8,7 @@
 #include <libavutil/imgutils.h>
 #include <libavutil/mem.h>
 
-int InitSystemCinematics();
+void InitSystemCinematics();
 int PlayCinematic(const char* filepath, SDL_Renderer* renderer);
 int ShutdownCinematicsSystem();
 

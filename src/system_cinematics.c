@@ -1,12 +1,10 @@
 #include "system_cinematics.h"
 extern SDL_Window* window;
 
-int InitSystemCinematics()
+void InitSystemCinematics()
 {
     // Initialize FFmpeg libraries
     avformat_network_init();
-
-    return 0;
 }
 
 int PlayCinematic(const char* filepath, SDL_Renderer* renderer)
@@ -58,6 +56,7 @@ int PlayCinematic(const char* filepath, SDL_Renderer* renderer)
         double time_base = av_q2d(fmt_ctx->streams[video_stream]->time_base);
         Uint32 start_time_ms = SDL_GetTicks();
         int quit = 0;
+        bool draw = false;
         while (!quit && av_read_frame(fmt_ctx, pkt) >= 0) {
             if (pkt->stream_index == video_stream) {
                 if (avcodec_send_packet(codec_ctx, pkt) == 0) {
@@ -68,26 +67,39 @@ int PlayCinematic(const char* filepath, SDL_Renderer* renderer)
 
                         Uint32 elapsed_ms = SDL_GetTicks() - start_time_ms;
 
-                        if (target_ms > elapsed_ms) {
-                            SDL_Delay(target_ms - elapsed_ms);
+                        /*Wait until target time*/
+                        while (elapsed_ms < target_ms) {
+                            SDL_Event ev;
+                            while (SDL_PollEvent(&ev)) { //Handle events
+                                if (ev.type == SDL_QUIT) quit = true;
+                            }
+                    
+                            elapsed_ms = SDL_GetTicks() - start_time_ms;
+                    
+                            if (target_ms - elapsed_ms > 1) {
+                                SDL_Delay(1); //Yield CPU
+                            }
                         }
+
                         sws_scale(sws_ctx, (const uint8_t * const*)frame->data, frame->linesize, 0, height, frame_rgba->data, frame_rgba->linesize);
                         SDL_UpdateYUVTexture(texture, NULL, 
                                             frame_rgba->data[0], frame_rgba->linesize[0], // Plano Y
                                             frame_rgba->data[1], frame_rgba->linesize[1], // Plano U
                                             frame_rgba->data[2], frame_rgba->linesize[2]  // Plano V
                                             );
+
                         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
                         SDL_RenderClear(renderer);
                         SDL_RenderCopy(renderer, texture, NULL, NULL);
+                        SDL_RenderCopy(renderer, texture, NULL, NULL);
                         SDL_RenderPresent(renderer);
-
-
                     }
                 }
             }
             av_packet_unref(pkt);
         }
+
+        goto cleanup;
 
     cleanup:
         if (texture) SDL_DestroyTexture(texture);
@@ -100,8 +112,6 @@ int PlayCinematic(const char* filepath, SDL_Renderer* renderer)
         if (pkt) av_packet_free(&pkt);
 
         return ret;
-
-    return 0;
 }
 
 int ShutdownCinematicsSystem()
