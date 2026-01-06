@@ -10,7 +10,6 @@ group and will be considered a real gay.
 
 Copyright 2025
 */
-/* pitos*/ 
 
 #include <stdio.h>
 #include <SDL2/SDL.h>
@@ -93,9 +92,9 @@ int main(int argc, char* argv[])
     InitMusic(); //Initialize music subsystem
     LoadSettingsFromFile(&game_settings); //Load settings from file
 
-    InitSystemCinematics();
-    PlayCinematic("cinematics/win1.mp4", renderer); //Play intro cinematic 1
-    ShutdownCinematicsSystem();
+    //InitSystemCinematics();
+    //PlayCinematic("cinematics/win1.mp4", renderer); //Play intro cinematic 1
+    //ShutdownCinematicsSystem();
 
     PlayMusicStateMenu(); //Play music for menu state
 
