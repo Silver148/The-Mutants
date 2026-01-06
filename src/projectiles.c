@@ -15,6 +15,7 @@ Copyright 2025
 #include "global_vars.h"
 #include "player.h"
 #include "zombies.h"
+#include "states.h"
 #include <SDL2/SDL.h>
 #include <string.h>
 #include <stdio.h>
@@ -22,6 +23,7 @@ Copyright 2025
 extern float deltaTime; /* from delta_time.c */
 extern ZOMBIE zombies[MAX_ZOMBIES];/*zombies instance (from zombies.c) */
 extern int num_zombies;; 
+int counter_kills = 0;
 
 static Projectile projectiles[MAX_PROJECTILES];
 
@@ -132,16 +134,22 @@ void UpdateProjectiles()
                 #endif
                 
                 if(zombies[z].health <= 0) {
-                    zombies[z].alive = 0;
-                    zombies[z].speed = 0.0f;
-                    num_zombies--;
+                      zombies[z].alive = 0;
+                      zombies[z].speed = 0.0f;
+                      num_zombies--;
+                      /* increment global kills counter and update texture */
+                      counter_kills++;
+                      #ifdef DEBUG
+                      SDL_Log("counter_kills incremented -> %d", counter_kills);
+                      #endif
+                      UpdateKillsTexture(counter_kills);
                     
-                    #ifdef DEBUG
-                    SDL_Log("Zombie %d eliminado! Zombies restantes: %d\n", 
-                           zombies[z].id, num_zombies);
-                    #else
-                    SDL_Log("Zombie died\n");
-                    #endif
+                      #ifdef DEBUG
+                      SDL_Log("Zombie %d eliminado! Zombies restantes: %d\n", 
+                          zombies[z].id, num_zombies);
+                      #else
+                      SDL_Log("Zombie died\n");
+                      #endif
                     
                 }
                 
@@ -157,12 +165,6 @@ void RenderProjectiles()
         if(!projectiles[i].active) continue;
         extern SDL_Rect backgroundSrcRect; /* declared in state_game.c */
         SDL_Rect r = { (int)projectiles[i].x - backgroundSrcRect.x, (int)projectiles[i].y - backgroundSrcRect.y, projectiles[i].w, projectiles[i].h };
-        #ifdef DEBUG
-        SDL_Log("RenderProjectile[%d]: world=(%.1f,%.1f) bgSrc=(%d,%d) screen=(%d,%d) size=(%d,%d) active=%d",
-            i, projectiles[i].x, projectiles[i].y,
-            backgroundSrcRect.x, backgroundSrcRect.y,
-            r.x, r.y, r.w, r.h, projectiles[i].active);
-        #endif
         /* draw the small projectile rect */
         SDL_RenderFillRect(renderer, &r);
         

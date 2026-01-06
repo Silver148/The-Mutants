@@ -16,6 +16,8 @@ Copyright 2025
 #include "global_vars.h"
 #include "player.h"
 #include "zombie_waves.h"
+#include "system_cinematics.h"
+#include "states.h"
 #include <SDL2/SDL.h>
 
 /* camera source rect from state_game.c */
@@ -288,7 +290,6 @@ void UpdateZombies() {
         if(r == -1)
         {
             SDL_Log("WAVE 2 FINISHED");
-            SDL_Log("GAME FINISHED!!!");
             /* mark that initial waves finished; wait until all zombies are cleared */
             wave_state = 4; /* waiting-for-clear state */
             pending_bg_change = 1;
@@ -357,12 +358,17 @@ void UpdateZombies() {
     /* If waves finished earlier and we're waiting for all zombies to be cleared,
        perform the background change only once there are no active zombies. */
     if (pending_bg_change && num_zombies == 0) {
+        InitSystemCinematics();
+        PlayCinematic("cinematics/win1.mp4", renderer);
+        ShutdownCinematicsSystem();
+        SDL_RenderClear(renderer);
+
         SDL_Log("All zombies cleared after waves. Changing background now.");
         /* change background, then start two additional waves */
         SetBackgroundImage("sprites/113 sin título_20260104134157~2.png");
         pending_bg_change = 0;
         /* start wave 3 */
-        InitWave(&wave3, 30, 2 + rand() % 2, 8);
+        InitWave(&wave3, 20, 2 + rand() % 2, 8);
         for(int i = 0; i<MAX_ZOMBIES; i++) { zombies[i].id = 0; next_zombie_id = 0; }
         SDL_Log("STARTING WAVE 3");
         wave_state = 5; /* wave3 running */
@@ -374,7 +380,7 @@ void UpdateZombies() {
         if (r == -1) {
             SDL_Log("WAVE 3 FINISHED");
             /* init wave4 */
-            InitWave(&wave4, 50, 2 + rand() % 2, 12);
+            InitWave(&wave4, 30, 2 + rand() % 2, 12);
             for(int i = 0; i<MAX_ZOMBIES; i++) { zombies[i].id = 0; next_zombie_id = 0; }
             SDL_Log("STARTING WAVE 4");
             wave_state = 6; /* wave4 running */
@@ -388,6 +394,14 @@ void UpdateZombies() {
             SDL_Log("ALL WAVES FINISHED!!!");
             wave_state = -1; /* final state: show winner */
         }
+    }
+
+    if(wave_state == -1)
+    {
+        InitSystemCinematics();
+        PlayCinematic("cinematics/level2_on_the_way_to_the_plane.mp4", renderer);
+        ShutdownCinematicsSystem();
+        SDL_RenderClear(renderer);
     }
 }
 

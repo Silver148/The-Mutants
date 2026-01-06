@@ -28,6 +28,7 @@ STATE GAME :D by Juan Yaguaro And Abel Ferrer
 #include <stdio.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
 
 SDL_Texture* backgroundTexture = NULL; //Background texture
 SDL_Rect backgroundRect;
@@ -63,6 +64,51 @@ const int POS_Y_BARRA = (480 - ALTURA_BARRA - 40);
 
 extern ZOMBIE zombies[MAX_ZOMBIES];/*zombies instance (from zombies.c) */
 
+TTF_Font* font_kills = NULL;
+SDL_Surface* tmp_surf_kills_text = NULL;
+SDL_Texture* kills_text_texture = NULL;
+
+char kills_text[32] = {0};
+extern int counter_kills;
+
+SDL_Rect kills_text_rect;
+
+/* Update or recreate the kills text texture from the current kills count */
+void UpdateKillsTexture(int kills)
+{
+    if (!font_kills) return;
+
+    char buf[64];
+    snprintf(buf, sizeof(buf), "Kills: %d", kills);
+
+    SDL_Surface* surf = TTF_RenderText_Blended(font_kills, buf, (SDL_Color){255,255,255,255});
+    if (!surf) {
+        SDL_Log("TTF_RenderText_Blended failed: %s", TTF_GetError());
+        return;
+    }
+
+    SDL_Texture* new_tex = SDL_CreateTextureFromSurface(renderer, surf);
+    SDL_FreeSurface(surf);
+    if (!new_tex) {
+        SDL_Log("SDL_CreateTextureFromSurface failed: %s", SDL_GetError());
+        return;
+    }
+
+    if (kills_text_texture) {
+        SDL_DestroyTexture(kills_text_texture);
+    }
+    kills_text_texture = new_tex;
+    SDL_SetTextureBlendMode(kills_text_texture, SDL_BLENDMODE_BLEND);
+
+    int w = 0, h = 0;
+    SDL_QueryTexture(kills_text_texture, NULL, NULL, &w, &h);
+    kills_text_rect.x = 640 - w - 10;
+    kills_text_rect.y = 10;
+    kills_text_rect.w = w;
+    kills_text_rect.h = h;
+    SDL_Log("UpdateKillsTexture: created texture for %d (w=%d h=%d)", kills, w, h);
+}
+
 void ShowHitboxPlayer()
 {
     Hitbox player_hitbox = GetPlayerHitbox();
@@ -93,6 +139,15 @@ void CheckChangeStatePlayer()
 
 int Init_State_Game()
 {
+    font_kills = TTF_OpenFont("fonts/SYSTEMIA.ttf", 24);
+    if (!font_kills) {
+        fprintf(stderr, "Failed to load font: %s\n", TTF_GetError());
+        return -1;
+    }
+
+    /* Create initial kills texture from current counter */
+    UpdateKillsTexture(counter_kills);
+
     /*Load BACKGROUND test main menu test*/
     SDL_Surface* background_surface = IMG_Load("sprites/cityminimap.png");
 
@@ -102,8 +157,8 @@ int Init_State_Game()
     backgroundTexture = SDL_CreateTextureFromSurface(renderer, background_surface); //Convert surface to texture
     SDL_FreeSurface(background_surface); //Free loaded surface
 
-    // Center-crop the background to fill window without vertical stretching
     int imgW = 0, imgH = 0;
+    // Center-crop the background to fill window without vertical stretching
     SDL_QueryTexture(backgroundTexture, NULL, NULL, &imgW, &imgH);
     backgroundImgW = imgW;
     backgroundImgH = imgH;
@@ -413,6 +468,12 @@ int Update_State_Game()
     UpdateProjectiles();
 
         /*TESTING*/
+        /* Refresh kills texture when counter changes */
+        static int last_counter_kills = -1;
+        if (last_counter_kills != counter_kills) {
+            UpdateKillsTexture(counter_kills);
+            last_counter_kills = counter_kills;
+        }
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); //clean screen with black color
         SDL_RenderClear(renderer);
 
@@ -456,6 +517,9 @@ int Update_State_Game()
 
         RenderBarHealth(); // Render player health
         RenderBarStamina(); //Render stamina bar
+        if (kills_text_texture) {
+            SDL_RenderCopy(renderer, kills_text_texture, NULL, &kills_text_rect);
+        }
 
         RenderPlayer(player_flip); //Render player
 

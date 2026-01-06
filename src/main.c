@@ -18,6 +18,7 @@ Copyright 2025
 #include <stdbool.h>
 #include <SDL2/SDL_ttf.h>
 #include <windows.h>
+#include "system_cinematics.h"
 #include "settings.h"
 #include "music.h"
 #include "states.h"

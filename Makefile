@@ -7,7 +7,7 @@
 SOURCES = src/main.c src/player.c src/states/state_menu.c \
 			src/states/state_game.c src/zombies.c src/delta_time.c src/anim_manager.c \
 			src/music.c src/settings.c src/projectiles.c src/zombie_waves.c src/update_system.c \
-			src/show_notifications.c
+			src/show_notifications.c src/system_cinematics.c
 OBJECTS = $(SOURCES:src/%.c=obj/%.o)
 
 # Windows x64 build settings
@@ -42,16 +42,16 @@ Windows_NT-x86_64:
 	cp SDL2-Mingw/x86_64-w64-mingw32/bin/libtiff-5.dll libtiff-5.dll
 	cp SDL2-Mingw/x86_64-w64-mingw32/bin/SDL2_mixer.dll SDL2_mixer.dll
 	cp SDL2-Mingw/x86_64-w64-mingw32/bin/SDL2_ttf.dll SDL2_ttf.dll
-	cp ffmpeg/bin/avcodec-62.dll libavcodec-62.dll
-	cp ffmpeg/bin/avformat-62.dll libavformat-62.dll
-	cp ffmpeg/bin/avutil-60.dll libavutil-60.dll
-	cp ffmpeg/bin/swscale-9.dll libswscale-9.dll
-	cp ffmpeg/bin/swresample-6.dll libswresample-6.dll
+	cp ffmpeg/bin/avcodec-62.dll avcodec-62.dll
+	cp ffmpeg/bin/avformat-62.dll avformat-62.dll
+	cp ffmpeg/bin/avutil-60.dll avutil-60.dll
+	cp ffmpeg/bin/swscale-9.dll swscale-9.dll
+	cp ffmpeg/bin/swresample-6.dll swresample-6.dll
 	cp ffmpeg/bin/avdevice-62.dll avdevice-62.dll
 	cp ffmpeg/bin/avfilter-11.dll avfilter-11.dll
 	cp curl/bin/libcurl-x64.dll libcurl-x64.dll
 	zip -r The_Mutants_windows.zip $(WIN_NAME) SDL2.dll libpng16-16.dll zlib1.dll libjpeg-9.dll SDL2_image.dll libtiff-5.dll SDL2_mixer.dll SDL2_ttf.dll libcurl-x64.dll \
-	sprites music fonts skins libavcodec-62.dll libavformat-62.dll libavutil-60.dll libswscale-9.dll libswresample-6.dll avdevice-62.dll avfilter-11.dll
+	sprites music fonts skins avcodec-62.dll avformat-62.dll avutil-60.dll swscale-9.dll swresample-6.dll avdevice-62.dll avfilter-11.dll cinematics
 	rm -f *.dll
 	rm -f $(WIN_NAME)
 	@echo "BUILD COMPLETE... Compiled from the $(OS)-$(ARCH)"
@@ -81,8 +81,16 @@ debug-windows-x64:
 	cp SDL2-Mingw/x86_64-w64-mingw32/bin/libtiff-5.dll libtiff-5.dll
 	cp SDL2-Mingw/x86_64-w64-mingw32/bin/SDL2_mixer.dll SDL2_mixer.dll
 	cp SDL2-Mingw/x86_64-w64-mingw32/bin/SDL2_ttf.dll SDL2_ttf.dll
+	cp ffmpeg/bin/avcodec-62.dll avcodec-62.dll
+	cp ffmpeg/bin/avformat-62.dll avformat-62.dll
+	cp ffmpeg/bin/avutil-60.dll avutil-60.dll
+	cp ffmpeg/bin/swscale-9.dll swscale-9.dll
+	cp ffmpeg/bin/swresample-6.dll swresample-6.dll
+	cp ffmpeg/bin/avdevice-62.dll avdevice-62.dll
+	cp ffmpeg/bin/avfilter-11.dll avfilter-11.dll
 	cp curl/bin/libcurl-x64.dll libcurl-x64.dll
-	zip -r The_Mutants_windows-debug.zip $(WIN_NAME) SDL2.dll libpng16-16.dll zlib1.dll libjpeg-9.dll SDL2_image.dll libtiff-5.dll SDL2_mixer.dll SDL2_ttf.dll libcurl-x64.dll sprites music fonts skins
+	zip -r The_Mutants_windows-debug.zip $(WIN_NAME) SDL2.dll libpng16-16.dll zlib1.dll libjpeg-9.dll SDL2_image.dll libtiff-5.dll SDL2_mixer.dll SDL2_ttf.dll libcurl-x64.dll \
+	sprites music fonts skins avcodec-62.dll avformat-62.dll avutil-60.dll swscale-9.dll swresample-6.dll avdevice-62.dll avfilter-11.dll cinematics
 	rm -f *.dll
 	rm -f $(WIN_NAME)
 	@echo "DEBUG BUILD COMPLETE... Compiled from the $(OS)-$(ARCH)"

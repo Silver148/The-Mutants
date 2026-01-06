@@ -8,5 +8,6 @@ int Update_State_Menu();
 /*GAME*/
 int Init_State_Game();
 int Update_State_Game();
+void UpdateKillsTexture(int kills);
 
 #endif // STATES_H

@@ -48,7 +48,7 @@ void Animation_Update(Animation* anim) {
         anim->last_update_time = current_time;
 
     #ifdef ANIM_DEBUG
-        SDL_Log("Animation_Update: current_frame=%d src_x=%d\n", anim->current_frame, anim->src_rect.x);
+        //SDL_Log("Animation_Update: current_frame=%d src_x=%d\n", anim->current_frame, anim->src_rect.x);
     #endif
     }
 }
