@@ -136,7 +136,7 @@ int Init_State_Menu()
     quit_rect.h = quitH;
 
     char TEXT_VERSION[64];
-    snprintf(TEXT_VERSION, sizeof(TEXT_VERSION), "Version %d.%d.%d Beta 1", GAME_VERSION_MAJOR, GAME_VERSION_MINOR, GAME_VERSION_PATCH);
+    snprintf(TEXT_VERSION, sizeof(TEXT_VERSION), "Version %d.%d.%d Beta 2", GAME_VERSION_MAJOR, GAME_VERSION_MINOR, GAME_VERSION_PATCH);
 
     /*VERSION*/
     version_surface = TTF_RenderText_Solid(font, TEXT_VERSION, (SDL_Color){255, 255, 255, 255});
