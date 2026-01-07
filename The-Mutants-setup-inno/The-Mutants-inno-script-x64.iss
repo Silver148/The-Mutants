@@ -5,7 +5,7 @@
 ;THE MUTANTS SETUP X64
 
 #define MyAppName "The Mutants"
-#define MyAppVersion "0.27"
+#define MyAppVersion "0.28"
 #define MyAppPublisher "TheLightAndSilverhacker"
 #define MyAppExeName "The_Mutants.exe"
 
@@ -24,7 +24,7 @@ DisableProgramGroupPage=yes
 InfoBeforeFile=before_info_setup.txt
 InfoAfterFile=after_info_setup.txt
 OutputDir="..\"
-OutputBaseFilename=The-Mutants-setup-v{#MyAppVersion}
+OutputBaseFilename=The-Mutants-setup-x64-v{#MyAppVersion}
 SetupIconFile=The-Mutants-ico.ico
 SolidCompression=yes
 WizardStyle=modern polar
