@@ -13,7 +13,7 @@ OBJECTS = $(SOURCES:src/%.c=obj/%.o)
 # Windows x64 build settings
 WIN_NAME = The_Mutants.exe
 WIN_CC = x86_64-w64-mingw32-gcc
-WIN_CFLAGS = -Iinclude -Icurl/include -Lcurl/lib -LSDL2-Mingw/x86_64-w64-mingw32/lib -ISDL2-Mingw/x86_64-w64-mingw32/include -Iffmpeg/include -Lffmpeg/lib -march=native -O2
+WIN_CFLAGS = -Iinclude -Icurl/include -Lcurl/lib/x64 -LSDL2-Mingw/x86_64-w64-mingw32/lib -ISDL2-Mingw/x86_64-w64-mingw32/include -Iffmpeg/include -Lffmpeg/lib/x64 -march=native -O2
 WIN_LIBS = -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_mixer -lSDL2_ttf -lcurl -mwindows \
 			-Wl,--dynamicbase -Wl,--nxcompat \
 			-Wl,--high-entropy-va -lm -ldinput8 -ldxguid -ldxerr8 -luser32 -lgdi32 \
@@ -22,13 +22,15 @@ WIN_LIBS = -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_mixer -lSDL2_ttf -lcu
 # Windows x32 build settings
 WIN32_NAME = The_Mutants_32.exe
 WIN32_CC = i686-w64-mingw32-gcc
-WIN32_CFLAGS = -Iinclude -Icurl/include -Lcurl/lib -LSDL2-Mingw/i686-w64-mingw32/lib -ISDL2-Mingw/i686-w64-mingw32/include -O2
+WIN32_CFLAGS = -Iinclude -Icurl/include -Lcurl/lib/x32 -LSDL2-Mingw/i686-w64-mingw32/lib -ISDL2-Mingw/i686-w64-mingw32/include -Iffmpeg/include -Lffmpeg/lib/x32 -O2
 WIN32_LIBS = -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_mixer -lSDL2_ttf -lcurl -mwindows \
 			-Wl,--dynamicbase -Wl,--nxcompat -Wl,-lm -ldinput8 -ldxguid -ldxerr8 -luser32 -lgdi32 \
-			-lwinmm -limm32 -lole32 -loleaut32 -lshell32 -lsetupapi -lversion -luuid
+			-lwinmm -limm32 -lole32 -loleaut32 -lshell32 -lsetupapi -lversion -luuid -lavcodec -lavformat -lavutil -lswscale -lswresample
 
 OS := $(shell uname -s)
 ARCH := $(shell uname -m)
+
+CURRENT_CFLAGS = $(WIN_CFLAGS)
 
 all: $(OS)-$(ARCH)
 
@@ -42,14 +44,14 @@ Windows_NT-x86_64:
 	cp SDL2-Mingw/x86_64-w64-mingw32/bin/libtiff-5.dll libtiff-5.dll
 	cp SDL2-Mingw/x86_64-w64-mingw32/bin/SDL2_mixer.dll SDL2_mixer.dll
 	cp SDL2-Mingw/x86_64-w64-mingw32/bin/SDL2_ttf.dll SDL2_ttf.dll
-	cp ffmpeg/bin/avcodec-62.dll avcodec-62.dll
-	cp ffmpeg/bin/avformat-62.dll avformat-62.dll
-	cp ffmpeg/bin/avutil-60.dll avutil-60.dll
-	cp ffmpeg/bin/swscale-9.dll swscale-9.dll
-	cp ffmpeg/bin/swresample-6.dll swresample-6.dll
-	cp ffmpeg/bin/avdevice-62.dll avdevice-62.dll
-	cp ffmpeg/bin/avfilter-11.dll avfilter-11.dll
-	cp curl/bin/libcurl-x64.dll libcurl-x64.dll
+	cp ffmpeg/bin/x64/avcodec-62.dll avcodec-62.dll
+	cp ffmpeg/bin/x64/avformat-62.dll avformat-62.dll
+	cp ffmpeg/bin/x64/avutil-60.dll avutil-60.dll
+	cp ffmpeg/bin/x64/swscale-9.dll swscale-9.dll
+	cp ffmpeg/bin/x64/swresample-6.dll swresample-6.dll
+	cp ffmpeg/bin/x64/avdevice-62.dll avdevice-62.dll
+	cp ffmpeg/bin/x64/avfilter-11.dll avfilter-11.dll
+	cp curl/bin/x64/libcurl-x64.dll libcurl-x64.dll
 	zip -r The_Mutants_windows.zip $(WIN_NAME) SDL2.dll libpng16-16.dll zlib1.dll libjpeg-9.dll SDL2_image.dll libtiff-5.dll SDL2_mixer.dll SDL2_ttf.dll libcurl-x64.dll \
 	sprites music fonts skins avcodec-62.dll avformat-62.dll avutil-60.dll swscale-9.dll swresample-6.dll avdevice-62.dll avfilter-11.dll cinematics
 	rm -f *.dll
@@ -66,7 +68,16 @@ Windows_NT-i686:
 	cp SDL2-Mingw/i686-w64-mingw32/bin/libtiff-5.dll libtiff-5.dll
 	cp SDL2-Mingw/i686-w64-mingw32/bin/SDL2_mixer.dll SDL2_mixer.dll
 	cp SDL2-Mingw/i686-w64-mingw32/bin/SDL2_ttf.dll SDL2_ttf.dll
-	zip -r The_Mutants_windows32.zip $(WIN32_NAME) SDL2.dll libpng16-16.dll zlib1.dll libjpeg-9.dll SDL2_image.dll libtiff-5.dll SDL2_mixer.dll SDL2_ttf.dll libcurl-x64.dll sprites music fonts skins
+	cp ffmpeg/bin/x32/avcodec-62.dll avcodec-62.dll
+	cp ffmpeg/bin/x32/avformat-62.dll avformat-62.dll
+	cp ffmpeg/bin/x32/avutil-60.dll avutil-60.dll
+	cp ffmpeg/bin/x32/swscale-9.dll swscale-9.dll
+	cp ffmpeg/bin/x32/swresample-6.dll swresample-6.dll
+	cp ffmpeg/bin/x32/avdevice-62.dll avdevice-62.dll
+	cp ffmpeg/bin/x32/avfilter-11.dll avfilter-11.dll
+	cp curl/bin/x32/libcurl.dll libcurl.dll
+	zip -r The_Mutants_windows32.zip $(WIN32_NAME) SDL2.dll libpng16-16.dll zlib1.dll libjpeg-9.dll SDL2_image.dll libtiff-5.dll SDL2_mixer.dll SDL2_ttf.dll libcurl.dll \
+	sprites music fonts skins avcodec-62.dll avformat-62.dll avutil-60.dll swscale-9.dll swresample-6.dll avdevice-62.dll avfilter-11.dll cinematics
 	rm -f *.dll
 	rm -f $(WIN32_NAME)
 	@echo "BUILD COMPLETE... Compiled from the $(OS)-$(ARCH)"
@@ -129,20 +140,16 @@ clean:
 #	$(CC) $(CFLAGS) $(OBJECTS) -o $(NAME) $(LIBS)
 
 #RULE WINDOWS X64
+$(WIN_NAME): CURRENT_CFLAGS = $(WIN_CFLAGS)
 $(WIN_NAME): $(OBJECTS)
 	$(WIN_CC) $(WIN_CFLAGS) $(OBJECTS) resource.o -o $(WIN_NAME) $(WIN_LIBS)
 
 # RULE WINDOWS 32-BIT
+$(WIN32_NAME): CURRENT_CFLAGS = $(WIN32_CFLAGS)
 $(WIN32_NAME): $(OBJECTS)
-	$(WIN32_CC) $(WIN32_CFLAGS) $(OBJECTS) resource.o -o $(WIN32_NAME) $(WIN32_LIBS)
+	$(WIN32_CC) $(WIN32_CFLAGS) $(OBJECTS) resource32.o -o $(WIN32_NAME) $(WIN32_LIBS)
 
 obj/%.o: src/%.c
 	mkdir -p obj
 	mkdir -p obj/states
-ifeq ($(CC), x86_64-w64-mingw32-gcc)
-	$(CC) $(WIN_CFLAGS) -c $< -o $@
-else ifeq ($(CC), i686-w64-mingw32-gcc)
-	$(CC) $(WIN32_CFLAGS) -c $< -o $@
-#else
-	$(CC) $(CFLAGS) -c $< -o $@
-endif
+	$(CC) $(CURRENT_CFLAGS) -c $< -o $@
