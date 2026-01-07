@@ -2,6 +2,8 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 ; Non-commercial use only
 
+;THE MUTANTS SETUP X64
+
 #define MyAppName "The Mutants"
 #define MyAppVersion "0.27"
 #define MyAppPublisher "TheLightAndSilverhacker"
