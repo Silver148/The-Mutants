@@ -1,3 +1,18 @@
+/*
+THE MUTANT'S
+
+Authors: Abel Ferrer(aka The_Light) and Juan Yaguaro(aka silverhacker)
+File: system_cinematics.c
+
+THIS CODE WILL REMAIN CONFIDENTIAL UNTIL THE PROJECT IS COMPLETED. 
+Anyone who leaks this code will be automatically kicked out of the 
+group and will be considered a real gay.
+
+Copyright 2025
+*/
+
+/*SISTEMA DE CINEMÁTICAS HECHO POR JUAN YAGUARO :D*/
+
 #include "system_cinematics.h"
 extern SDL_Window* window;
 
@@ -29,23 +44,11 @@ int PlayCinematic(const char* filepath, SDL_Renderer* renderer)
         if (avcodec_open2(codec_ctx, codec, NULL) < 0) { ret = -1; goto cleanup; }
 
         AVFrame *frame = av_frame_alloc();
-        AVFrame *frame_rgba = av_frame_alloc();
-        if (!frame || !frame_rgba) { ret = -1; goto cleanup; }
 
         int width = codec_ctx->width;
         int height = codec_ctx->height;
 
-        struct SwsContext *sws_ctx = sws_getContext(width, height, codec_ctx->pix_fmt,
-                                                    width, height, AV_PIX_FMT_YUV420P,
-                                                    SWS_BILINEAR, NULL, NULL, NULL);
-        if (!sws_ctx) { ret = -1; goto cleanup; }
-
-        int num_bytes = av_image_get_buffer_size(AV_PIX_FMT_YUV420P, width, height, 1);
-        uint8_t *buffer = (uint8_t*)av_malloc(num_bytes * sizeof(uint8_t));
-        if (!buffer) { ret = -1; goto cleanup; }
-        av_image_fill_arrays(frame_rgba->data, frame_rgba->linesize, buffer, AV_PIX_FMT_YUV420P, width, height, 1);
-
-        SDL_Texture *texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_YV12, SDL_TEXTUREACCESS_STREAMING, width, height);
+        SDL_Texture *texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_IYUV, SDL_TEXTUREACCESS_STREAMING, width, height);
         if (!texture) { ret = -1; goto cleanup; }
 
         AVPacket *pkt = av_packet_alloc();
@@ -72,6 +75,11 @@ int PlayCinematic(const char* filepath, SDL_Renderer* renderer)
                             SDL_Event ev;
                             while (SDL_PollEvent(&ev)) { //Handle events
                                 if (ev.type == SDL_QUIT) quit = true;
+                                switch(ev.type) {
+                                    case SDL_KEYDOWN:
+                                        if (ev.key.keysym.sym == SDLK_ESCAPE) quit = 1;
+                                        break;
+                                }
                             }
                     
                             elapsed_ms = SDL_GetTicks() - start_time_ms;
@@ -81,16 +89,14 @@ int PlayCinematic(const char* filepath, SDL_Renderer* renderer)
                             }
                         }
 
-                        sws_scale(sws_ctx, (const uint8_t * const*)frame->data, frame->linesize, 0, height, frame_rgba->data, frame_rgba->linesize);
                         SDL_UpdateYUVTexture(texture, NULL, 
-                                            frame_rgba->data[0], frame_rgba->linesize[0], // Plano Y
-                                            frame_rgba->data[1], frame_rgba->linesize[1], // Plano U
-                                            frame_rgba->data[2], frame_rgba->linesize[2]  // Plano V
+                                            frame->data[0], frame->linesize[0], // Plano Y
+                                            frame->data[1], frame->linesize[1], // Plano U
+                                            frame->data[2], frame->linesize[2]  // Plano V
                                             );
 
                         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
                         SDL_RenderClear(renderer);
-                        SDL_RenderCopy(renderer, texture, NULL, NULL);
                         SDL_RenderCopy(renderer, texture, NULL, NULL);
                         SDL_RenderPresent(renderer);
                     }
@@ -103,9 +109,6 @@ int PlayCinematic(const char* filepath, SDL_Renderer* renderer)
 
     cleanup:
         if (texture) SDL_DestroyTexture(texture);
-        if (buffer) av_free(buffer);
-        if (sws_ctx) sws_freeContext(sws_ctx);
-        if (frame_rgba) av_frame_free(&frame_rgba);
         if (frame) av_frame_free(&frame);
         if (codec_ctx) { avcodec_free_context(&codec_ctx); }
         if (fmt_ctx) avformat_close_input(&fmt_ctx);

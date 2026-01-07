@@ -368,11 +368,7 @@ void UpdateZombies() {
        perform the background change only once there are no active zombies. */
     if (pending_bg_change && num_zombies == 0) {
         InitSystemCinematics();
-        #if defined(__i386__) || defined(_M_IX86)
-            PlayCinematic("cinematics/win1_optimized.mp4", renderer);
-        #else
-            PlayCinematic("cinematics/win1.mp4", renderer);
-        #endif
+        PlayCinematic("cinematics/win1.mp4", renderer);
         ShutdownCinematicsSystem();
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
@@ -414,11 +410,7 @@ void UpdateZombies() {
     {
         InitSystemCinematics();
         SDL_SetWindowTitle(window, "The Mutant's");
-        #if defined(__i386__) || defined(_M_IX86)
-            PlayCinematic("cinematics/level2_on_the_way_to_the_plane_optimized.mp4", renderer);
-        #else
-            PlayCinematic("cinematics/level2_on_the_way_to_the_plane.mp4", renderer);
-        #endif
+        PlayCinematic("cinematics/level2_on_the_way_to_the_plane.mp4", renderer);
         ShutdownCinematicsSystem();
         SDL_RenderClear(renderer);
         wave_state = -2; /* prevent replaying cinematic */
