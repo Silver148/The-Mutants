@@ -22,8 +22,8 @@ make debug-windows-x64
 | **Sistema Operativo** | Windows 7 SP1 o superior | Windows 10 / 11 |
 | **Procesador** | Intel Pentium 4 / Athlon 64 (Soporte SSE2 obligatorio) | Intel Core 2 Duo / i3 o superior |
 | **Memoria RAM** | 1 GB de RAM | 2 GB de RAM o más |
-| **Gráficos** | Intel GMA 3100 / Gráficos integrados con soporte SDL2 | Gráficos dedicados o Intel HD Graphics |
-| **Almacenamiento** | 100 MB de espacio disponible | 150 MB de espacio disponible |
+| **Gráficos** | Intel GMA 3100 | Gráficos dedicados o gráficos integrados Intel HD Graphics/AMD Radeon  |
+| **Almacenamiento** | 125 MB de espacio disponible | 150 MB de espacio disponible |
 | **Notas Adicionales** | Requiere soporte de instrucciones **SSE2** | Se recomienda la versión x64 para mejor gestión de memoria |
 
 ## Cosas que se quieren agregar :D
