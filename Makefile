@@ -13,7 +13,8 @@ OBJECTS = $(SOURCES:src/%.c=obj/%.o)
 # Windows x64 build settings
 WIN_NAME = The_Mutants.exe
 WIN_CC = x86_64-w64-mingw32-gcc
-WIN_CFLAGS = -Iinclude -Icurl/include -Lcurl/lib/x64 -LSDL2-Mingw/x86_64-w64-mingw32/lib -ISDL2-Mingw/x86_64-w64-mingw32/include -Iffmpeg/include -Lffmpeg/lib/x64 -march=native -O2
+WIN_CFLAGS = -Iinclude -Icurl/include -Lcurl/lib/x64 -LSDL2-Mingw/x86_64-w64-mingw32/lib -ISDL2-Mingw/x86_64-w64-mingw32/include -Iffmpeg/include -Lffmpeg/lib/x64 \
+			-march=x86-64 -O2 -msse2 -mfpmath=sse
 WIN_LIBS = -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_mixer -lSDL2_ttf -lcurl -mwindows \
 			-Wl,--dynamicbase -Wl,--nxcompat \
 			-Wl,--high-entropy-va -lm -ldinput8 -ldxguid -ldxerr8 -luser32 -lgdi32 \
@@ -22,7 +23,8 @@ WIN_LIBS = -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_mixer -lSDL2_ttf -lcu
 # Windows x32 build settings
 WIN32_NAME = The_Mutants_32.exe
 WIN32_CC = i686-w64-mingw32-gcc
-WIN32_CFLAGS = -Iinclude -Icurl/include -Lcurl/lib/x32 -LSDL2-Mingw/i686-w64-mingw32/lib -ISDL2-Mingw/i686-w64-mingw32/include -Iffmpeg/include -Lffmpeg/lib/x32 -O2 -march=i686
+WIN32_CFLAGS = -Iinclude -Icurl/include -Lcurl/lib/x32 -LSDL2-Mingw/i686-w64-mingw32/lib -ISDL2-Mingw/i686-w64-mingw32/include -Iffmpeg/include -Lffmpeg/lib/x32 \
+				-O2 -march=i686 -msse2 -mfpmath=sse
 WIN32_LIBS = -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_mixer -lSDL2_ttf -lcurl -mwindows \
 			-Wl,--dynamicbase -Wl,--nxcompat -Wl,-lm -ldinput8 -ldxguid -ldxerr8 -luser32 -lgdi32 \
 			-lwinmm -limm32 -lole32 -loleaut32 -lshell32 -lsetupapi -lversion -luuid -lavcodec -lavformat -lavutil
@@ -75,7 +77,7 @@ Windows_NT-i686:
 	@echo "BUILD COMPLETE... Compiled from the $(OS)-$(ARCH)"
 
 debug-windows-x64:
-	make $(WIN_NAME) CC=$(WIN_CC) "WIN_CFLAGS=$(WIN_CFLAGS) -g -ggdb3 -O0 -DDEBUG -DANIM_DEBUG"
+	make $(WIN_NAME) CC=$(WIN_CC) "WIN_CFLAGS=$(WIN_CFLAGS) -g -ggdb3 -Og -DDEBUG -DANIM_DEBUG"
 	cp SDL2-Mingw/x86_64-w64-mingw32/bin/SDL2.dll SDL2.dll
 	cp SDL2-Mingw/x86_64-w64-mingw32/bin/libpng16-16.dll libpng16-16.dll
 	cp SDL2-Mingw/x86_64-w64-mingw32/bin/zlib1.dll zlib1.dll
@@ -95,7 +97,7 @@ debug-windows-x64:
 	@echo "DEBUG BUILD COMPLETE... Compiled from the $(OS)-$(ARCH)"
 
 debug-windows-x32:
-	make $(WIN32_NAME) CC=$(WIN32_CC) "WIN32_CFLAGS=$(WIN32_CFLAGS) -g -ggdb3 -O0 -DDEBUG -DANIM_DEBUG"
+	make $(WIN32_NAME) CC=$(WIN32_CC) "WIN32_CFLAGS=$(WIN32_CFLAGS) -g -ggdb3 -Og -DDEBUG -DANIM_DEBUG"
 	cp SDL2-Mingw/i686-w64-mingw32/bin/SDL2.dll SDL2.dll
 	cp SDL2-Mingw/i686-w64-mingw32/bin/libpng16-16.dll libpng16-16.dll
 	cp SDL2-Mingw/i686-w64-mingw32/bin/zlib1.dll zlib1.dll
