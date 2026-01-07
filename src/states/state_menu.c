@@ -440,7 +440,7 @@ int State_Skins(){
     SDL_Rect huehuehue_rect;
     int huehuehueW = 0, huehuehueH = 0;
     SDL_QueryTexture(huehuehue_texture, NULL, NULL, &huehuehueW, &huehuehueH);
-    huehuehue_rect.x = 320;
+    huehuehue_rect.x = 250;
     huehuehue_rect.y = 150;
     huehuehue_rect.w = huehuehueW / 6;
     huehuehue_rect.h = huehuehueH / 6;
@@ -465,10 +465,10 @@ int State_Skins(){
     SDL_Rect goku_rect;
     int gokuW = 0, gokuH = 0;
     SDL_QueryTexture(goku_texture, NULL, NULL, &gokuW, &gokuH);
-    goku_rect.x = huehuehue_rect.x + 100;
+    goku_rect.x = huehuehue_rect.x + 150;
     goku_rect.y = 150 - huehuehue_rect.h;
-    goku_rect.w = gokuW / 50;
-    goku_rect.h = gokuH / 50;
+    goku_rect.w = gokuW;
+    goku_rect.h = gokuH;
 
     /*SKINS TEXT*/
     SDL_Surface* skins_text_surface = TTF_RenderText_Solid(font, "Skins", (SDL_Color){255, 255, 255, 255});
@@ -504,7 +504,7 @@ int State_Skins(){
     SDL_Rect arrow2_rect;
     int arrow2W = 0, arrow2H = 0;
     SDL_QueryTexture(arrow2_texture, NULL, NULL, &arrow2W, &arrow2H);
-    arrow2_rect.x = default_skin_rect.x;
+    arrow2_rect.x = default_skin_rect.x + 50;
     arrow2_rect.y = 150;
     arrow2_rect.w = arrow2W;
     arrow2_rect.h = arrow2H;
@@ -518,11 +518,14 @@ int State_Skins(){
             {
                 if(skins_text_texture){ SDL_DestroyTexture(skins_text_texture); skins_text_texture = NULL; }
                 if(huehuehue_texture){ SDL_DestroyTexture(huehuehue_texture); huehuehue_texture = NULL; }
+                if(default_skin_texture){ SDL_DestroyTexture(default_skin_texture); default_skin_texture = NULL; }
+                if(goku_texture){ SDL_DestroyTexture(goku_texture); goku_texture = NULL; }
                 if(arrow_texture){ SDL_DestroyTexture(arrow_texture); arrow_texture = NULL; }
 
                 TTF_CloseFont(font);
                 TTF_Quit();
                 SDL_Quit();
+                exit(0);
                 return 0;
             }
 
@@ -534,7 +537,7 @@ int State_Skins(){
                     if(index_selected_skin < 3)
                     {
                         index_selected_skin++;
-                        arrow2_rect.x += 280;
+                        arrow2_rect.x += 150;
                         SDL_Log("State_Skins: keyboard selected skin %d (RIGHT)\n", index_selected_skin);
                         if(index_selected_skin == 1)
                         {
@@ -555,7 +558,7 @@ int State_Skins(){
                     if(index_selected_skin > 1)
                     {
                         index_selected_skin--;
-                        arrow2_rect.x -= 280;
+                        arrow2_rect.x -= 150;
                         SDL_Log("State_Skins: keyboard selected skin %d (LEFT)\n", index_selected_skin);
                         if(index_selected_skin == 1)
                         {
@@ -580,6 +583,8 @@ int State_Skins(){
                     if(skins_text_texture){ SDL_DestroyTexture(skins_text_texture); skins_text_texture = NULL; }
                     if(huehuehue_texture){ SDL_DestroyTexture(huehuehue_texture); huehuehue_texture = NULL; }
                     if(arrow_texture){ SDL_DestroyTexture(arrow_texture); arrow_texture = NULL; }
+                    if(default_skin_texture){ SDL_DestroyTexture(default_skin_texture); default_skin_texture = NULL; }
+                    if(goku_texture){ SDL_DestroyTexture(goku_texture); goku_texture = NULL; }
 
                     return 0;
                 }
