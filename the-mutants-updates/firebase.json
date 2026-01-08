@@ -39,16 +39,21 @@
     ],
     "redirects": [
       {
-        "source": "/update/v0.28.0",
+        "source": "/update/latest-x64",
         "destination": "https://github.com/HT14813/The-Mutants-updates/releases/download/0.28beta2/The-Mutants-setup-x64-v0.28.exe",
         "type": 302,
         "comment": "Always update the link whenever a new version is released :)"
       },
       {
+        "source": "/update/latest-x32",
+        "destination": "https://github.com/HT14813/The-Mutants-updates/releases/download/0.28beta2/The-Mutants-setup-x32-v0.28.exe",
+        "type": 302
+      },
+      {
         "source": "/update",
-        "destination": "update/v0.28.0",
+        "destination": "/update/latest-x64",
         "type": 302,
-        "comment": "It always changes every time a new version comes out :)"
+        "comment": "Redirect to x64 by default"
       }
     ]
   }

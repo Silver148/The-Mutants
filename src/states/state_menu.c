@@ -650,7 +650,11 @@ int StateUpdate()
     if(!start_texture && !quit_texture && !version_texture && !settings_texture && !skins_texture && !Check_for_updates_texture)
     {
         DownloadArgs* args = (DownloadArgs*)malloc(sizeof(DownloadArgs));
-        args->url = "https://the-mutants-updates.web.app/update";
+        #if defined(__i386__) && !defined(__LP64__)
+            args->url = "https://the-mutants-updates.web.app/update-x32";
+        #else
+            args->url = "https://the-mutants-updates.web.app/update";
+        #endif
         args->filename = strdup(download_path); // Use strdup to ensure string safety
         download_result = -1;
         
