@@ -70,8 +70,14 @@ SDL_Texture* kills_text_texture = NULL;
 
 char kills_text[32] = {0};
 extern int counter_kills;
-
 SDL_Rect kills_text_rect;
+
+bool is_paused = false;
+TTF_Font* font_paused = NULL;
+SDL_Texture* paused_texture = NULL;
+
+TTF_Font* press_esc = NULL;
+SDL_Texture* press_esc_texture = NULL;
 
 /* Update or recreate the kills text texture from the current kills count */
 void UpdateKillsTexture(int kills)
@@ -107,6 +113,72 @@ void UpdateKillsTexture(int kills)
     kills_text_rect.w = w;
     kills_text_rect.h = h;
     SDL_Log("UpdateKillsTexture: created texture for %d (w=%d h=%d)", kills, w, h);
+}
+
+void CleanupKillsTexture()
+{
+    TTF_CloseFont(font_kills);
+    font_kills = NULL;
+    if (kills_text_texture) {
+        SDL_DestroyTexture(kills_text_texture);
+        kills_text_texture = NULL;
+    }
+}
+
+int GamePaused()
+{
+    font_paused = TTF_OpenFont("fonts/SYSTEMIA.ttf", 48);
+    press_esc = TTF_OpenFont("fonts/SYSTEMIA.ttf", 24);
+
+    if(!font_paused){
+        SDL_Log("font_paused failed to load: %s", TTF_GetError());
+        return -1;
+    }
+
+    SDL_Surface* paused_surface = TTF_RenderText_Solid(font_paused, "GAME PAUSED :)", (SDL_Color){255, 0, 0, 255});
+    SDL_Surface* press_esc_surface = TTF_RenderText_Solid(press_esc, "Press ESC to resume", (SDL_Color){255, 255, 255, 255});
+    press_esc_texture = SDL_CreateTextureFromSurface(renderer, press_esc_surface);
+    paused_texture = SDL_CreateTextureFromSurface(renderer, paused_surface);
+    SDL_FreeSurface(paused_surface);
+    SDL_FreeSurface(press_esc_surface);
+
+    SDL_Rect paused_rect;
+    int pW = 0, pH = 0;
+    SDL_QueryTexture(paused_texture, NULL, NULL, &pW, &pH);
+    paused_rect.x = (640 - pW) / 2;
+    paused_rect.y = (480 - pH) / 2;
+    paused_rect.w = pW;
+    paused_rect.h = pH;
+
+    SDL_Rect press_esc_rect;
+    int eW = 0, eH = 0;
+    SDL_QueryTexture(press_esc_texture, NULL, NULL, &eW, &eH);
+    press_esc_rect.x = (640 - eW) / 2;
+    press_esc_rect.y = paused_rect.y + pH + 20;
+    press_esc_rect.w = eW;
+    press_esc_rect.h = eH;
+
+    SDL_RenderCopy(renderer, paused_texture, NULL, &paused_rect);
+    SDL_RenderCopy(renderer, press_esc_texture, NULL, &press_esc_rect);
+    SDL_RenderPresent(renderer);
+}
+
+void CleanGamePaused()
+{
+    TTF_CloseFont(font_paused);
+    TTF_CloseFont(press_esc);
+    press_esc = NULL;
+    font_paused = NULL;
+
+    if(paused_texture){
+        SDL_DestroyTexture(paused_texture);
+        paused_texture = NULL;
+    }
+
+    if(press_esc_texture){
+        SDL_DestroyTexture(press_esc_texture);
+        press_esc_texture = NULL;
+    }
 }
 
 void ShowHitboxPlayer()
@@ -341,7 +413,7 @@ int Update_State_Game()
 {
     Uint32 start_fps = SDL_GetTicks();
     int frames = 0;
-    while(1) //Main loop(TESTING)
+    while(!is_paused) //Main loop(TESTING)
     {
         SDL_Event e;
         while(SDL_PollEvent(&e))
@@ -352,11 +424,17 @@ int Update_State_Game()
                 CleanupZombieSystem();
                 CleanupPlayer();
                 CleanupProjectileSystem();
-                TTF_CloseFont(font_kills);
+                CleanupKillsTexture();
                 TTF_Quit();
                 SDL_Quit();
                 exit(0);
                 return 0;
+            }
+
+            if(e.type == SDL_KEYDOWN){
+                if(e.key.keysym.sym == SDLK_ESCAPE){;
+                    is_paused = true;
+                }
             }
         }
 
@@ -367,10 +445,11 @@ int Update_State_Game()
         /*BOOL MOVEMENT*/
         bool is_moving = state[SDL_SCANCODE_A] || state[SDL_SCANCODE_D];
 
+        /*
         if(state[SDL_SCANCODE_ESCAPE]){
             SDL_Quit();
             return 0;
-        }
+        }*/
 
         /* si shift esta pulsado, el jugador obtiene velocidad*/
         if ((state[SDL_SCANCODE_LSHIFT] || state[SDL_SCANCODE_RSHIFT]) && is_moving){
@@ -474,15 +553,45 @@ int Update_State_Game()
             // if shooting, keep SHOOT until animation finishes
         }
 
-    UpdateAnimsPLAYER();
-    UpdateDeltaTime();
-    UpdateJump();
-    CheckIfPlayerIsDead();
+        //If "is_paused" is true, enter paused loop
+        while(is_paused){
+        SDL_Event e;
+        while(SDL_PollEvent(&e))
+        {
+            if(e.type == SDL_QUIT)
+            {
+                CleanupBackground();
+                CleanupZombieSystem();
+                CleanupPlayer();
+                CleanupProjectileSystem();
+                CleanupKillsTexture();
+                TTF_Quit();
+                SDL_Quit();
+                exit(0);
+                return 0;
+            }
 
-    /* update zombies AI and movement */
-    UpdateZombies();
+            if(e.type == SDL_KEYDOWN){
+                if(e.key.keysym.sym == SDLK_ESCAPE){
+                    UpdateDeltaTime();
+                    is_paused = false;
+                }
+            }
+        }
+        GamePaused();
+        SDL_Delay(100); //CPU friendly loop when paused :)
+    }
+
+    //Update if not paused
+    if(!is_paused) {
+        UpdateAnimsPLAYER();
+        UpdateDeltaTime();
+        UpdateJump();
+        CheckIfPlayerIsDead();
+        UpdateZombies(); /* update zombies AI and movement */
+        UpdateProjectiles();
+    }
     
-    UpdateProjectiles();
 
         /*TESTING*/
         /* Refresh kills texture when counter changes */

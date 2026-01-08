@@ -9,7 +9,9 @@ int Update_State_Menu();
 int Init_State_Game();
 int Update_State_Game();
 void UpdateKillsTexture(int kills);
-
+void CleanupKillsTexture();
+int GamePaused();
+void CleanGamePaused();
 void CleanupBackground();
 
 #endif // STATES_H

@@ -420,11 +420,11 @@ void UpdateZombies() {
     {
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
+        CleanupBackground();
         CleanupZombieSystem();
         CleanupPlayer();
-        CleanupBackground();
         CleanupProjectileSystem();
-        TTF_CloseFont(font_kills);
+        CleanupKillsTexture();
         CloseMusic();
         InitMusic();
         PlayMusicStateMenu();
