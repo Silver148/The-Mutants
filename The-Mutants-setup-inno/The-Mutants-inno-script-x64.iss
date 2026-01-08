@@ -43,6 +43,7 @@ Source: "{#MySourcePath}\skins\*"; DestDir: "{app}\skins"; Flags: ignoreversion 
 Source: "{#MySourcePath}\fonts\*"; DestDir: "{app}\fonts"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#MySourcePath}\music\*"; DestDir: "{app}\music"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#MySourcePath}\sprites\*"; DestDir: "{app}\sprites"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#MySourcePath}\cinematics\*"; DestDir: "{app}\cinematics"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
