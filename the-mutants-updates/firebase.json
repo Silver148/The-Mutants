@@ -46,7 +46,7 @@
       },
       {
         "source": "/update/latest-x32",
-        "destination": "https://github.com/HT14813/The-Mutants-updates/releases/download/0.28beta2/The-Mutants-setup-x32-v0.28.exe",
+        "destination": "https://github.com/HT14813/The-Mutants-updates/releases/download/0.29beta3/The-Mutants-setup-x32-v0.29.exe",
         "type": 302
       },
       {
