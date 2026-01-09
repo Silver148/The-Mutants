@@ -15,7 +15,24 @@ Copyright 2025
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_mixer.h>
 #include <string.h>
+#include <shlobj.h>
+#include <direct.h>
 #include "settings.h"
+
+char settingsPATH[MAX_PATH];
+
+void EnsurePath() {
+    if (settingsPATH[0] == '\0') {
+        char DocumentsPATH[MAX_PATH];
+        if (SHGetFolderPathA(NULL, CSIDL_PERSONAL, NULL, 0, DocumentsPATH) == S_OK) {
+            
+            char folderPath[MAX_PATH];
+            snprintf(folderPath, sizeof(folderPath), "%s\\The Mutants", DocumentsPATH);
+            _mkdir(folderPath);
+            snprintf(settingsPATH, sizeof(settingsPATH), "%s\\settings.cfg", folderPath);
+        }
+    }
+}
 
 int LoadSettingsDefault(Settings* settings) {
     if (settings == NULL) {
@@ -28,13 +45,15 @@ int LoadSettingsDefault(Settings* settings) {
 }
 
 int SaveSettings(Settings* settings){
-    
-    FILE* file = fopen("settings.cfg", "w");
+
+    EnsurePath();
+
+    FILE* file = fopen(settingsPATH, "w");
     if(!file) return -1;
 
     fprintf(file, "volume_music_in_game=%d\n", settings->volume_music_in_game);
     fprintf(file, "volume_music_in_menu=%d\n", settings->volume_music_in_menu);
-    fprintf(file, "fullscreen=%d",settings->fullscreen);
+    fprintf(file, "fullscreen=%d\n",settings->fullscreen);
 
     fclose(file);
 
@@ -43,7 +62,9 @@ int SaveSettings(Settings* settings){
 
 int LoadSettingsFromFile(Settings* settings) {
 
-    FILE* file = fopen("settings.cfg", "r");
+    EnsurePath();
+
+    FILE* file = fopen(settingsPATH, "r");
     if(!file) {
         SDL_Log("Creating settings.cfg with default configurations\n");
         LoadSettingsDefault(settings);
@@ -69,6 +90,8 @@ int LoadSettingsFromFile(Settings* settings) {
         }
 
     }
+
+    fclose(file);
 
     return 0;
 
