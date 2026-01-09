@@ -67,6 +67,10 @@ SDL_Surface* Check_for_updates_surface = NULL;
 SDL_Texture* Check_for_updates_texture = NULL;
 SDL_Rect Check_for_updates_rect;
 
+SDL_Texture* tex_fullscreen_on = NULL;
+SDL_Texture* tex_fullscreen_off = NULL;
+SDL_Rect fullscreen_rect;
+
 extern Settings game_settings;
 
 int Init_State_Menu()
@@ -136,7 +140,7 @@ int Init_State_Menu()
     quit_rect.h = quitH;
 
     char TEXT_VERSION[64];
-    snprintf(TEXT_VERSION, sizeof(TEXT_VERSION), "Version %d.%d.%d Beta 2", GAME_VERSION_MAJOR, GAME_VERSION_MINOR, GAME_VERSION_PATCH);
+    snprintf(TEXT_VERSION, sizeof(TEXT_VERSION), "Version %d.%d.%d Beta 3", GAME_VERSION_MAJOR, GAME_VERSION_MINOR, GAME_VERSION_PATCH);
 
     /*VERSION*/
     version_surface = TTF_RenderText_Solid(font, TEXT_VERSION, (SDL_Color){255, 255, 255, 255});
@@ -150,6 +154,8 @@ int Init_State_Menu()
     version_rect.y = 10;
     version_rect.w = versionW;
     version_rect.h = versionH;
+
+    SDL_ShowCursor(SDL_ENABLE);
 
     return 0;
 }
@@ -223,7 +229,7 @@ int State_Config(){
     int save_settingsW = 0, save_settingsH = 0;
     SDL_QueryTexture(save_settings_texture, NULL, NULL, &save_settingsW, &save_settingsH);
     save_settings_rect.x = (640 - save_settingsW) / 2;
-    save_settings_rect.y = minus_rect.y + minus_rect.h + 20;
+    save_settings_rect.y = minus_rect.y + minus_rect.h + 60;
     save_settings_rect.w = save_settingsW;
     save_settings_rect.h = save_settingsH;
 
@@ -236,7 +242,7 @@ int State_Config(){
     int settings_savedW = 0, settings_savedH = 0;
     SDL_QueryTexture(settings_saved_texture, NULL, NULL, &settings_savedW, &settings_savedH);
     settings_saved_rect.x = (640 - settings_savedW) / 2;
-    settings_saved_rect.y = save_settings_rect.y + save_settings_rect.h + 20;
+    settings_saved_rect.y = save_settings_rect.y + save_settings_rect.h + 80;
     settings_saved_rect.w = settings_savedW;
     settings_saved_rect.h = settings_savedH;
 
@@ -279,6 +285,22 @@ int State_Config(){
     minus_game_rect.w = minus_gameW;
     minus_game_rect.h = minus_gameH;
 
+    /*FULLSCREEN TEXT*/
+    SDL_Surface* s_off = TTF_RenderText_Solid(font, "Fullscreen: Disabled", (SDL_Color){255, 255, 255, 255});
+    tex_fullscreen_off = SDL_CreateTextureFromSurface(renderer, s_off);
+    SDL_FreeSurface(s_off);
+
+    SDL_Surface* s_on = TTF_RenderText_Solid(font, "Fullscreen: Enabled", (SDL_Color){255, 255, 255, 255});
+    tex_fullscreen_on = SDL_CreateTextureFromSurface(renderer, s_on);
+    SDL_FreeSurface(s_on);
+
+    int fullscreenW = 0, fullscreenH = 0;
+    SDL_QueryTexture(tex_fullscreen_off, NULL, NULL, &fullscreenW, &fullscreenH);
+    fullscreen_rect.x = (640 - fullscreenW) / 2;
+    fullscreen_rect.y = save_settings_rect.y - 40;
+    fullscreen_rect.w = fullscreenW;
+    fullscreen_rect.h = fullscreenH;
+
     while(1)
     {
         SDL_Event e;
@@ -293,6 +315,7 @@ int State_Config(){
                 TTF_CloseFont(font);
                 TTF_Quit();
                 SDL_Quit();
+                exit(0);
                 return 0;
             }
 
@@ -305,8 +328,11 @@ int State_Config(){
                    my >= arrow_rect.y && my <= arrow_rect.y + arrow_rect.h)
                 {
                     if(volumen_text_menu_texture){ SDL_DestroyTexture(volumen_text_menu_texture); volumen_text_menu_texture = NULL; }
+                    if(volumen_text_game){SDL_DestroyTexture(volumen_text_game_texture); volumen_text_game_texture = NULL;}
                     if(plus_texture){ SDL_DestroyTexture(plus_texture); plus_texture = NULL; }
                     if(arrow_texture){ SDL_DestroyTexture(arrow_texture); arrow_texture = NULL; }
+                    if(tex_fullscreen_off){ SDL_DestroyTexture(tex_fullscreen_off); tex_fullscreen_off = NULL;}
+                    if(tex_fullscreen_on){ SDL_DestroyTexture(tex_fullscreen_on); tex_fullscreen_on = NULL;}
 
                     return 0;
                 }
@@ -398,6 +424,20 @@ int State_Config(){
                     SDL_FreeSurface(volumen_text_game);
                 }
 
+                /* Toggle fullscreen when clicking the fullscreen text */
+                if(mx >= fullscreen_rect.x && mx <= fullscreen_rect.x + fullscreen_rect.w &&
+                   my >= fullscreen_rect.y && my <= fullscreen_rect.y + fullscreen_rect.h)
+                {
+                    if(game_settings.fullscreen){
+                        game_settings.fullscreen = false;
+                        SDL_SetWindowFullscreen(window, 0);
+                    }else {
+                        game_settings.fullscreen = true;
+                        SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
+                    }
+                        
+                }
+
                 if(mx >= save_settings_rect.x && mx <= save_settings_rect.x + save_settings_rect.w &&
                    my >= save_settings_rect.y && my <= save_settings_rect.y + save_settings_rect.h)
                 {
@@ -417,8 +457,15 @@ int State_Config(){
         SDL_RenderCopy(renderer, plus_texture, NULL, &plus_rect); /*+*/
         SDL_RenderCopy(renderer, minus_texture, NULL, &minus_rect); /*-*/
         SDL_RenderCopy(renderer, volumen_text_game_texture, NULL, &volumen_text_game_rect); /*VOLUMEN GAME TEXT*/
-        SDL_RenderCopy(renderer, plus_game_texture, NULL, &plus_game_rect); /*+ GAME*/
-        SDL_RenderCopy(renderer, minus_game_texture, NULL, &minus_game_rect); /*- GAME*/
+
+        if(game_settings.fullscreen){
+            SDL_RenderCopy(renderer, tex_fullscreen_on, NULL, &fullscreen_rect);
+        }else {
+            SDL_RenderCopy(renderer, tex_fullscreen_off, NULL, &fullscreen_rect);
+        }
+
+        SDL_RenderCopy(renderer, plus_game_texture, NULL, &plus_game_rect); /*+ VOLUMEN GAME*/
+        SDL_RenderCopy(renderer, minus_game_texture, NULL, &minus_game_rect); /*- VOLUMEN GAMEGAME*/
         SDL_RenderCopy(renderer, save_settings_texture, NULL, &save_settings_rect); /*SAVE SETTINGS TEXT*/
         SDL_RenderCopy(renderer, arrow_texture, NULL, &arrow_rect); /*ARROW*/
 
@@ -773,7 +820,7 @@ int StateUpdate()
 int Update_State_Menu()
 {
 
-    while(1) //Main loop(TESTING)
+    while(1) //Main loop
     {
         SDL_Event e;
         while(SDL_PollEvent(&e))

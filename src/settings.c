@@ -23,6 +23,7 @@ int LoadSettingsDefault(Settings* settings) {
     }
     settings->volume_music_in_game = 50;
     settings->volume_music_in_menu = 50;
+    settings->fullscreen = false;
     return 0;
 }
 
@@ -33,6 +34,7 @@ int SaveSettings(Settings* settings){
 
     fprintf(file, "volume_music_in_game=%d\n", settings->volume_music_in_game);
     fprintf(file, "volume_music_in_menu=%d\n", settings->volume_music_in_menu);
+    fprintf(file, "fullscreen=%d",settings->fullscreen);
 
     fclose(file);
 
@@ -41,11 +43,10 @@ int SaveSettings(Settings* settings){
 
 int LoadSettingsFromFile(Settings* settings) {
 
-    LoadSettingsDefault(settings);
-
     FILE* file = fopen("settings.cfg", "r");
     if(!file) {
         SDL_Log("Creating settings.cfg with default configurations\n");
+        LoadSettingsDefault(settings);
         SaveSettings(settings);
         return 0;
     }
@@ -59,6 +60,8 @@ int LoadSettingsFromFile(Settings* settings) {
                 settings->volume_music_in_game = atoi(value);
             } else if(strcmp(key, "volume_music_in_menu") == 0) {
                 settings->volume_music_in_menu = atoi(value);
+            }else if(strcmp(key, "fullscreen") == 0){
+                settings->fullscreen = atoi(value);
             } else {
                 SDL_Log("Unknown setting: %s\n", key);
                 break;

@@ -5,7 +5,7 @@
 ;THE MUTANTS SETUP X64
 
 #define MyAppName "The Mutants"
-#define MyAppVersion "0.28"
+#define MyAppVersion "0.29"
 #define MyAppPublisher "TheLightAndSilverhacker"
 #define MyAppExeName "The_Mutants.exe"
 

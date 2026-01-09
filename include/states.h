@@ -10,7 +10,7 @@ int Init_State_Game();
 int Update_State_Game();
 void UpdateKillsTexture(int kills);
 void CleanupKillsTexture();
-int GamePaused();
+void GamePaused();
 void CleanGamePaused();
 void CleanupBackground();
 

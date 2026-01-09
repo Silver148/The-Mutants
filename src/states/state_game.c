@@ -78,6 +78,8 @@ SDL_Texture* paused_texture = NULL;
 
 TTF_Font* press_esc = NULL;
 SDL_Texture* press_esc_texture = NULL;
+SDL_Rect paused_rect;
+SDL_Rect press_esc_rect;
 
 /* Update or recreate the kills text texture from the current kills count */
 void UpdateKillsTexture(int kills)
@@ -125,39 +127,8 @@ void CleanupKillsTexture()
     }
 }
 
-int GamePaused()
+void GamePaused()
 {
-    font_paused = TTF_OpenFont("fonts/SYSTEMIA.ttf", 48);
-    press_esc = TTF_OpenFont("fonts/SYSTEMIA.ttf", 24);
-
-    if(!font_paused){
-        SDL_Log("font_paused failed to load: %s", TTF_GetError());
-        return -1;
-    }
-
-    SDL_Surface* paused_surface = TTF_RenderText_Solid(font_paused, "GAME PAUSED :)", (SDL_Color){255, 0, 0, 255});
-    SDL_Surface* press_esc_surface = TTF_RenderText_Solid(press_esc, "Press ESC to resume", (SDL_Color){255, 255, 255, 255});
-    press_esc_texture = SDL_CreateTextureFromSurface(renderer, press_esc_surface);
-    paused_texture = SDL_CreateTextureFromSurface(renderer, paused_surface);
-    SDL_FreeSurface(paused_surface);
-    SDL_FreeSurface(press_esc_surface);
-
-    SDL_Rect paused_rect;
-    int pW = 0, pH = 0;
-    SDL_QueryTexture(paused_texture, NULL, NULL, &pW, &pH);
-    paused_rect.x = (640 - pW) / 2;
-    paused_rect.y = (480 - pH) / 2;
-    paused_rect.w = pW;
-    paused_rect.h = pH;
-
-    SDL_Rect press_esc_rect;
-    int eW = 0, eH = 0;
-    SDL_QueryTexture(press_esc_texture, NULL, NULL, &eW, &eH);
-    press_esc_rect.x = (640 - eW) / 2;
-    press_esc_rect.y = paused_rect.y + pH + 20;
-    press_esc_rect.w = eW;
-    press_esc_rect.h = eH;
-
     SDL_RenderCopy(renderer, paused_texture, NULL, &paused_rect);
     SDL_RenderCopy(renderer, press_esc_texture, NULL, &press_esc_rect);
     SDL_RenderPresent(renderer);
@@ -277,6 +248,38 @@ int Init_State_Game()
     /* init Zombie system */
     InitZombieSys();
     InitProjectiles();
+
+    font_paused = TTF_OpenFont("fonts/SYSTEMIA.ttf", 48);
+    press_esc = TTF_OpenFont("fonts/SYSTEMIA.ttf", 24);
+
+    if(!font_paused){
+        SDL_Log("font_paused failed to load: %s", TTF_GetError());
+        return -1;
+    }
+
+    SDL_Surface* paused_surface = TTF_RenderText_Solid(font_paused, "GAME PAUSED :)", (SDL_Color){255, 0, 0, 255});
+    SDL_Surface* press_esc_surface = TTF_RenderText_Solid(press_esc, "Press ESC to resume", (SDL_Color){255, 255, 255, 255});
+    press_esc_texture = SDL_CreateTextureFromSurface(renderer, press_esc_surface);
+    paused_texture = SDL_CreateTextureFromSurface(renderer, paused_surface);
+    SDL_FreeSurface(paused_surface);
+    SDL_FreeSurface(press_esc_surface);
+
+    int pW = 0, pH = 0;
+    SDL_QueryTexture(paused_texture, NULL, NULL, &pW, &pH);
+    paused_rect.x = (640 - pW) / 2;
+    paused_rect.y = (480 - pH) / 2;
+    paused_rect.w = pW;
+    paused_rect.h = pH;
+
+    int eW = 0, eH = 0;
+    SDL_QueryTexture(press_esc_texture, NULL, NULL, &eW, &eH);
+    press_esc_rect.x = (640 - eW) / 2;
+    press_esc_rect.y = paused_rect.y + pH + 20;
+    press_esc_rect.w = eW;
+    press_esc_rect.h = eH;
+
+    SDL_ShowCursor(SDL_DISABLE);
+    SDL_SetRelativeMouseMode(SDL_TRUE);
 
     return 0;
 }
@@ -413,7 +416,7 @@ int Update_State_Game()
 {
     Uint32 start_fps = SDL_GetTicks();
     int frames = 0;
-    while(!is_paused) //Main loop(TESTING)
+    while(!is_paused) //Main loop
     {
         SDL_Event e;
         while(SDL_PollEvent(&e))
@@ -558,6 +561,8 @@ int Update_State_Game()
         SDL_Event e;
         while(SDL_PollEvent(&e))
         {
+            SDL_SetRelativeMouseMode(SDL_FALSE);
+            SDL_ShowCursor(SDL_ENABLE);
             if(e.type == SDL_QUIT)
             {
                 CleanupBackground();
@@ -565,6 +570,7 @@ int Update_State_Game()
                 CleanupPlayer();
                 CleanupProjectileSystem();
                 CleanupKillsTexture();
+                CleanGamePaused();
                 TTF_Quit();
                 SDL_Quit();
                 exit(0);
@@ -574,6 +580,7 @@ int Update_State_Game()
             if(e.type == SDL_KEYDOWN){
                 if(e.key.keysym.sym == SDLK_ESCAPE){
                     UpdateDeltaTime();
+                    SDL_ShowCursor(SDL_DISABLE);
                     is_paused = false;
                 }
             }
@@ -592,8 +599,6 @@ int Update_State_Game()
         UpdateProjectiles();
     }
     
-
-        /*TESTING*/
         /* Refresh kills texture when counter changes */
         static int last_counter_kills = -1;
         if (last_counter_kills != counter_kills) {

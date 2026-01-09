@@ -92,6 +92,13 @@ int main(int argc, char* argv[])
     InitMusic(); //Initialize music subsystem
     LoadSettingsFromFile(&game_settings); //Load settings from file
 
+    if(game_settings.fullscreen)
+    {
+        SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
+    }else{
+        SDL_SetWindowFullscreen(window, 0);
+    }
+
     #if 0
     /*SYSTEM CINEMATIC TESTING*/
     InitSystemCinematics(); //Initialize cinematic system
