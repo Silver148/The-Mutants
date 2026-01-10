@@ -86,10 +86,10 @@ debug-windows-x64:
 	cp SDL2-Mingw/x86_64-w64-mingw32/bin/libtiff-5.dll libtiff-5.dll
 	cp SDL2-Mingw/x86_64-w64-mingw32/bin/SDL2_mixer.dll SDL2_mixer.dll
 	cp SDL2-Mingw/x86_64-w64-mingw32/bin/SDL2_ttf.dll SDL2_ttf.dll
-	cp ffmpeg/bin/avcodec-62.dll avcodec-62.dll
-	cp ffmpeg/bin/avformat-62.dll avformat-62.dll
-	cp ffmpeg/bin/avutil-60.dll avutil-60.dll
-	cp curl/bin/libcurl-x64.dll libcurl-x64.dll
+	cp ffmpeg/bin/x64/avcodec-62.dll avcodec-62.dll
+	cp ffmpeg/bin/x64/avformat-62.dll avformat-62.dll
+	cp ffmpeg/bin/x64/avutil-60.dll avutil-60.dll
+	cp curl/bin/x64/libcurl-x64.dll libcurl-x64.dll
 	zip -r The_Mutants_windows-debug.zip $(WIN_NAME) SDL2.dll libpng16-16.dll zlib1.dll libjpeg-9.dll SDL2_image.dll libtiff-5.dll SDL2_mixer.dll SDL2_ttf.dll libcurl-x64.dll \
 	sprites music fonts skins avcodec-62.dll avformat-62.dll avutil-60.dll cinematics
 	rm -f *.dll

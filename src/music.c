@@ -32,6 +32,8 @@ int InitMusic()
 
 int CloseMusic()
 {
+    Mix_HaltMusic();
+    
     Mix_CloseAudio();
     return 0;
 }

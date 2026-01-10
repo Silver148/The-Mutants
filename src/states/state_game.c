@@ -78,8 +78,12 @@ SDL_Texture* paused_texture = NULL;
 
 TTF_Font* press_esc = NULL;
 SDL_Texture* press_esc_texture = NULL;
+SDL_Texture* exit_to_menu = NULL;
 SDL_Rect paused_rect;
 SDL_Rect press_esc_rect;
+SDL_Rect exit_to_menu_rect;
+
+extern STATES game_state;
 
 /* Update or recreate the kills text texture from the current kills count */
 void UpdateKillsTexture(int kills)
@@ -131,6 +135,7 @@ void GamePaused()
 {
     SDL_RenderCopy(renderer, paused_texture, NULL, &paused_rect);
     SDL_RenderCopy(renderer, press_esc_texture, NULL, &press_esc_rect);
+    SDL_RenderCopy(renderer, exit_to_menu, NULL, &exit_to_menu_rect);
     SDL_RenderPresent(renderer);
 }
 
@@ -149,6 +154,11 @@ void CleanGamePaused()
     if(press_esc_texture){
         SDL_DestroyTexture(press_esc_texture);
         press_esc_texture = NULL;
+    }
+
+    if(exit_to_menu){
+        SDL_DestroyTexture(exit_to_menu);
+        exit_to_menu = NULL;
     }
 }
 
@@ -259,10 +269,13 @@ int Init_State_Game()
 
     SDL_Surface* paused_surface = TTF_RenderText_Solid(font_paused, "GAME PAUSED :)", (SDL_Color){255, 0, 0, 255});
     SDL_Surface* press_esc_surface = TTF_RenderText_Solid(press_esc, "Press ESC to resume", (SDL_Color){255, 255, 255, 255});
+    SDL_Surface* exit_to_menu_surface = TTF_RenderText_Solid(press_esc, "Exit to menu", (SDL_Color){255, 0, 0, 255});
     press_esc_texture = SDL_CreateTextureFromSurface(renderer, press_esc_surface);
     paused_texture = SDL_CreateTextureFromSurface(renderer, paused_surface);
+    exit_to_menu = SDL_CreateTextureFromSurface(renderer, exit_to_menu_surface);
     SDL_FreeSurface(paused_surface);
     SDL_FreeSurface(press_esc_surface);
+    SDL_FreeSurface(exit_to_menu_surface);
 
     int pW = 0, pH = 0;
     SDL_QueryTexture(paused_texture, NULL, NULL, &pW, &pH);
@@ -271,10 +284,17 @@ int Init_State_Game()
     paused_rect.w = pW;
     paused_rect.h = pH;
 
+    int exitW = 0, exitH = 0;
+    SDL_QueryTexture(exit_to_menu, NULL, NULL, &exitW, &exitH);
+    exit_to_menu_rect.x = (640 - exitW) / 2;
+    exit_to_menu_rect.y = paused_rect.y + pH + 20;
+    exit_to_menu_rect.w = exitW;
+    exit_to_menu_rect.h = exitH;
+
     int eW = 0, eH = 0;
     SDL_QueryTexture(press_esc_texture, NULL, NULL, &eW, &eH);
     press_esc_rect.x = (640 - eW) / 2;
-    press_esc_rect.y = paused_rect.y + pH + 20;
+    press_esc_rect.y = exit_to_menu_rect.y + exitH + 20;
     press_esc_rect.w = eW;
     press_esc_rect.h = eH;
 
@@ -547,13 +567,13 @@ int Update_State_Game()
         }
 
         // Decide el estado final del jugador (no sobrescribir SHOOT mientras se reproduce)
-        if (is_jumping) {
-            states_player = JUMP; // Mantiene JUMP si está saltando
+        if (IsPlayerShooting()) {
+        // Si está disparando, mantenemos el estado de disparo sin importar si salta o camina
+            states_player = SHOOT; 
+        } else if (is_jumping) {
+            states_player = JUMP;
         } else {
-            if (!IsPlayerShooting()) {
-                states_player = input_state; // Usa el estado de entrada
-            }
-            // if shooting, keep SHOOT until animation finishes
+        states_player = input_state; // IDLE o WALK
         }
 
         //If "is_paused" is true, enter paused loop
@@ -582,6 +602,29 @@ int Update_State_Game()
                     UpdateDeltaTime();
                     SDL_ShowCursor(SDL_DISABLE);
                     is_paused = false;
+                }
+            }
+
+            if(e.type == SDL_MOUSEBUTTONDOWN)
+            {
+                int mx = e.button.x;
+                int my = e.button.y;
+
+                if(mx >= exit_to_menu_rect.x && mx <= exit_to_menu_rect.x + exit_to_menu_rect.w && 
+                my >= exit_to_menu_rect.y && my <= exit_to_menu_rect.y + exit_to_menu_rect.h)
+                {
+                    CleanupBackground();
+                    CleanupZombieSystem();
+                    CleanupPlayer();
+                    CleanupProjectileSystem();
+                    CleanupKillsTexture();
+                    CleanGamePaused();
+
+                    CloseMusic();
+                    InitMusic();
+                    PlayMusicStateMenu();
+                    game_state = STATE_MENU;
+                    return 0;
                 }
             }
         }

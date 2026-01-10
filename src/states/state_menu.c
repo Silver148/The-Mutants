@@ -72,6 +72,7 @@ SDL_Texture* tex_fullscreen_off = NULL;
 SDL_Rect fullscreen_rect;
 
 extern Settings game_settings;
+extern STATES game_state;
 
 int Init_State_Menu()
 {
@@ -851,6 +852,7 @@ int Update_State_Menu()
                     if(version_texture){ SDL_DestroyTexture(version_texture); version_texture = NULL; }
                     if(settings_texture){ SDL_DestroyTexture(settings_texture); settings_texture = NULL; }
                     TTF_CloseFont(font);
+                    game_state = STATE_GAME;
                     return 1;
                 }else if(mx >= quit_rect.x && mx <= quit_rect.x + quit_rect.w &&
                    my >= quit_rect.y && my <= quit_rect.y + quit_rect.h)
@@ -861,8 +863,7 @@ int Update_State_Menu()
                     if(settings_texture){ SDL_DestroyTexture(settings_texture); settings_texture = NULL; }
                     TTF_CloseFont(font);
                     TTF_Quit();
-                    SDL_Quit();
-                    exit(0);
+                    game_state = STATE_EXIT;
                     return 0;
                 }else if(mx >= settings_rect.x && mx <= settings_rect.x + settings_rect.w &&
                    my >= settings_rect.y && my <= settings_rect.y + settings_rect.h)

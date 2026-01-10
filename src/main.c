@@ -35,6 +35,7 @@ Copyright 2025
 SDL_Window* window = NULL;
 SDL_Renderer* renderer = NULL;
 Settings game_settings;
+STATES game_state;
 
 int InitSDLAndSubSystems()
 {
@@ -110,17 +111,21 @@ int main(int argc, char* argv[])
     SDL_RenderClear(renderer);
     #endif
 
-    PlayMusicStateMenu(); //Play music for menu state
+    game_state = STATE_MENU;
 
-    /*STATES*/
-    Init_State_Menu(); //Initialize menu state
-    Update_State_Menu(); //Update menu state
+    while(game_state != STATE_EXIT){
+        if(game_state == STATE_MENU){
+        PlayMusicStateMenu(); //Play music for menu state
 
-    /*
-    Cuando el jugador presiona "Start" en el menú, se sale del bucle del menú y se inicia el estado del juego.
-    */
+        /*STATES*/
+        Init_State_Menu(); //Initialize menu state
+        Update_State_Menu(); //Update menu state
 
-    PlayMusicStateGame(); //Play music for game state
+        /*
+        Cuando el jugador presiona "Start" en el menú, se sale del bucle del menú y se inicia el estado del juego.
+        */
+    }else if(game_state == STATE_GAME){
+        PlayMusicStateGame(); //Play music for game state
 
         #ifdef DEBUG
         /* Debug: report whether player textures were loaded from menu selections */
@@ -130,9 +135,16 @@ int main(int argc, char* argv[])
             (void*)jump_player.tex_jumpplayer);
         #endif
 
-    Init_State_Game(); //Initialize game state
-    Update_State_Game(); //Update game state
+        Init_State_Game(); //Initialize game state
+        Update_State_Game(); //Update game state
+        }
+    }
 
+    CloseMusic();
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+    SDL_Quit();
+    
     return 0;
 }
 // End func main

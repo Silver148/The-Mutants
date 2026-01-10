@@ -1,6 +1,12 @@
 #ifndef STATES_H
 #define STATES_H
 
+typedef enum{
+    STATE_GAME,
+    STATE_MENU,
+    STATE_EXIT
+} STATES;
+
 /*MENU*/
 int Init_State_Menu();
 int Update_State_Menu();
