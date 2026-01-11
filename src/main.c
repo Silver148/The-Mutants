@@ -37,6 +37,9 @@ SDL_Renderer* renderer = NULL;
 Settings game_settings;
 STATES game_state;
 
+bool state_game_ready = false;
+bool state_menu_ready = false;
+
 int InitSDLAndSubSystems()
 {
     /*Initialize SDL*/
@@ -115,17 +118,20 @@ int main(int argc, char* argv[])
 
     while(game_state != STATE_EXIT){
         if(game_state == STATE_MENU){
-        PlayMusicStateMenu(); //Play music for menu state
 
-        /*STATES*/
         Init_State_Menu(); //Initialize menu state
+        PlayMusicStateMenu(); //Play music for menu state
+        
         Update_State_Menu(); //Update menu state
 
         /*
         Cuando el jugador presiona "Start" en el menú, se sale del bucle del menú y se inicia el estado del juego.
         */
     }else if(game_state == STATE_GAME){
+        Init_State_Game(); //Initialize game state
         PlayMusicStateGame(); //Play music for game state
+
+        Update_State_Game(); //Update game state
 
         #ifdef DEBUG
         /* Debug: report whether player textures were loaded from menu selections */
@@ -134,9 +140,7 @@ int main(int argc, char* argv[])
             (void*)walk_player.tex_walkplayer,
             (void*)jump_player.tex_jumpplayer);
         #endif
-
-        Init_State_Game(); //Initialize game state
-        Update_State_Game(); //Update game state
+        
         }
     }
 
