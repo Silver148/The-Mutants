@@ -670,12 +670,8 @@ void PlayerForward()
     position_x += player_speed * deltaTime;
     int rightLimit = backgroundImgW - PLAYER_WIDTH;
  
-    if (worldBarrierX > 0) {
-        int barrierLimit = worldBarrierX - PLAYER_WIDTH;
-        if (barrierLimit < rightLimit) rightLimit = barrierLimit;
-    }
-    if(position_x > rightLimit){
-        position_x = rightLimit;
+    if (position_x > (worldBarrierX - PLAYER_WIDTH)) {
+        position_x = worldBarrierX - PLAYER_WIDTH;
     }
     UpdatePlayerHitbox();
 }
@@ -877,11 +873,9 @@ void PlayerBackward()
 {
     position_x -= player_speed * deltaTime;
 
-    int leftLimit = 0;
-    if (worldBarrierLeftX >= 0) {
-        leftLimit = worldBarrierLeftX + WORLD_BARRIER_WIDTH;
-    }
-    if(position_x < leftLimit){
+    int leftLimit = worldBarrierLeftX; 
+
+    if (position_x < leftLimit) {
         position_x = leftLimit;
     }
     UpdatePlayerHitbox();

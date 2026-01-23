@@ -5,7 +5,7 @@
 #include <SDL2/SDL_image.h>
 
 /* world barrier width (used by multiple modules) */
-#define WORLD_BARRIER_WIDTH 32
+#define WORLD_BARRIER_WIDTH 64
 
 extern SDL_Window* window;
 extern SDL_Renderer* renderer;
