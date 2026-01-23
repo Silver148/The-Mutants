@@ -85,6 +85,9 @@ SDL_Rect exit_to_menu_rect;
 
 extern STATES game_state;
 
+extern bool state_game_ready;
+extern bool state_menu_ready;
+
 /* Update or recreate the kills text texture from the current kills count */
 void UpdateKillsTexture(int kills)
 {
@@ -192,6 +195,8 @@ void CheckChangeStatePlayer()
 
 int Init_State_Game()
 {
+    if(state_game_ready){ return -1;}
+
     font_kills = TTF_OpenFont("fonts/SYSTEMIA.ttf", 24);
     if (!font_kills) {
         fprintf(stderr, "Failed to load font: %s\n", TTF_GetError());
@@ -201,6 +206,7 @@ int Init_State_Game()
     /* Create initial kills texture from current counter */
     UpdateKillsTexture(counter_kills);
 
+    SDL_Log("Cargando fondo...");
     /*Load BACKGROUND test main menu test*/
     SDL_Surface* background_surface = IMG_Load("sprites/cityminimap.png");
 
@@ -300,6 +306,8 @@ int Init_State_Game()
 
     SDL_ShowCursor(SDL_DISABLE);
     SDL_SetRelativeMouseMode(SDL_TRUE);
+
+    SDL_Log("67");
 
     return 0;
 }
@@ -623,7 +631,12 @@ int Update_State_Game()
                     CloseMusic();
                     InitMusic();
                     PlayMusicStateMenu();
+
+                    counter_kills = 0;
+                    is_paused = false;
+
                     game_state = STATE_MENU;
+                    state_game_ready = false;
                     return 0;
                 }
             }

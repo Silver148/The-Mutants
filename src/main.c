@@ -117,32 +117,38 @@ int main(int argc, char* argv[])
     game_state = STATE_MENU;
 
     while(game_state != STATE_EXIT){
-        if(game_state == STATE_MENU){
-
-        Init_State_Menu(); //Initialize menu state
-        PlayMusicStateMenu(); //Play music for menu state
+    if(game_state == STATE_MENU){
+        if(!state_menu_ready){
+            Init_State_Menu();
+            PlayMusicStateMenu();
+            state_menu_ready = true;
+        }
         
-        Update_State_Menu(); //Update menu state
+        if(state_menu_ready)
+            Update_State_Menu();
+
+    } else if(game_state == STATE_GAME){
+        if(!state_game_ready){
+            Init_State_Game();
+            PlayMusicStateGame();
+            state_game_ready = true;
+        }
+
+        if(state_game_ready){
+            Update_State_Game();
+        }
+        
 
         /*
-        Cuando el jugador presiona "Start" en el menú, se sale del bucle del menú y se inicia el estado del juego.
-        */
-    }else if(game_state == STATE_GAME){
-        Init_State_Game(); //Initialize game state
-        PlayMusicStateGame(); //Play music for game state
-
-        Update_State_Game(); //Update game state
-
         #ifdef DEBUG
-        /* Debug: report whether player textures were loaded from menu selections */
+        // Este log ahora solo debería salir una vez o ser estable
         SDL_Log("Main: idle tex=%p walk tex=%p jump tex=%p\n",
             (void*)idle_player.tex_idleplayer,
             (void*)walk_player.tex_walkplayer,
             (void*)jump_player.tex_jumpplayer);
-        #endif
-        
-        }
+        #endif*/
     }
+}
 
     CloseMusic();
     SDL_DestroyRenderer(renderer);

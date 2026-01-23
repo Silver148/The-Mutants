@@ -73,7 +73,8 @@ SDL_Rect fullscreen_rect;
 
 extern Settings game_settings;
 extern STATES game_state;
-extern bool state_game_is_ready;
+extern bool state_game_ready;
+extern bool state_menu_ready;
 
 int Init_State_Menu()
 {
@@ -853,9 +854,12 @@ int Update_State_Menu()
                     if(version_texture){ SDL_DestroyTexture(version_texture); version_texture = NULL; }
                     if(settings_texture){ SDL_DestroyTexture(settings_texture); settings_texture = NULL; }
                     TTF_CloseFont(font);
+                    state_game_ready = false;
+                    state_menu_ready = false;
                     game_state = STATE_GAME;
+                    
                     menu_running = false;
-                    return 1;
+                    return 0;
                 }else if(mx >= quit_rect.x && mx <= quit_rect.x + quit_rect.w &&
                    my >= quit_rect.y && my <= quit_rect.y + quit_rect.h)
                 {
