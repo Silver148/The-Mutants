@@ -437,7 +437,7 @@ void UpdateZombies() {
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
         SDL_ShowCursor(SDL_ENABLE);
-        SDL_SetRelativeMouseMode(SDL_TRUE);
+        SDL_SetRelativeMouseMode(SDL_FALSE);
 
         /*INIT STATE MENU :)*/
         Init_State_Menu();
@@ -564,7 +564,7 @@ void CleanupZombieSystem() {
     DeinitWave(&wave2);
     DeinitWave(&wave3);
     DeinitWave(&wave4);
-    
+
     wave_state = 0;
     pending_bg_change = 0;
     current_wave = 0;
