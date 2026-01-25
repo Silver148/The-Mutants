@@ -307,8 +307,6 @@ int Init_State_Game()
     SDL_ShowCursor(SDL_DISABLE);
     SDL_SetRelativeMouseMode(SDL_TRUE);
 
-    SDL_Log("67");
-
     return 0;
 }
 

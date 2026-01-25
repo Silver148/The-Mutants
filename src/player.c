@@ -514,6 +514,11 @@ void CleanupPlayer()
         jump_player.tex_jumpplayer = NULL;
     }
 
+    health = 170;
+    
+    extern float stamina;
+    stamina = 25.0f;
+
     //Reset anims
     Animation_Reset(&walk_player.walk_anim);
     Animation_Reset(&idle_player.idle_anim);

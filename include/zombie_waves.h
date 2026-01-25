@@ -13,6 +13,7 @@ typedef struct{
 } WAVE;
 
 int InitWave(WAVE *w, int n_zombies, float spawn_cooldown, float delay_time_start);
+void DeinitWave(WAVE *w);
 int UpdateWave(WAVE* w, ZOMBIE *z);
 
 #endif

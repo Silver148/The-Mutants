@@ -16,6 +16,7 @@ Copyright 2025
 #include <SDL2/SDL.h>
 extern int num_zombies;
 extern float deltaTime;
+static int zombies_spawned = 0;
 
 int InitWave(WAVE *w, int n_zombies, float spawn_cooldown, float delay_time_start){
 
@@ -28,10 +29,20 @@ int InitWave(WAVE *w, int n_zombies, float spawn_cooldown, float delay_time_star
     return 1;
 }
 
+void DeinitWave(WAVE *w){
+    w->num_zombies = 0;
+    w->spawn_timer = 0.0f;
+    w->spawn_cooldown = 0;
+    w->delay_time_start = 0;
+    w->timer = 0.0f;
+    zombies_spawned = 0;
+
+    memset(&w, 0, sizeof(WAVE));
+}
+
 int UpdateWave(WAVE* w, ZOMBIE *z){
 
     static bool spawn = true;
-    static int zombies_spawned = 0;
     w->timer += deltaTime;
     //SDL_Log("timer: %f\n", w->timer);
 

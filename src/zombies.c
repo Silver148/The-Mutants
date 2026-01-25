@@ -67,6 +67,8 @@ int wave_counter = 0;
 
 extern TTF_Font* font_kills;
 
+static WAVE wave1, wave2, wave3, wave4;
+
 static int find_free_zombie_slot() {
     for (int i = 0; i < MAX_ZOMBIES; i++) {
         if (!zombies[i].alive) {
@@ -243,7 +245,6 @@ void UpdateZombies() {
     float player_x = GetPositionPlayerX();
     float player_y = GetPositionPlayerY();
 
-    static WAVE wave1, wave2, wave3, wave4;
     ZOMBIE* z = NULL;
 
     for(int i = 0; i<MAX_ZOMBIES; i++)
@@ -417,19 +418,28 @@ void UpdateZombies() {
     }
 
     if(wave_state == -2)
-    {
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    {   
+        /* CLEAR SCREN*/
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); 
         SDL_RenderClear(renderer);
+        /* CLEAR STATE GAME RESOURCES*/                          
         CleanupBackground();
         CleanupZombieSystem();
         CleanupPlayer();
         CleanupProjectileSystem();
         CleanupKillsTexture();
+
+        /* STOP MUSIC*/
         CloseMusic();
+        /* INIT MENU MUSIC*/
         InitMusic();
         PlayMusicStateMenu();
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
+        SDL_ShowCursor(SDL_ENABLE);
+        SDL_SetRelativeMouseMode(SDL_TRUE);
+
+        /*INIT STATE MENU :)*/
         Init_State_Menu();
         Update_State_Menu();
     }
@@ -509,8 +519,26 @@ void CleanupZombieSystem() {
     for (int i = 0; i < MAX_ZOMBIES; i++) {
         zombies[i].alive = 0;
         zombies[i].id = 0;
+        zombies[i].health = 0;
+        zombies[i].x = 0.0f;
+        zombies[i].y = 0.0f;
+        zombies[i].base_y = 0.0f;
+        zombies[i].speed = 0.0f;
+        zombies[i].dir = 0;
+        zombies[i].state = IDLE_Z;
+        zombies[i].attack_damage = 0;
+        zombies[i].attack_cooldown = 0.0f;
+        zombies[i].attack_timer = 0.0f;
+        zombies[i].wander_timer = 0.0f;
+
+        zombies[i].dest.x = 0;
+        zombies[i].dest.y = 0;
+        zombies[i].dest.w = 0;
+        zombies[i].dest.h = 0;
+        
     }
     num_zombies = 0;
+    next_zombie_id = 0;
 
     if (winner_tex) {
         SDL_DestroyTexture(winner_tex);
@@ -528,6 +556,19 @@ void CleanupZombieSystem() {
         SDL_DestroyTexture(idle_zombie.tex_zombie_idle);
         idle_zombie.tex_zombie_idle = NULL;
     }
+
+    Animation_Reset(&walk_zombie.walk_anim);
+    Animation_Reset(&idle_zombie.idle_anim);
+
+    DeinitWave(&wave1);
+    DeinitWave(&wave2);
+    DeinitWave(&wave3);
+    DeinitWave(&wave4);
+    
+    wave_state = 0;
+    pending_bg_change = 0;
+    current_wave = 0;
+    wave_counter = 0;
 }
 
 /* kept for compatibility with existing calls */
