@@ -7,7 +7,7 @@
 SOURCES = src/main.c src/player.c src/states/state_menu.c \
 			src/states/state_game.c src/zombies.c src/delta_time.c src/anim_manager.c \
 			src/music.c src/settings.c src/projectiles.c src/zombie_waves.c src/update_system.c \
-			src/show_notifications.c src/system_cinematics.c
+			src/show_notifications.c src/system_cinematics.c src/weapons_system.c
 OBJECTS = $(SOURCES:src/%.c=obj/%.o)
 
 # Windows x64 build settings

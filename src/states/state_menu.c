@@ -143,7 +143,7 @@ int Init_State_Menu()
     quit_rect.h = quitH;
 
     char TEXT_VERSION[64];
-    snprintf(TEXT_VERSION, sizeof(TEXT_VERSION), "Version %d.%d.%d Beta 3", GAME_VERSION_MAJOR, GAME_VERSION_MINOR, GAME_VERSION_PATCH);
+    snprintf(TEXT_VERSION, sizeof(TEXT_VERSION), "Version %d.%d.%d Beta 4", GAME_VERSION_MAJOR, GAME_VERSION_MINOR, GAME_VERSION_PATCH);
 
     /*VERSION*/
     version_surface = TTF_RenderText_Solid(font, TEXT_VERSION, (SDL_Color){255, 255, 255, 255});
@@ -336,6 +336,7 @@ int State_Config(){
                     if(arrow_texture){ SDL_DestroyTexture(arrow_texture); arrow_texture = NULL; }
                     if(tex_fullscreen_off){ SDL_DestroyTexture(tex_fullscreen_off); tex_fullscreen_off = NULL;}
                     if(tex_fullscreen_on){ SDL_DestroyTexture(tex_fullscreen_on); tex_fullscreen_on = NULL;}
+                    if(settings_saved_texture){ SDL_DestroyTexture(settings_saved_texture); settings_saved_texture = NULL; }
 
                     return 0;
                 }
@@ -444,11 +445,15 @@ int State_Config(){
                 if(mx >= save_settings_rect.x && mx <= save_settings_rect.x + save_settings_rect.w &&
                    my >= save_settings_rect.y && my <= save_settings_rect.y + save_settings_rect.h)
                 {
+                    bool settings_saved_show = true;
                     SaveSettings(&game_settings);
-                    SDL_RenderCopy(renderer, settings_saved_texture, NULL, &settings_saved_rect);
+                    if(settings_saved_show){
+                        SDL_RenderCopy(renderer, settings_saved_texture, NULL, &settings_saved_rect);
+                    }
+                    
                     SDL_RenderPresent(renderer);
                     SDL_Delay(1000); //Show message for 1 seconds
-                    if(settings_saved_texture){ SDL_DestroyTexture(settings_saved_texture); settings_saved_texture = NULL; }
+                    settings_saved_show = false;
                 }
             }
         }
@@ -589,6 +594,7 @@ int State_Skins(){
                         index_selected_skin++;
                         arrow2_rect.x += 150;
                         SDL_Log("State_Skins: keyboard selected skin %d (RIGHT)\n", index_selected_skin);
+
                         if(index_selected_skin == 1)
                         {
                             ChangePlayerSkin("sprites/idle_player_spritesheet.png", "sprites/walk_player_spritesheet.png", "sprites/jump_player-spritesheet.png");
@@ -820,6 +826,15 @@ int StateUpdate()
     return 0;
 }
 
+void Cleanup_Menu_Textures() {
+    if(start_texture) { SDL_DestroyTexture(start_texture); start_texture = NULL; }
+    if(quit_texture) { SDL_DestroyTexture(quit_texture); quit_texture = NULL; }
+    if(version_texture) { SDL_DestroyTexture(version_texture); version_texture = NULL; }
+    if(settings_texture) { SDL_DestroyTexture(settings_texture); settings_texture = NULL; }
+    if(skins_texture) { SDL_DestroyTexture(skins_texture); skins_texture = NULL; }
+    if(Check_for_updates_texture) { SDL_DestroyTexture(Check_for_updates_texture); Check_for_updates_texture = NULL; }
+}
+
 int Update_State_Menu()
 {
     bool menu_running = true;
@@ -830,10 +845,8 @@ int Update_State_Menu()
         {
             if(e.type == SDL_QUIT)
             {
-                if(start_texture){ SDL_DestroyTexture(start_texture); start_texture = NULL; }
-                if(quit_texture){ SDL_DestroyTexture(quit_texture); quit_texture = NULL; }
-                if(version_texture){ SDL_DestroyTexture(version_texture); version_texture = NULL; }
-                if(settings_texture){ SDL_DestroyTexture(settings_texture); settings_texture = NULL; }
+                Cleanup_Menu_Textures();
+
                 TTF_CloseFont(font);
                 TTF_Quit();
                 SDL_Quit();
@@ -849,10 +862,8 @@ int Update_State_Menu()
                 if(mx >= start_rect.x && mx <= start_rect.x + start_rect.w &&
                    my >= start_rect.y && my <= start_rect.y + start_rect.h)
                 {
-                    if(start_texture){ SDL_DestroyTexture(start_texture); start_texture = NULL; }
-                    if(quit_texture){ SDL_DestroyTexture(quit_texture); quit_texture = NULL; }
-                    if(version_texture){ SDL_DestroyTexture(version_texture); version_texture = NULL; }
-                    if(settings_texture){ SDL_DestroyTexture(settings_texture); settings_texture = NULL; }
+                    Cleanup_Menu_Textures();
+                    
                     TTF_CloseFont(font);
                     state_game_ready = false;
                     state_menu_ready = false;
@@ -863,10 +874,8 @@ int Update_State_Menu()
                 }else if(mx >= quit_rect.x && mx <= quit_rect.x + quit_rect.w &&
                    my >= quit_rect.y && my <= quit_rect.y + quit_rect.h)
                 {
-                    if(start_texture){ SDL_DestroyTexture(start_texture); start_texture = NULL; }
-                    if(quit_texture){ SDL_DestroyTexture(quit_texture); quit_texture = NULL; }
-                    if(version_texture){ SDL_DestroyTexture(version_texture); version_texture = NULL; }
-                    if(settings_texture){ SDL_DestroyTexture(settings_texture); settings_texture = NULL; }
+                    Cleanup_Menu_Textures();
+
                     TTF_CloseFont(font);
                     TTF_Quit();
                     game_state = STATE_EXIT;
@@ -875,10 +884,7 @@ int Update_State_Menu()
                 }else if(mx >= settings_rect.x && mx <= settings_rect.x + settings_rect.w &&
                    my >= settings_rect.y && my <= settings_rect.y + settings_rect.h)
                 {
-                    if(start_texture){ SDL_DestroyTexture(start_texture); start_texture = NULL; }
-                    if(quit_texture){ SDL_DestroyTexture(quit_texture); quit_texture = NULL; }
-                    if(version_texture){ SDL_DestroyTexture(version_texture); version_texture = NULL; }
-                    if(settings_texture){ SDL_DestroyTexture(settings_texture); settings_texture = NULL; }
+                    Cleanup_Menu_Textures();
 
                     State_Config();
                     /* Recreate menu textures after returning from config */
@@ -886,28 +892,19 @@ int Update_State_Menu()
                 }else if(mx >= skins_rect.x && mx <= skins_rect.x + skins_rect.w &&
                    my >= skins_rect.y && my <= skins_rect.y + skins_rect.h)
                 {
-                    if(start_texture){ SDL_DestroyTexture(start_texture); start_texture = NULL; }
-                    if(quit_texture){ SDL_DestroyTexture(quit_texture); quit_texture = NULL; }
-                    if(version_texture){ SDL_DestroyTexture(version_texture); version_texture = NULL; }
-                    if(settings_texture){ SDL_DestroyTexture(settings_texture); settings_texture = NULL; }
-                    if(skins_texture){ SDL_DestroyTexture(skins_texture); skins_texture = NULL; }
-                    if(Check_for_updates_texture){ SDL_DestroyTexture(Check_for_updates_texture); Check_for_updates_texture = NULL; }
+                    Cleanup_Menu_Textures();
 
                     State_Skins();
                     /* Recreate menu textures after returning from skins */
                     Init_State_Menu();
                 }else if(mx >= Check_for_updates_rect.x && mx <= Check_for_updates_rect.x + Check_for_updates_rect.w &&
-                my>= Check_for_updates_rect.y && my <= Check_for_updates_rect.y + Check_for_updates_rect.h)
+                my >= Check_for_updates_rect.y && my <= Check_for_updates_rect.y + Check_for_updates_rect.h)
                 {
-                    if(start_texture){ SDL_DestroyTexture(start_texture); start_texture = NULL; }
-                    if(quit_texture){ SDL_DestroyTexture(quit_texture); quit_texture = NULL; }
-                    if(version_texture){ SDL_DestroyTexture(version_texture); version_texture = NULL; }
-                    if(settings_texture){ SDL_DestroyTexture(settings_texture); settings_texture = NULL; }
-                    if(skins_texture){ SDL_DestroyTexture(skins_texture); skins_texture = NULL; }
-                    if(Check_for_updates_texture){ SDL_DestroyTexture(Check_for_updates_texture); Check_for_updates_texture = NULL; }
+                    Cleanup_Menu_Textures();
 
                     StateUpdate();
                 }
+            }
         }
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
@@ -921,7 +918,6 @@ int Update_State_Menu()
         SDL_RenderCopy(renderer, settings_texture, NULL, &settings_rect); //SETTINGS TEXT
 
         SDL_RenderPresent(renderer);
-        }
     }
 
     return 0;

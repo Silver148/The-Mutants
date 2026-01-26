@@ -15,6 +15,9 @@ Copyright 2025
 #include "delta_time.h"
 #include "global_vars.h"
 #include "anim_manager.h"
+#include "zombies.h"
+#include "states.h"
+#include "projectiles.h"
 #include <stdio.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
@@ -57,6 +60,10 @@ static int shoot_anim_type = 0; /* 0 = normal shoot, 1 = walk-shoot */
 
 int PLAYER_WIDTH = 64;
 int PLAYER_HEIGHT = 64;
+
+extern bool state_game_ready;
+extern bool state_menu_ready;
+extern STATES game_state;
 
 void CleanTextureShoot(void);
 
@@ -184,7 +191,10 @@ Hitbox GetPlayerHitbox(void) {
     return player_hitbox;
 }
 
-void LoadSpritesPlayer() {   
+void LoadSpritesPlayer() {
+    skin_is_goku = false;
+    skin_is_metal = false;
+
     /* Only load default sprites if textures are not already set (preserve skins set from menu) */
     if (!idle_player.tex_idleplayer) {
         idle_player.tmp_surf_idleplayer = IMG_Load("sprites/idle_player_spritesheet.png");
@@ -692,8 +702,8 @@ void PlayerWalkAnim(SDL_RendererFlip flip_type)
         int tex_w = 0, tex_h = 0;
         if (walk_player.tex_walkplayer) SDL_QueryTexture(walk_player.tex_walkplayer, NULL, NULL, &tex_w, &tex_h);
         
-        const int left_extra = 0;  /* pixels to include to the left of frame */
-        const int right_crop = 0;  /* pixels to remove from right of frame */
+        const int left_extra = -12;  /* pixels to include to the left of frame */
+        const int right_crop = -8;  /* pixels to remove from right of frame */
 
         /* try to move source x leftwards by left_extra (if possible) */
         int new_x = src_mod.x - left_extra;
@@ -907,13 +917,30 @@ void ResetPlayerSpeed(void)
     player_speed = default_base_player_speed * skin_speed_multiplier;
 }
 
-void CheckIfPlayerIsDead()
+bool CheckIfPlayerIsDead()
 {
     if(health <= 0)
     {
         SDL_Log("Player is dead!\n");
-        exit(0);
+
+        CleanupBackground();
+        CleanupZombieSystem();
+        CleanupPlayer();
+        CleanupProjectileSystem();
+        CleanupKillsTexture();
+        CleanupAmmunitions();
+
+        SDL_ShowCursor(SDL_ENABLE);
+        SDL_SetRelativeMouseMode(SDL_FALSE);
+
+        game_state = STATE_MENU;
+        state_game_ready = false;
+        state_menu_ready = false;
+
+        return true;
     }
+
+    return false;
 }
 
 float GetPositionPlayerX(void)

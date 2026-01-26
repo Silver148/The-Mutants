@@ -16,14 +16,17 @@ Copyright 2025
 #include "player.h"
 #include "zombies.h"
 #include "states.h"
+#include "weapons_system.h"
 #include <SDL2/SDL.h>
 #include <string.h>
 #include <stdio.h>
 
 extern float deltaTime; /* from delta_time.c */
 extern ZOMBIE zombies[MAX_ZOMBIES];/*zombies instance (from zombies.c) */
-extern int num_zombies;; 
+extern int num_zombies;
+extern int Ammunition;
 int counter_kills = 0;
+int spawned_bullets = 0;
 
 static Projectile projectiles[MAX_PROJECTILES];
 
@@ -34,6 +37,11 @@ void InitProjectiles()
 
 void SpawnProjectile(float x, float y, float vx, float vy, int damage)
 {
+    if(!CheckMunitions()){
+        SDL_Log("You ran out of bullets!");
+        return;
+    }
+
     for(int i=0;i<MAX_PROJECTILES;i++){
         if(!projectiles[i].active){
             projectiles[i].active = 1;
@@ -48,6 +56,8 @@ void SpawnProjectile(float x, float y, float vx, float vy, int damage)
             extern SDL_Rect backgroundSrcRect; /* from state_game.c */
             int screen_x = (int)x - backgroundSrcRect.x;
             int screen_y = (int)y - backgroundSrcRect.y;
+            spawned_bullets++;
+            Ammunition--;
             #ifdef DEBUG
             SDL_Log("SpawnProjectile: world=(%.1f,%.1f) bgSrc=(%d,%d) screen=(%d,%d) vx=%.1f vy=%.1f dmg=%d slot=%d",
                     x, y, backgroundSrcRect.x, backgroundSrcRect.y, screen_x, screen_y, vx, vy, damage, i);
@@ -186,4 +196,5 @@ void RenderProjectiles()
 void CleanupProjectileSystem()
 {
     memset(projectiles, 0, sizeof(projectiles));
+    Ammunition = 100;
 }

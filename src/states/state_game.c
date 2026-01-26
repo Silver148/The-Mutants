@@ -24,6 +24,7 @@ STATE GAME :D by Juan Yaguaro And Abel Ferrer
 #include "music.h"
 #include "projectiles.h"
 #include "zombie_waves.h"
+#include "weapons_system.h"
 
 #include <stdio.h>
 #include <SDL2/SDL.h>
@@ -79,14 +80,21 @@ SDL_Texture* paused_texture = NULL;
 TTF_Font* press_esc = NULL;
 SDL_Texture* press_esc_texture = NULL;
 SDL_Texture* exit_to_menu = NULL;
+
 SDL_Rect paused_rect;
 SDL_Rect press_esc_rect;
 SDL_Rect exit_to_menu_rect;
+
+TTF_Font* font_ammunitions = NULL;
+SDL_Texture* font_ammunitions_texture = NULL;
+SDL_Rect font_ammunitions_rect;
 
 extern STATES game_state;
 
 extern bool state_game_ready;
 extern bool state_menu_ready;
+
+extern int Ammunition;
 
 /* Update or recreate the kills text texture from the current kills count */
 void UpdateKillsTexture(int kills)
@@ -124,6 +132,34 @@ void UpdateKillsTexture(int kills)
     SDL_Log("UpdateKillsTexture: created texture for %d (w=%d h=%d)", kills, w, h);
 }
 
+void UpdateAmmunitions(){
+    char Ammunitions_text[64];
+    if(!font_ammunitions) return;
+
+    snprintf(Ammunitions_text, sizeof(Ammunitions_text), "Ammunitions: %d", Ammunition);
+
+    SDL_Surface* surf_ammunitions = TTF_RenderText_Solid(font_ammunitions, Ammunitions_text, (SDL_Color){255,255,255,255});
+
+    SDL_Texture* tex_ammunitions = SDL_CreateTextureFromSurface(renderer, surf_ammunitions);
+    SDL_FreeSurface(surf_ammunitions);
+
+    if(!tex_ammunitions) return;
+
+    if(font_ammunitions_texture){
+        SDL_DestroyTexture(font_ammunitions_texture);
+    }
+    font_ammunitions_texture = tex_ammunitions;
+    SDL_SetTextureBlendMode(font_ammunitions_texture, SDL_BLENDMODE_BLEND);
+
+    int w_am = 0, h_am = 0;
+    SDL_QueryTexture(font_ammunitions_texture, NULL, NULL, &w_am, &h_am);
+    font_ammunitions_rect.x = kills_text_rect.x - kills_text_rect.w - font_ammunitions_rect.w - 20;
+    font_ammunitions_rect.y = 10;
+    font_ammunitions_rect.w = w_am;
+    font_ammunitions_rect.h = h_am;
+    SDL_Log("UpdateAmmunitions: created texture for %d (w=%d h=%d)", Ammunition, w_am, h_am);
+}
+
 void CleanupKillsTexture()
 {
     TTF_CloseFont(font_kills);
@@ -131,6 +167,16 @@ void CleanupKillsTexture()
     if (kills_text_texture) {
         SDL_DestroyTexture(kills_text_texture);
         kills_text_texture = NULL;
+    }
+}
+
+void CleanupAmmunitions(){
+    TTF_CloseFont(font_ammunitions);
+    font_ammunitions = NULL;
+
+    if(font_ammunitions_texture){
+        SDL_DestroyTexture(font_ammunitions_texture);
+        font_ammunitions_texture = NULL;
     }
 }
 
@@ -199,6 +245,12 @@ int Init_State_Game()
 
     font_kills = TTF_OpenFont("fonts/SYSTEMIA.ttf", 24);
     if (!font_kills) {
+        fprintf(stderr, "Failed to load font: %s\n", TTF_GetError());
+        return -1;
+    }
+
+    font_ammunitions = TTF_OpenFont("fonts/SYSTEMIA.ttf", 24);
+    if(!font_ammunitions){
         fprintf(stderr, "Failed to load font: %s\n", TTF_GetError());
         return -1;
     }
@@ -273,6 +325,7 @@ int Init_State_Game()
         return -1;
     }
 
+    /*PAUSED TEXTURE :)*/
     SDL_Surface* paused_surface = TTF_RenderText_Solid(font_paused, "GAME PAUSED :)", (SDL_Color){255, 0, 0, 255});
     SDL_Surface* press_esc_surface = TTF_RenderText_Solid(press_esc, "Press ESC to resume", (SDL_Color){255, 255, 255, 255});
     SDL_Surface* exit_to_menu_surface = TTF_RenderText_Solid(press_esc, "Exit to menu", (SDL_Color){255, 0, 0, 255});
@@ -304,6 +357,10 @@ int Init_State_Game()
     press_esc_rect.w = eW;
     press_esc_rect.h = eH;
 
+    /*FONT AMMUNITIONS */
+    UpdateAmmunitions();
+
+    /* HIDE CURSOR */
     SDL_ShowCursor(SDL_DISABLE);
     SDL_SetRelativeMouseMode(SDL_TRUE);
 
@@ -454,6 +511,7 @@ int Update_State_Game()
                 CleanupPlayer();
                 CleanupProjectileSystem();
                 CleanupKillsTexture();
+                CleanupAmmunitions();
                 TTF_Quit();
                 SDL_Quit();
                 exit(0);
@@ -564,9 +622,20 @@ int Update_State_Game()
            Use walk-shoot when moving (A or D pressed) */
         if (state[SDL_SCANCODE_Z]) {
             if (state[SDL_SCANCODE_A] || state[SDL_SCANCODE_D]) {
-                StartPlayerShootingWalk();
+                if(CheckMunitions())
+                    StartPlayerShootingWalk();
+                else{
+                    states_player = input_state;
+                    StopPlayerShooting();
+                }
+                    
             } else {
-                StartPlayerShooting();
+                if(CheckMunitions())
+                    StartPlayerShooting();
+                else {
+                    states_player = input_state;
+                    StopPlayerShooting();
+                }    
             }
         } else {
             StopPlayerShooting();
@@ -596,6 +665,7 @@ int Update_State_Game()
                 CleanupPlayer();
                 CleanupProjectileSystem();
                 CleanupKillsTexture();
+                CleanupAmmunitions();
                 CleanGamePaused();
                 TTF_Quit();
                 SDL_Quit();
@@ -624,6 +694,7 @@ int Update_State_Game()
                     CleanupPlayer();
                     CleanupProjectileSystem();
                     CleanupKillsTexture();
+                    CleanupAmmunitions();
                     CleanGamePaused();
 
                     CloseMusic();
@@ -635,6 +706,11 @@ int Update_State_Game()
 
                     game_state = STATE_MENU;
                     state_game_ready = false;
+
+                    /* CLEAR SCREN*/
+                    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+                    SDL_RenderClear(renderer);
+                    SDL_RenderPresent(renderer);
                     return 0;
                 }
             }
@@ -648,7 +724,13 @@ int Update_State_Game()
         UpdateAnimsPLAYER();
         UpdateDeltaTime();
         UpdateJump();
-        CheckIfPlayerIsDead();
+        if(CheckIfPlayerIsDead()){
+            /* CLEAR SCREN*/
+            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+            SDL_RenderClear(renderer);
+            SDL_RenderPresent(renderer);
+            return 0;
+        }
         UpdateZombies(); /* update zombies AI and movement */
         UpdateProjectiles();
     }
@@ -659,6 +741,14 @@ int Update_State_Game()
             UpdateKillsTexture(counter_kills);
             last_counter_kills = counter_kills;
         }
+
+        /* REFRESH AMMUNITIONS TEXTURE :D*/
+        static int last_ammunitions = -1;
+        if(last_ammunitions != Ammunition){
+            UpdateAmmunitions();
+            last_ammunitions = Ammunition;
+        }
+
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); //clean screen with black color
         SDL_RenderClear(renderer);
 
@@ -695,7 +785,7 @@ int Update_State_Game()
             }
                 SDL_RenderCopy(renderer, backgroundTexture, &backgroundSrcRect, &backgroundRect);
         } else {
-            SDL_RenderCopy(renderer, backgroundTexture, NULL, &backgroundRect); /*TEXTURE TEST :)*/
+            SDL_RenderCopy(renderer, backgroundTexture, NULL, &backgroundRect);
         }
         
         /* world barriers exist in logic but are invisible (no rendering) */
@@ -704,6 +794,10 @@ int Update_State_Game()
         RenderBarStamina(); //Render stamina bar
         if (kills_text_texture) {
             SDL_RenderCopy(renderer, kills_text_texture, NULL, &kills_text_rect);
+        }
+
+        if(font_ammunitions_texture){
+            SDL_RenderCopy(renderer, font_ammunitions_texture, NULL, &font_ammunitions_rect);
         }
 
         RenderPlayer(player_flip); //Render player

@@ -108,7 +108,7 @@ void Update_IDLE();
 void RenderIdlePlayerAnim(SDL_RendererFlip flip_type);
 void SetPlayerSpeedMultiplier(float multiplier);
 void ResetPlayerSpeed(void);
-void CheckIfPlayerIsDead();
+bool CheckIfPlayerIsDead();
 
 /*POSITION X AND Y*/
 float GetPositionPlayerX(void);

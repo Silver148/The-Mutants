@@ -419,15 +419,13 @@ void UpdateZombies() {
 
     if(wave_state == -2)
     {   
-        /* CLEAR SCREN*/
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); 
-        SDL_RenderClear(renderer);
         /* CLEAR STATE GAME RESOURCES*/                          
         CleanupBackground();
         CleanupZombieSystem();
         CleanupPlayer();
         CleanupProjectileSystem();
         CleanupKillsTexture();
+        CleanupAmmunitions();
 
         /* STOP MUSIC*/
         CloseMusic();
@@ -438,6 +436,11 @@ void UpdateZombies() {
         SDL_RenderClear(renderer);
         SDL_ShowCursor(SDL_ENABLE);
         SDL_SetRelativeMouseMode(SDL_FALSE);
+
+        /* CLEAR SCREN*/
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(renderer);
+        SDL_RenderPresent(renderer);
 
         /*INIT STATE MENU :)*/
         Init_State_Menu();
