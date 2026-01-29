@@ -143,7 +143,7 @@ int Init_State_Menu()
     quit_rect.h = quitH;
 
     char TEXT_VERSION[64];
-    snprintf(TEXT_VERSION, sizeof(TEXT_VERSION), "Version %d.%d.%d Beta 4", GAME_VERSION_MAJOR, GAME_VERSION_MINOR, GAME_VERSION_PATCH);
+    snprintf(TEXT_VERSION, sizeof(TEXT_VERSION), "Version %d.%d.%d Beta 5", GAME_VERSION_MAJOR, GAME_VERSION_MINOR, GAME_VERSION_PATCH);
 
     /*VERSION*/
     version_surface = TTF_RenderText_Solid(font, TEXT_VERSION, (SDL_Color){255, 255, 255, 255});
@@ -684,6 +684,11 @@ int StateUpdate()
 {
     char tempFolder[MAX_PATH];
     char download_path[MAX_PATH];
+
+    /*PERCENT VARIABLES*/
+    int pW=0,pH=0;
+    SDL_Texture* percent_tex = NULL;
+    SDL_Rect pRect = { (640 - pW)/2, 260, pW, pH };
     
     /* Get temp path and prepare filename outside the loop to avoid repeating work */
     GetTempPath(MAX_PATH, tempFolder);
@@ -701,6 +706,9 @@ int StateUpdate()
     dl_rect.y = 220;
     dl_rect.w = dlW;
     dl_rect.h = dlH;
+
+    SDL_SetTextureBlendMode(dl_texture, SDL_BLENDMODE_BLEND);
+    SDL_SetTextureBlendMode(percent_tex, SDL_BLENDMODE_BLEND);
 
     /* start download in background thread - MOVED OUTSIDE OF LOOP to prevent infinite threads */
     if(!start_texture && !quit_texture && !version_texture && !settings_texture && !skins_texture && !Check_for_updates_texture)
@@ -755,10 +763,9 @@ int StateUpdate()
             snprintf(percent_text, sizeof(percent_text), "--%%");
 
         SDL_Surface* percent_surf = TTF_RenderText_Solid(font, percent_text, (SDL_Color){255,255,255,255});
-        SDL_Texture* percent_tex = SDL_CreateTextureFromSurface(renderer, percent_surf);
+        percent_tex = SDL_CreateTextureFromSurface(renderer, percent_surf);
         SDL_FreeSurface(percent_surf);
 
-        int pW=0,pH=0;
         SDL_QueryTexture(percent_tex, NULL, NULL, &pW, &pH);
         SDL_Rect pRect = { (640 - pW)/2, 260, pW, pH };
 
@@ -775,20 +782,25 @@ int StateUpdate()
         SDL_RenderCopy(renderer, percent_tex, NULL, &pRect);
 
         SDL_SetRenderDrawColor(renderer, 255,255,255,255);
+
+        int breathingAlpha = 170 + (int)(85 * sin(SDL_GetTicks() / 500.0));
+        int anim_speed = SDL_GetTicks() / 100;
+        SDL_SetTextureAlphaMod(dl_texture, breathingAlpha);
+
         for(int i=0;i<8;i++)
         {
-            double ang = (i * M_PI * 2) / 8.0;
+            double ang = (i * M_PI * 2) / 8.0 + anim_speed;
             int dx = (int)(cx + cos(ang) * r);
             int dy = (int)(cy + sin(ang) * r);
             SDL_Rect dot = { dx - dotRadius, dy - dotRadius, dotRadius*2, dotRadius*2 };
             
             /* fade inactive dots */
+            #if 0
             if(((i + frame) % 8) < 3)
             {
-                SDL_SetRenderDrawColor(renderer, 255,255,255,255);
             } else {
-                SDL_SetRenderDrawColor(renderer, 180,180,180,255);
             }
+            #endif
             SDL_RenderFillRect(renderer, &dot);
         }
 
@@ -815,6 +827,8 @@ int StateUpdate()
 
         if(ShellExecuteEx(&sei)){
             MoveFileEx(download_path, NULL, MOVEFILE_DELAY_UNTIL_REBOOT);
+            SDL_DestroyTexture(dl_texture);
+            SDL_DestroyTexture(percent_tex);
             TTF_CloseFont(font);
             TTF_Quit();
             SDL_Quit();

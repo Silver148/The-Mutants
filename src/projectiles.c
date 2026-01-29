@@ -127,10 +127,7 @@ void UpdateProjectiles()
             };
             
             //AAB Collision check
-            if (prect_hitbox.x < zrect.x + zrect.w && 
-                prect_hitbox.x + prect_hitbox.w > zrect.x &&
-                prect_hitbox.y < zrect.y + zrect.h && 
-                prect_hitbox.y + prect_hitbox.h > zrect.y) {
+            if (SDL_HasIntersection(&prect_hitbox, &zrect)) {
                 
                 // HIT
                 zombies[z].health -= projectiles[i].damage;

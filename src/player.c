@@ -192,8 +192,6 @@ Hitbox GetPlayerHitbox(void) {
 }
 
 void LoadSpritesPlayer() {
-    skin_is_goku = false;
-    skin_is_metal = false;
 
     /* Only load default sprites if textures are not already set (preserve skins set from menu) */
     if (!idle_player.tex_idleplayer) {
@@ -503,6 +501,12 @@ void CleanTextureShoot()
 
 void CleanupPlayer()
 {
+    skin_is_goku = false;
+    skin_is_metal = false;
+
+    player_speed = base_player_speed = default_base_player_speed;
+    skin_speed_multiplier = 1.0f;
+
     //Clean shoot textures
     CleanTextureShoot();
 

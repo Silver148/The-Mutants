@@ -21,6 +21,12 @@ Copyright 2025
 #include "music.h"
 #include "projectiles.h"
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
+#include <math.h>
+#include <stdlib.h>
+#include <time.h>
+#include <stdio.h>
 
 /* camera source rect from state_game.c */
 extern SDL_Rect backgroundSrcRect;
@@ -28,13 +34,6 @@ extern int backgroundImgW;
 extern int backgroundImgH;
 /* allow changing background from other modules */
 extern void SetBackgroundImage(const char* path);
-#include <stdio.h>
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#include <SDL2/SDL_ttf.h>
-#include <math.h>
-#include <stdlib.h>
-#include <time.h>
 
 /* file-scope state so all functions can access it */
 static int wave_state = 0;
@@ -349,8 +348,7 @@ void UpdateZombies() {
             player_hitbox.h 
         };
         
-        if (zrect.x < prect.x + prect.w && zrect.x + zrect.w > prect.x &&
-            zrect.y < prect.y + prect.h && zrect.y + zrect.h > prect.y) {
+        if (SDL_HasIntersection(&zrect, &prect)) {
             if(z->attack_timer <= 0.0f){
                 health -= z->attack_damage;
                 if(health < 0) health = 0;
