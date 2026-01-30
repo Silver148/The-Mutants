@@ -278,10 +278,4 @@ void CleanupProjectileSystem()
 {
     memset(projectiles, 0, sizeof(projectiles));
     Ammunition = 100;
-    /* cleanup ammo packs and texture */
-    for (int a = 0; a < MAX_AMMO_PACKS; ++a) ammo_packs[a].active = 0;
-    if (ammo_texture) {
-        SDL_DestroyTexture(ammo_texture);
-        ammo_texture = NULL;
-    }
 }
