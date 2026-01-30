@@ -114,7 +114,7 @@ extern bool state_menu_ready;
 
 int Init_State_Menu()
 {
-    font = TTF_OpenFont("fonts/Half Awake.ttf", 28); //Cargar fuente para el menú (tamaño original)
+    font = TTF_OpenFont("fonts/Half Awake.ttf", 24); //Cargar fuente para el menú (tamaño original)
 
     /*¨START TEXT with outline (tighter letter spacing)*/
     {
