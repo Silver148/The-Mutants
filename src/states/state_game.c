@@ -30,6 +30,7 @@ STATE GAME :D by Juan Yaguaro And Abel Ferrer
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
+#include <math.h>
 
 SDL_Texture* backgroundTexture = NULL; //Background texture
 SDL_Rect backgroundRect;
@@ -95,6 +96,8 @@ extern bool state_game_ready;
 extern bool state_menu_ready;
 
 extern int Ammunition;
+Ammunitions ammunitions[128];
+SDL_Texture* bullets_tex = NULL;
 
 /* Update or recreate the kills text texture from the current kills count */
 void UpdateKillsTexture(int kills)
@@ -177,6 +180,14 @@ void CleanupAmmunitions(){
     if(font_ammunitions_texture){
         SDL_DestroyTexture(font_ammunitions_texture);
         font_ammunitions_texture = NULL;
+    }
+
+    for(int i = 0; i < 128; i++){
+        ammunitions[i].dest_bullet.x = -1;
+        ammunitions[i].dest_bullet.y = -1;
+        ammunitions[i].tex_bullet = NULL;
+        ammunitions[i].dest_bullet.w = 0;
+        ammunitions[i].dest_bullet.h = 0;
     }
 }
 
@@ -323,6 +334,22 @@ int Init_State_Game()
     if(!font_paused){
         SDL_Log("font_paused failed to load: %s", TTF_GetError());
         return -1;
+    }
+
+    SDL_Surface* tmp_surf_revolver_ammunition = IMG_Load("sprites/balas de revolver.png");
+    bullets_tex = SDL_CreateTextureFromSurface(renderer, tmp_surf_revolver_ammunition);
+    SDL_FreeSurface(tmp_surf_revolver_ammunition);
+
+    for(int i = 0; i < 128; i++) {
+        ammunitions[i].tex_bullet = bullets_tex;
+    
+        ammunitions[i].dest_bullet.x = -1; 
+        ammunitions[i].dest_bullet.y = -1;
+    
+        int w, h;
+        SDL_QueryTexture(bullets_tex, NULL, NULL, &w, &h);
+        ammunitions[i].dest_bullet.w = w;
+        ammunitions[i].dest_bullet.h = h;
     }
 
     /*PAUSED TEXTURE :)*/
@@ -493,6 +520,72 @@ void RenderBarHealth()
     /* border */
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
     SDL_RenderDrawRect(renderer, &frameRect);
+}
+
+Uint32 ammo_spawn_timer = 0;
+Uint32 next_ammo_spawn_time = 30000;
+
+void SpawnAmmunition() {
+
+    Uint32 currentTime = SDL_GetTicks();
+
+    int slot = -1;
+    if (currentTime > ammo_spawn_timer) {
+        for (int i = 0; i < 128; i++) {
+            if (ammunitions[i].dest_bullet.x == -1) {
+                slot = i;
+                break;
+            }
+        }
+    }
+
+    if (slot == -1) return;
+    float player_x = GetPositionPlayerX();
+    
+    int spawn_x = 0; 
+    do{
+        spawn_x = rand() % (backgroundImgW - 100);
+
+    }while(fabsf(spawn_x - player_x) < 250.0f);
+    
+    int spawn_y = 350;
+
+    ammunitions[slot].dest_bullet.x = spawn_x;
+    ammunitions[slot].dest_bullet.y = spawn_y;
+
+    ammo_spawn_timer = currentTime + (5000 + rand() % 5000);
+
+    SDL_Log("Munición spawneada en el slot %d, pos: (%d, %d)", slot, spawn_x, spawn_y);
+}
+
+void UpdateAmmoCollection() {
+    Hitbox player_hitbox = GetPlayerHitbox();
+    SDL_Rect pRect = { (int)player_hitbox.x, (int)player_hitbox.y, player_hitbox.w, player_hitbox.h };
+
+    for (int i = 0; i < 128; i++) {
+        if (ammunitions[i].dest_bullet.x != -1) {
+            
+            if (SDL_HasIntersection(&pRect, &ammunitions[i].dest_bullet)) {
+                Ammunition += 20;
+                ammunitions[i].dest_bullet.x = -1;
+
+                UpdateAmmunitions(); 
+                SDL_Log("Municion recogida! Total: %d", Ammunition);
+            }
+        }
+    }
+}
+
+void RenderAmmunitionsItems() {
+    for (int i = 0; i < 128; i++) {
+        if (ammunitions[i].dest_bullet.x != -1) {
+            SDL_Rect render_pos = ammunitions[i].dest_bullet;
+            render_pos.x -= backgroundSrcRect.x;
+            render_pos.y -= backgroundSrcRect.y;
+            
+            SDL_RenderCopy(renderer, bullets_tex, NULL, &render_pos);
+        }
+    }
 }
 
 int Update_State_Game()
@@ -733,6 +826,8 @@ int Update_State_Game()
         }
         UpdateZombies(); /* update zombies AI and movement */
         UpdateProjectiles();
+        UpdateAmmoCollection();
+        SpawnAmmunition();
     }
     
         /* Refresh kills texture when counter changes */
@@ -804,6 +899,7 @@ int Update_State_Game()
 
         RenderZombies(); //Render zombies
         RenderProjectiles(); // bullets
+        RenderAmmunitionsItems(); // Render ammunition items on the ground
 
         #ifdef DEBUG
         ShowHitboxPlayer();
