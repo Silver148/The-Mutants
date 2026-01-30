@@ -139,6 +139,10 @@ void StopPlayerShooting(void)
 float position_x = POS_X;
 float position_y = POS_Y;
 
+/* record the player's spawn (initial) position so other modules can reference it */
+float player_spawn_x = POS_X;
+float player_spawn_y = POS_Y;
+
 int last_position_x = 0;    
 int last_position_y = 0;
 

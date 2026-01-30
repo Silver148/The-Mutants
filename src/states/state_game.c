@@ -243,13 +243,13 @@ int Init_State_Game()
 {
     if(state_game_ready){ return -1;}
 
-    font_kills = TTF_OpenFont("fonts/SYSTEMIA.ttf", 24);
+    font_kills = TTF_OpenFont("fonts/Half Awake.ttf", 24);
     if (!font_kills) {
         fprintf(stderr, "Failed to load font: %s\n", TTF_GetError());
         return -1;
     }
 
-    font_ammunitions = TTF_OpenFont("fonts/SYSTEMIA.ttf", 24);
+    font_ammunitions = TTF_OpenFont("fonts/Half Awake.ttf", 12);
     if(!font_ammunitions){
         fprintf(stderr, "Failed to load font: %s\n", TTF_GetError());
         return -1;

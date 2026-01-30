@@ -29,11 +29,28 @@ State Menu :D
 #include <SDL2/SDL_ttf.h>
 
 #include <math.h>
+#include <string.h>
 
 char download_path[MAX_PATH];
 
 /* Pi constant for spinner math */
 static const double PI = 3.14159265358979323846;
+
+/* Draw a simple vertical gradient from top color to bottom color as a fallback background */
+static void DrawVerticalGradient(SDL_Renderer* rend, SDL_Color top, SDL_Color bottom)
+{
+    int w = 640;
+    int h = 480;
+    for(int y = 0; y < h; y++) {
+        float t = (float)y / (float)(h - 1);
+        Uint8 r = (Uint8)((1.0f - t) * top.r + t * bottom.r);
+        Uint8 g = (Uint8)((1.0f - t) * top.g + t * bottom.g);
+        Uint8 b = (Uint8)((1.0f - t) * top.b + t * bottom.b);
+        SDL_SetRenderDrawColor(rend, r, g, b, 255);
+        SDL_Rect row = {0, y, w, 1};
+        SDL_RenderFillRect(rend, &row);
+    }
+}
 
 #include "player.h"
 extern IDLE_PLAYER idle_player;
@@ -41,9 +58,28 @@ extern IDLE_PLAYER idle_player;
 extern SDL_Renderer* renderer;
 extern SDL_Window* window;
 
+/* Forward declaration so CreateTextTextureWithGlyphs can be used before its definition */
+static SDL_Texture* CreateTextTextureWithGlyphs(const char* text, TTF_Font* font, SDL_Color color, int gap_adjust, SDL_Rect* out_rect);
+static SDL_Texture* CreateOutlinedTextTexture(const char* text, TTF_Font* font, SDL_Color fg_color, SDL_Color outline_color, int outline_px, int gap_adjust, SDL_Rect* out_rect);
+
 SDL_Surface* start_surface = NULL;
 SDL_Texture* start_texture = NULL;
 SDL_Rect start_rect;
+
+SDL_Texture* menu_bg_texture = NULL;
+
+SDL_Texture* start_outline_texture = NULL;
+SDL_Rect start_outline_rect;
+SDL_Texture* settings_outline_texture = NULL;
+SDL_Rect settings_outline_rect;
+SDL_Texture* skins_outline_texture = NULL;
+SDL_Rect skins_outline_rect;
+SDL_Texture* Check_for_updates_outline_texture = NULL;
+SDL_Rect Check_for_updates_outline_rect;
+SDL_Texture* quit_outline_texture = NULL;
+SDL_Rect quit_outline_rect;
+SDL_Texture* version_outline_texture = NULL;
+SDL_Rect version_outline_rect;
 
 TTF_Font* font = NULL;
 
@@ -78,87 +114,105 @@ extern bool state_menu_ready;
 
 int Init_State_Menu()
 {
-    font = TTF_OpenFont("fonts/SYSTEMIA.ttf", 24); //Cargar fuente para el menú
+    font = TTF_OpenFont("fonts/Half Awake.ttf", 28); //Cargar fuente para el menú (tamaño original)
 
-    /*¨START TEXT*/
-    start_surface = TTF_RenderText_Solid(font, "Start", (SDL_Color){255, 0, 0, 255});
-    start_texture = SDL_CreateTextureFromSurface(renderer, start_surface);
-
-    SDL_FreeSurface(start_surface);
-
-    int startW = 0, startH = 0;
-    SDL_QueryTexture(start_texture, NULL, NULL, &startW, &startH);
-    start_rect.x = (640 - startW) / 2;
-    start_rect.y = 200;
-    start_rect.w = startW;
-    start_rect.h = startH;
+    /*¨START TEXT with outline (tighter letter spacing)*/
+    {
+        const char* txt = "Start";
+        SDL_Color outline_col = {0,0,0,255};
+        SDL_Color fg_col = {255,255,255,255};
+        int gap = 2; /* tighten letters by 2px */
+        int outline_px = 2;
+        SDL_Rect out_r = {0};
+        /* create combined texture (outline + main) so outline matches the glyph exactly */
+        start_texture = CreateOutlinedTextTexture(txt, font, fg_col, outline_col, outline_px, gap, &out_r);
+        start_rect.w = out_r.w; start_rect.h = out_r.h; start_rect.x = (640 - out_r.w) / 2; start_rect.y = 180;
+        /* clear separate outline texture (not used when using combined) */
+        start_outline_texture = NULL;
+    }
 
     /*SETTINGS*/
-    settings_surface = TTF_RenderText_Solid(font, "Settings", (SDL_Color){255, 0, 0, 255});
-    settings_texture = SDL_CreateTextureFromSurface(renderer, settings_surface);
-    SDL_FreeSurface(settings_surface);
-
-    int settingsW = 0, settingsH = 0;
-    SDL_QueryTexture(settings_texture, NULL, NULL, &settingsW, &settingsH);
-    settings_rect.x = (640 - settingsW) / 2;
-    settings_rect.y = 300;
-    settings_rect.w = settingsW;
-    settings_rect.h = settingsH;
+    /* SETTINGS with outline (tighter letter spacing) */
+    {
+        const char* txt = "Settings";
+        SDL_Color outline_col = {0,0,0,255};
+        SDL_Color fg_col = {255,255,255,255};
+        int gap = 2;
+        int outline_px = 2;
+        SDL_Rect out_r = {0};
+        settings_texture = CreateOutlinedTextTexture(txt, font, fg_col, outline_col, outline_px, gap, &out_r);
+        settings_rect.w = out_r.w; settings_rect.h = out_r.h; settings_rect.x = (640 - out_r.w) / 2; settings_rect.y = 280;
+        settings_outline_texture = NULL;
+    }
 
     /*SKINS TEXT*/
-    skins_surface = TTF_RenderText_Solid(font, "Skins", (SDL_Color){255, 0, 0, 255});
-    skins_texture = SDL_CreateTextureFromSurface(renderer, skins_surface);
-    SDL_FreeSurface(skins_surface);
-
-    int skinsW = 0, skinsH = 0;
-    SDL_QueryTexture(skins_texture, NULL, NULL, &skinsW, &skinsH);
-    skins_rect.x = (640 - skinsW) / 2;
-    skins_rect.y = 350;
-    skins_rect.w = skinsW;
-    skins_rect.h = skinsH;
+    /* SKINS with outline (tighter letter spacing) */
+    {
+        const char* txt = "Skins";
+        SDL_Color outline_col = {0,0,0,255};
+        SDL_Color fg_col = {255,255,255,255};
+        int gap = 2;
+        int outline_px = 2;
+        SDL_Rect out_r = {0};
+        skins_texture = CreateOutlinedTextTexture(txt, font, fg_col, outline_col, outline_px, gap, &out_r);
+        skins_rect.w = out_r.w; skins_rect.h = out_r.h; skins_rect.x = (640 - out_r.w) / 2; skins_rect.y = 330;
+        skins_outline_texture = NULL;
+    }
 
     /*CHECK FOR UPDATES TEXT*/
-    Check_for_updates_surface = TTF_RenderText_Solid(font, "Check for updates", (SDL_Color){255, 0, 0, 255});
-    Check_for_updates_texture = SDL_CreateTextureFromSurface(renderer, Check_for_updates_surface);
-    SDL_FreeSurface(Check_for_updates_surface);
-
-    int Check_for_updatesW = 0, Check_for_updatesH = 0;
-    SDL_QueryTexture(Check_for_updates_texture, NULL, NULL, &Check_for_updatesW, &Check_for_updatesH);
-    Check_for_updates_rect.x = (640 - Check_for_updatesW) / 2;
-    Check_for_updates_rect.y = 250;
-    Check_for_updates_rect.w = Check_for_updatesW;
-    Check_for_updates_rect.h = Check_for_updatesH;
+    /* CHECK FOR UPDATES with outline (tighter letter spacing) */
+    {
+        const char* txt = "Check for updates";
+        SDL_Color outline_col = {0,0,0,255};
+        SDL_Color fg_col = {255,255,255,255};
+        int gap = 2;
+        int outline_px = 2;
+        SDL_Rect out_r = {0};
+        Check_for_updates_texture = CreateOutlinedTextTexture(txt, font, fg_col, outline_col, outline_px, gap, &out_r);
+        Check_for_updates_rect.w = out_r.w; Check_for_updates_rect.h = out_r.h; Check_for_updates_rect.x = (640 - out_r.w) / 2; Check_for_updates_rect.y = 230;
+        Check_for_updates_outline_texture = NULL;
+    }
 
     /*QUIT TEXT*/
-    quit_surface = TTF_RenderText_Solid(font, "Quit", (SDL_Color){255, 0, 0, 255});
-    quit_texture = SDL_CreateTextureFromSurface(renderer, quit_surface);
-
-    SDL_FreeSurface(quit_surface);
-
-    int quitW = 0, quitH = 0;
-    SDL_QueryTexture(quit_texture, NULL, NULL, &quitW, &quitH);
-    quit_rect.x = (640 - quitW) / 2;
-    quit_rect.y = 400;
-    quit_rect.w = quitW;
-    quit_rect.h = quitH;
+    /* QUIT with outline (tighter letter spacing) */
+    {
+        const char* txt = "Quit";
+        SDL_Color outline_col = {0,0,0,255};
+        SDL_Color fg_col = {255,255,255,255};
+        int gap = 2;
+        int outline_px = 2;
+        SDL_Rect out_r = {0};
+        quit_texture = CreateOutlinedTextTexture(txt, font, fg_col, outline_col, outline_px, gap, &out_r);
+        quit_rect.w = out_r.w; quit_rect.h = out_r.h; quit_rect.x = (640 - out_r.w) / 2; quit_rect.y = 380;
+        quit_outline_texture = NULL;
+    }
 
     char TEXT_VERSION[64];
     snprintf(TEXT_VERSION, sizeof(TEXT_VERSION), "Version %d.%d.%d Beta 4", GAME_VERSION_MAJOR, GAME_VERSION_MINOR, GAME_VERSION_PATCH);
 
     /*VERSION*/
-    version_surface = TTF_RenderText_Solid(font, TEXT_VERSION, (SDL_Color){255, 255, 255, 255});
-    version_texture = SDL_CreateTextureFromSurface(renderer, version_surface);
-
-    SDL_FreeSurface(version_surface);
-
-    int versionW = 0, versionH = 0;
-    SDL_QueryTexture(version_texture, NULL, NULL, &versionW, &versionH);
-    version_rect.x = 10;
-    version_rect.y = 10;
-    version_rect.w = versionW;
-    version_rect.h = versionH;
+    /* VERSION with outline (tighter letter spacing) */
+    {
+        SDL_Color outline_col = {0,0,0,255};
+        SDL_Color fg_col = {255,255,255,255};
+        int gap = 2;
+        int outline_px = 2;
+        SDL_Rect out_r = {0};
+        version_texture = CreateOutlinedTextTexture(TEXT_VERSION, font, fg_col, outline_col, outline_px, gap, &out_r);
+        version_rect.w = out_r.w; version_rect.h = out_r.h; version_rect.x = 10; version_rect.y = 10;
+        version_outline_rect.w = out_r.w; version_outline_rect.h = out_r.h; version_outline_rect.x = 10 - (out_r.w - out_r.w)/2; version_outline_rect.y = 10 - (out_r.h - out_r.h)/2;
+    }
 
     SDL_ShowCursor(SDL_ENABLE);
+
+    /* Try to load optional menu background image */
+    SDL_Surface* menu_bg_surface = IMG_Load("sprites/menu_bg.png");
+    if(menu_bg_surface) {
+        menu_bg_texture = SDL_CreateTextureFromSurface(renderer, menu_bg_surface);
+        SDL_FreeSurface(menu_bg_surface);
+    } else {
+        SDL_Log("Menu background image not found: sprites/menu_bg.png, using solid color background");
+    }
 
     return 0;
 }
@@ -833,6 +887,13 @@ void Cleanup_Menu_Textures() {
     if(settings_texture) { SDL_DestroyTexture(settings_texture); settings_texture = NULL; }
     if(skins_texture) { SDL_DestroyTexture(skins_texture); skins_texture = NULL; }
     if(Check_for_updates_texture) { SDL_DestroyTexture(Check_for_updates_texture); Check_for_updates_texture = NULL; }
+    if(menu_bg_texture) { SDL_DestroyTexture(menu_bg_texture); menu_bg_texture = NULL; }
+    if(start_outline_texture) { SDL_DestroyTexture(start_outline_texture); start_outline_texture = NULL; }
+    if(settings_outline_texture) { SDL_DestroyTexture(settings_outline_texture); settings_outline_texture = NULL; }
+    if(skins_outline_texture) { SDL_DestroyTexture(skins_outline_texture); skins_outline_texture = NULL; }
+    if(Check_for_updates_outline_texture) { SDL_DestroyTexture(Check_for_updates_outline_texture); Check_for_updates_outline_texture = NULL; }
+    if(quit_outline_texture) { SDL_DestroyTexture(quit_outline_texture); quit_outline_texture = NULL; }
+    if(version_outline_texture) { SDL_DestroyTexture(version_outline_texture); version_outline_texture = NULL; }
 }
 
 int Update_State_Menu()
@@ -910,6 +971,31 @@ int Update_State_Menu()
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
 
+        if(menu_bg_texture) {
+            int texW = 0, texH = 0;
+            SDL_QueryTexture(menu_bg_texture, NULL, NULL, &texW, &texH);
+            if(texW > 0 && texH > 0) {
+                const float winW = 640.0f;
+                const float winH = 480.0f;
+                float scale = fminf(winW / (float)texW, winH / (float)texH);
+                int dstW = (int)(texW * scale);
+                int dstH = (int)(texH * scale);
+                SDL_Rect dst = { (int)((winW - dstW) / 2.0f), (int)((winH - dstH) / 2.0f), dstW, dstH };
+                SDL_RenderCopy(renderer, menu_bg_texture, NULL, &dst);
+            }
+        } else {
+            /* Fallback gradient similar to the attached background image */
+            DrawVerticalGradient(renderer, (SDL_Color){167,240,226,255}, (SDL_Color){83,190,164,255});
+        }
+
+        /* Render outlines first (if any), then main text so outlines appear as borders */
+        if(start_outline_texture) SDL_RenderCopy(renderer, start_outline_texture, NULL, &start_outline_rect);
+        if(settings_outline_texture) SDL_RenderCopy(renderer, settings_outline_texture, NULL, &settings_outline_rect);
+        if(skins_outline_texture) SDL_RenderCopy(renderer, skins_outline_texture, NULL, &skins_outline_rect);
+        if(Check_for_updates_outline_texture) SDL_RenderCopy(renderer, Check_for_updates_outline_texture, NULL, &Check_for_updates_outline_rect);
+        if(quit_outline_texture) SDL_RenderCopy(renderer, quit_outline_texture, NULL, &quit_outline_rect);
+        if(version_outline_texture) SDL_RenderCopy(renderer, version_outline_texture, NULL, &version_outline_rect);
+
         SDL_RenderCopy(renderer, start_texture, NULL, &start_rect); //START TEXT
         SDL_RenderCopy(renderer, quit_texture, NULL, &quit_rect); //QUIT TEXT
         SDL_RenderCopy(renderer, Check_for_updates_texture, NULL, &Check_for_updates_rect); //CHECK FOR UPDATES TEXT
@@ -921,4 +1007,128 @@ int Update_State_Menu()
     }
 
     return 0;
+}
+
+/* Create a texture by rendering each glyph individually allowing custom letter spacing.
+ * gap_adjust: pixels to subtract between glyphs (use positive to tighten spacing)
+ */
+static SDL_Texture* CreateTextTextureWithGlyphs(const char* text, TTF_Font* font, SDL_Color color, int gap_adjust, SDL_Rect* out_rect)
+{
+    int len = (int)strlen(text);
+    if(len == 0) return NULL;
+
+    SDL_Surface** glyphs = (SDL_Surface**)malloc(sizeof(SDL_Surface*) * len);
+    if(!glyphs) return NULL;
+
+    int totalW = 0;
+    int maxH = 0;
+    for(int i = 0; i < len; ++i) {
+        Uint16 ch = (unsigned char)text[i];
+        glyphs[i] = TTF_RenderGlyph_Blended(font, ch, color);
+        if(!glyphs[i]) {
+            // cleanup
+            for(int j = 0; j < i; ++j) SDL_FreeSurface(glyphs[j]);
+            free(glyphs);
+            return NULL;
+        }
+        totalW += glyphs[i]->w;
+        if(i > 0) totalW -= gap_adjust;
+        if(glyphs[i]->h > maxH) maxH = glyphs[i]->h;
+    }
+
+    SDL_Surface* master = SDL_CreateRGBSurfaceWithFormat(0, totalW, maxH, 32, SDL_PIXELFORMAT_RGBA32);
+    if(!master) {
+        for(int i = 0; i < len; ++i) SDL_FreeSurface(glyphs[i]);
+        free(glyphs);
+        return NULL;
+    }
+    SDL_SetSurfaceBlendMode(master, SDL_BLENDMODE_BLEND);
+    SDL_FillRect(master, NULL, SDL_MapRGBA(master->format, 0, 0, 0, 0));
+
+    int x = 0;
+    for(int i = 0; i < len; ++i) {
+        SDL_Rect dst = { x, (maxH - glyphs[i]->h) / 2, glyphs[i]->w, glyphs[i]->h };
+        SDL_BlitSurface(glyphs[i], NULL, master, &dst);
+        x += glyphs[i]->w - gap_adjust;
+        SDL_FreeSurface(glyphs[i]);
+    }
+
+    free(glyphs);
+
+    SDL_Texture* tex = SDL_CreateTextureFromSurface(renderer, master);
+    if(out_rect) {
+        out_rect->x = 0; out_rect->y = 0; out_rect->w = master->w; out_rect->h = master->h;
+    }
+    SDL_FreeSurface(master);
+    return tex;
+}
+
+static SDL_Texture* CreateOutlinedTextTexture(const char* text, TTF_Font* font, SDL_Color fg_color, SDL_Color outline_color, int outline_px, int gap_adjust, SDL_Rect* out_rect)
+{
+    int len = (int)strlen(text);
+    if(len == 0) return NULL;
+
+    SDL_Surface** outline_glyphs = (SDL_Surface**)malloc(sizeof(SDL_Surface*) * len);
+    SDL_Surface** main_glyphs = (SDL_Surface**)malloc(sizeof(SDL_Surface*) * len);
+    if(!outline_glyphs || !main_glyphs) { free(outline_glyphs); free(main_glyphs); return NULL; }
+
+    int totalW = 0;
+    int maxH = 0;
+    for(int i = 0; i < len; ++i) {
+        Uint16 ch = (unsigned char)text[i];
+        outline_glyphs[i] = TTF_RenderGlyph_Blended(font, ch, outline_color);
+        main_glyphs[i] = TTF_RenderGlyph_Blended(font, ch, fg_color);
+        if(!main_glyphs[i] || !outline_glyphs[i]) {
+            for(int j = 0; j <= i; ++j) { if(outline_glyphs[j]) SDL_FreeSurface(outline_glyphs[j]); if(main_glyphs[j]) SDL_FreeSurface(main_glyphs[j]); }
+            free(outline_glyphs); free(main_glyphs);
+            return NULL;
+        }
+        totalW += main_glyphs[i]->w;
+        if(i > 0) totalW -= gap_adjust;
+        if(main_glyphs[i]->h > maxH) maxH = main_glyphs[i]->h;
+    }
+
+    int outW = totalW + 2*outline_px;
+    int outH = maxH + 2*outline_px;
+
+    SDL_Surface* master = SDL_CreateRGBSurfaceWithFormat(0, outW, outH, 32, SDL_PIXELFORMAT_RGBA32);
+    if(!master) {
+        for(int i = 0; i < len; ++i) { SDL_FreeSurface(outline_glyphs[i]); SDL_FreeSurface(main_glyphs[i]); }
+        free(outline_glyphs); free(main_glyphs);
+        return NULL;
+    }
+    SDL_SetSurfaceBlendMode(master, SDL_BLENDMODE_BLEND);
+    SDL_FillRect(master, NULL, SDL_MapRGBA(master->format, 0, 0, 0, 0));
+
+    // Blit outline glyphs with offsets to create border
+    int x = 0;
+    for(int i = 0; i < len; ++i) {
+        int glyphW = outline_glyphs[i]->w;
+        int glyphH = outline_glyphs[i]->h;
+        for(int oy = -outline_px; oy <= outline_px; ++oy) {
+            for(int ox = -outline_px; ox <= outline_px; ++ox) {
+                SDL_Rect dst = { x + outline_px + ox, outline_px + (maxH - glyphH) / 2 + oy, glyphW, glyphH };
+                SDL_BlitSurface(outline_glyphs[i], NULL, master, &dst);
+            }
+        }
+        x += glyphW - gap_adjust;
+    }
+
+    // Blit main glyphs centered over outline
+    x = 0;
+    for(int i = 0; i < len; ++i) {
+        int glyphW = main_glyphs[i]->w;
+        int glyphH = main_glyphs[i]->h;
+        SDL_Rect dst = { x + outline_px, outline_px + (maxH - glyphH) / 2, glyphW, glyphH };
+        SDL_BlitSurface(main_glyphs[i], NULL, master, &dst);
+        x += glyphW - gap_adjust;
+    }
+
+    for(int i = 0; i < len; ++i) { SDL_FreeSurface(outline_glyphs[i]); SDL_FreeSurface(main_glyphs[i]); }
+    free(outline_glyphs); free(main_glyphs);
+
+    SDL_Texture* tex = SDL_CreateTextureFromSurface(renderer, master);
+    if(out_rect) { out_rect->x = 0; out_rect->y = 0; out_rect->w = master->w; out_rect->h = master->h; }
+    SDL_FreeSurface(master);
+    return tex;
 }

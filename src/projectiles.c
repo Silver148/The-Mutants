@@ -28,11 +28,39 @@ extern int Ammunition;
 int counter_kills = 0;
 int spawned_bullets = 0;
 
+/* Ammo pack system */
+#define MAX_AMMO_PACKS 8
+#define AMMO_PACK_W 24
+#define AMMO_PACK_H 16
+#define AMMO_PER_PACK 10
+
+typedef struct {
+    int active;
+    float x, y;
+    int w, h;
+} AmmoPack;
+
+static AmmoPack ammo_packs[MAX_AMMO_PACKS];
+static SDL_Texture* ammo_texture = NULL;
+static int last_ammo_spawn_kill = 0;
+
 static Projectile projectiles[MAX_PROJECTILES];
 
 void InitProjectiles()
 {
     memset(projectiles, 0, sizeof(projectiles));
+    memset(ammo_packs, 0, sizeof(ammo_packs));
+
+    /* load ammo sprite (optional) */
+    SDL_Surface* ammo_surf = IMG_Load("sprites/balas de revolver.png");
+    if (ammo_surf) {
+        ammo_texture = SDL_CreateTextureFromSurface(renderer, ammo_surf);
+        SDL_FreeSurface(ammo_surf);
+    } else {
+        SDL_Log("InitProjectiles: ammo sprite not found: %s", IMG_GetError());
+        ammo_texture = NULL;
+    }
+    /* ammo_packs initialized; pickups are handled in UpdateProjectiles() */
 }
 
 void SpawnProjectile(float x, float y, float vx, float vy, int damage)
@@ -65,6 +93,7 @@ void SpawnProjectile(float x, float y, float vx, float vy, int damage)
             return;
         }
     }
+    
 }
 
 void UpdateProjectiles()
@@ -153,6 +182,24 @@ void UpdateProjectiles()
                       SDL_Log("counter_kills incremented -> %d", counter_kills);
                       #endif
                       UpdateKillsTexture(counter_kills);
+                      /* spawn ammo pack every 9 kills (once per multiple) */
+                      if (counter_kills > 0 && (counter_kills % 9) == 0 && counter_kills != last_ammo_spawn_kill) {
+                          /* spawn at player's initial spawn position (where player appears at game start) */
+                          extern float player_spawn_x; /* from include/global_vars.h */
+                          extern float player_spawn_y;
+                          for (int a = 0; a < MAX_AMMO_PACKS; ++a) {
+                              if (!ammo_packs[a].active) {
+                                  ammo_packs[a].active = 1;
+                                  ammo_packs[a].x = player_spawn_x;
+                                  ammo_packs[a].y = player_spawn_y;
+                                  ammo_packs[a].w = AMMO_PACK_W;
+                                  ammo_packs[a].h = AMMO_PACK_H;
+                                  last_ammo_spawn_kill = counter_kills;
+                                  SDL_Log("SpawnAmmoPack at player start: slot=%d world=(%.1f,%.1f) counter_kills=%d", a, ammo_packs[a].x, ammo_packs[a].y, counter_kills);
+                                  break;
+                              }
+                          }
+                      }
                     
                       #ifdef DEBUG
                       SDL_Log("Zombie %d eliminado! Zombies restantes: %d\n", 
@@ -165,6 +212,20 @@ void UpdateProjectiles()
                 
                 break;
             }
+        }
+    }
+    /* Update ammo packs: check player pickups */
+    for (int a = 0; a < MAX_AMMO_PACKS; ++a) {
+        if (!ammo_packs[a].active) continue;
+        Hitbox ph = GetPlayerHitbox();
+        SDL_Rect packRect = { (int)ammo_packs[a].x, (int)ammo_packs[a].y, ammo_packs[a].w, ammo_packs[a].h };
+        if (packRect.x < (int)(ph.x + ph.w) && packRect.x + packRect.w > (int)ph.x &&
+            packRect.y < (int)(ph.y + ph.h) && packRect.y + packRect.h > (int)ph.y) {
+            /* collected */
+            Ammunition += AMMO_PER_PACK;
+            ammo_packs[a].active = 0;
+            SDL_Log("Ammo pack collected: +%d. Total Ammunition=%d", AMMO_PER_PACK, Ammunition);
+            UpdateAmmunitions();
         }
     }
 }
@@ -191,10 +252,31 @@ void RenderProjectiles()
           SDL_SetRenderDrawBlendMode(renderer, oldMode);
         #endif
     }
+    /* Render ammo packs */
+    for (int a = 0; a < MAX_AMMO_PACKS; ++a) {
+        if (!ammo_packs[a].active) continue;
+        extern SDL_Rect backgroundSrcRect; /* declared in state_game.c */
+        SDL_Rect dst = { (int)ammo_packs[a].x - backgroundSrcRect.x, (int)ammo_packs[a].y - backgroundSrcRect.y, ammo_packs[a].w, ammo_packs[a].h };
+        SDL_Log("RenderAmmoPack: slot=%d world=(%.1f,%.1f) screen=(%d,%d) tex=%p", a, ammo_packs[a].x, ammo_packs[a].y, dst.x, dst.y, (void*)ammo_texture);
+        if (ammo_texture) {
+            SDL_RenderCopy(renderer, ammo_texture, NULL, &dst);
+        } else {
+            /* fallback: draw small magenta box */
+            SDL_SetRenderDrawColor(renderer, 255, 0, 255, 255);
+            SDL_RenderFillRect(renderer, &dst);
+            SDL_SetRenderDrawColor(renderer, 255, 220, 0, 255);
+        }
+    }
 }
 
 void CleanupProjectileSystem()
 {
     memset(projectiles, 0, sizeof(projectiles));
     Ammunition = 100;
+    /* cleanup ammo packs and texture */
+    for (int a = 0; a < MAX_AMMO_PACKS; ++a) ammo_packs[a].active = 0;
+    if (ammo_texture) {
+        SDL_DestroyTexture(ammo_texture);
+        ammo_texture = NULL;
+    }
 }

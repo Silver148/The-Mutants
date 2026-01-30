@@ -12,4 +12,8 @@ extern SDL_Renderer* renderer;
 extern int worldBarrierX; /* world-space X coordinate of right-side barrier */
 extern int worldBarrierLeftX; /* world-space X coordinate of left-side barrier */
 
+/* Player spawn coordinates (world space) set at game init) */
+extern float player_spawn_x;
+extern float player_spawn_y;
+
 #endif // GLOBAL_VARS_H
