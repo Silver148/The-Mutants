@@ -99,6 +99,9 @@ extern int Ammunition;
 Ammunitions ammunitions[128];
 SDL_Texture* bullets_tex = NULL;
 
+extern int counter_kills;
+static int last_ammo_spawn_kill = 0;
+
 /* Update or recreate the kills text texture from the current kills count */
 void UpdateKillsTexture(int kills)
 {
@@ -522,21 +525,17 @@ void RenderBarHealth()
     SDL_RenderDrawRect(renderer, &frameRect);
 }
 
-Uint32 ammo_spawn_timer = 0;
-Uint32 next_ammo_spawn_time = 30000;
-
 void SpawnAmmunition() {
 
-    Uint32 currentTime = SDL_GetTicks();
-
     int slot = -1;
-    if (currentTime > ammo_spawn_timer) {
+    if (counter_kills > 0 && (counter_kills % 9) == 0 && counter_kills != last_ammo_spawn_kill) {
         for (int i = 0; i < 128; i++) {
             if (ammunitions[i].dest_bullet.x == -1) {
                 slot = i;
                 break;
             }
         }
+        last_ammo_spawn_kill = counter_kills;
     }
 
     if (slot == -1) return;
@@ -553,15 +552,13 @@ void SpawnAmmunition() {
     ammunitions[slot].dest_bullet.x = spawn_x;
     ammunitions[slot].dest_bullet.y = spawn_y;
 
-    ammo_spawn_timer = currentTime + (5000 + rand() % 5000);
-
     SDL_Log("Munición spawneada en el slot %d, pos: (%d, %d)", slot, spawn_x, spawn_y);
 }
 
 void UpdateAmmoCollection() {
     Hitbox player_hitbox = GetPlayerHitbox();
     SDL_Rect pRect = { (int)player_hitbox.x, (int)player_hitbox.y, player_hitbox.w, player_hitbox.h };
-
+    
     for (int i = 0; i < 128; i++) {
         if (ammunitions[i].dest_bullet.x != -1) {
             

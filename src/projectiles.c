@@ -28,6 +28,7 @@ extern int Ammunition;
 int counter_kills = 0;
 int spawned_bullets = 0;
 
+#if 0
 /* Ammo pack system */
 #define MAX_AMMO_PACKS 8
 #define AMMO_PACK_W 24
@@ -42,7 +43,7 @@ typedef struct {
 
 static AmmoPack ammo_packs[MAX_AMMO_PACKS];
 static SDL_Texture* ammo_texture = NULL;
-static int last_ammo_spawn_kill = 0;
+#endif
 
 static Projectile projectiles[MAX_PROJECTILES];
 
@@ -50,7 +51,7 @@ void InitProjectiles()
 {
     memset(projectiles, 0, sizeof(projectiles));
     memset(ammo_packs, 0, sizeof(ammo_packs));
-
+    #if 0
     /* load ammo sprite (optional) */
     SDL_Surface* ammo_surf = IMG_Load("sprites/balas de revolver.png");
     if (ammo_surf) {
@@ -61,6 +62,7 @@ void InitProjectiles()
         ammo_texture = NULL;
     }
     /* ammo_packs initialized; pickups are handled in UpdateProjectiles() */
+    #endif
 }
 
 void SpawnProjectile(float x, float y, float vx, float vy, int damage)
@@ -180,6 +182,7 @@ void UpdateProjectiles()
                       #endif
                       UpdateKillsTexture(counter_kills);
                       /* spawn ammo pack every 9 kills (once per multiple) */
+                      #if 0
                       if (counter_kills > 0 && (counter_kills % 9) == 0 && counter_kills != last_ammo_spawn_kill) {
                           /* spawn at player's initial spawn position (where player appears at game start) */
                           extern float player_spawn_x; /* from include/global_vars.h */
@@ -197,6 +200,7 @@ void UpdateProjectiles()
                               }
                           }
                       }
+                    #endif
                     
                       #ifdef DEBUG
                       SDL_Log("Zombie %d eliminado! Zombies restantes: %d\n", 
@@ -211,6 +215,7 @@ void UpdateProjectiles()
             }
         }
     }
+    #if 0
     /* Update ammo packs: check player pickups */
     for (int a = 0; a < MAX_AMMO_PACKS; ++a) {
         if (!ammo_packs[a].active) continue;
@@ -225,6 +230,7 @@ void UpdateProjectiles()
             UpdateAmmunitions();
         }
     }
+    #endif
 }
 void RenderProjectiles()
 {
@@ -249,6 +255,7 @@ void RenderProjectiles()
           SDL_SetRenderDrawBlendMode(renderer, oldMode);
         #endif
     }
+    #if 0
     /* Render ammo packs */
     for (int a = 0; a < MAX_AMMO_PACKS; ++a) {
         if (!ammo_packs[a].active) continue;
@@ -264,6 +271,7 @@ void RenderProjectiles()
             SDL_SetRenderDrawColor(renderer, 255, 220, 0, 255);
         }
     }
+    #endif
 }
 
 void CleanupProjectileSystem()
