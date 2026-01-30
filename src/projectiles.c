@@ -50,7 +50,7 @@ static Projectile projectiles[MAX_PROJECTILES];
 void InitProjectiles()
 {
     memset(projectiles, 0, sizeof(projectiles));
-    memset(ammo_packs, 0, sizeof(ammo_packs));
+    //memset(ammo_packs, 0, sizeof(ammo_packs));
     #if 0
     /* load ammo sprite (optional) */
     SDL_Surface* ammo_surf = IMG_Load("sprites/balas de revolver.png");
@@ -278,4 +278,12 @@ void CleanupProjectileSystem()
 {
     memset(projectiles, 0, sizeof(projectiles));
     Ammunition = 100;
+    #if 0
+    /* cleanup ammo packs and texture */
+    for (int a = 0; a < MAX_AMMO_PACKS; ++a) ammo_packs[a].active = 0;
+    if (ammo_texture) {
+        SDL_DestroyTexture(ammo_texture);
+        ammo_texture = NULL;
+    }
+    #endif
 }
