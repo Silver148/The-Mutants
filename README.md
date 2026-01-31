@@ -6,7 +6,7 @@ Este juego está hecho en C con la librería SDL2.
 
 # Como compilar el juego
 
-Para compilar el juego necesitas tener w64devkit en tu PC si usas Windows(O WSL en Windows modernos, pero se requieren las siguientes librerías: SDL2, SDL2-Mixer y SDL2-Image, y tambíen se requiere el compilador de C(en WSL está gcc) y también la herramienta Make). En el caso que uses Linux requieres las librería SDL2, SDL2-Mixer y SDL2-Image, y también tener el compilador de C para Linux(gcc) y la herramienta Make.
+Para compilar el juego necesitas tener w64devkit en tu PC si usas Windows(O WSL en Windows 10-11, pero se requieren las siguientes librerías: SDL2, SDL2-Mixer y SDL2-Image, y el compilador de C(para WSL es gcc) y también la herramienta Make). En el caso que uses Linux requieres las librería SDL2, SDL2-Mixer y SDL2-Image, y también tener el compilador de C para Linux(gcc) y la herramienta Make.
 
 ## Modo DEBUG
 
@@ -24,7 +24,7 @@ make debug-windows-x64
 | **Memoria RAM** | 1 GB de RAM | 2 GB de RAM o más |
 | **Gráficos** | Intel GMA 3100 | Gráficos dedicados o gráficos integrados Intel HD Graphics/AMD Radeon  |
 | **Almacenamiento** | 125 MB de espacio disponible | 150 MB de espacio disponible |
-| **Notas Adicionales** | Requiere soporte de instrucciones **SSE2** | Se recomienda la versión x64 para mejor gestión de memoria |
+| **Notas Adicionales** | Requiere soporte de instrucciones **SSE2** 
 
 ## Cosas que se quieren agregar :D
 
@@ -38,7 +38,7 @@ make debug-windows-x64
 
 * Escena de créditos
 
-* Sistema de manejo de armas para el jugador
+* Sistema de manejo de armas para el jugador (En proceso 🚧)
 
 * Sistema de vida en el jugador ✅
 
@@ -59,7 +59,7 @@ El acceso y distribución del juego por los momentos están estrictamente contro
 
 # ❌ PROHIBIDO ACTUALMENTE  
 - Distribuir ejecutables a personas externas al equipo
-- Compartir el juego con amigos, familiares u otros estudiantes
+- Compartir el juego con amigos, familiares u otros estudiantes(sin autorización previa)
 - Publicar en internet, redes sociales o cualquier plataformas
 
 # Este juego se liberará al público cuando se presente en la feria tecnológica
