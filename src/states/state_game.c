@@ -563,11 +563,12 @@ void UpdateAmmoCollection() {
         if (ammunitions[i].dest_bullet.x != -1) {
             
             if (SDL_HasIntersection(&pRect, &ammunitions[i].dest_bullet)) {
-                Ammunition += 20;
+                /* Grant configured amount per ammo box */
+                Ammunition += AMMO_BOX_AMOUNT;
                 ammunitions[i].dest_bullet.x = -1;
 
                 UpdateAmmunitions(); 
-                SDL_Log("Municion recogida! Total: %d", Ammunition);
+                SDL_Log("Municion recogida! +%d Total: %d", AMMO_BOX_AMOUNT, Ammunition);
             }
         }
     }

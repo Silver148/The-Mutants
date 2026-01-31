@@ -10,4 +10,7 @@ typedef struct {
 
 bool CheckMunitions();
 
+/* Number of bullets granted by each ammunition box pickup */
+#define AMMO_BOX_AMOUNT 60
+
 #endif
