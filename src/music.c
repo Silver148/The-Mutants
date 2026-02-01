@@ -55,7 +55,7 @@ int PlayMusicStateGame()
 
 int PlayMusicStateMenu()
 {
-    Mix_Music* bgm = Mix_LoadMUS("music/Drill_random_TEST.mp3");
+    Mix_Music* bgm = Mix_LoadMUS("music/The Mutants Menu Music.mp3");
     if(bgm == NULL)
     {
         printf("Failed to load menu music! SDL_mixer Error: %s\n", Mix_GetError());
