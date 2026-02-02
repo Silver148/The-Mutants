@@ -5,6 +5,7 @@ typedef struct{
     int volume_music_in_game;
     int volume_music_in_menu;
     bool fullscreen;
+    bool fx;
 } Settings;
 
 int LoadSettingsDefault(Settings* settings);

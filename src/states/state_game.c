@@ -331,8 +331,8 @@ int Init_State_Game()
     InitZombieSys();
     InitProjectiles();
 
-    font_paused = TTF_OpenFont("fonts/SYSTEMIA.ttf", 48);
-    press_esc = TTF_OpenFont("fonts/SYSTEMIA.ttf", 24);
+    font_paused = TTF_OpenFont("fonts/Half Awake.ttf", 48);
+    press_esc = TTF_OpenFont("fonts/Half Awake.ttf", 24);
 
     if(!font_paused){
         SDL_Log("font_paused failed to load: %s", TTF_GetError());

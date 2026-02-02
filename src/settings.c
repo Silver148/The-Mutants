@@ -53,6 +53,7 @@ int SaveSettings(Settings* settings){
 
     fprintf(file, "volume_music_in_game=%d\n", settings->volume_music_in_game);
     fprintf(file, "volume_music_in_menu=%d\n", settings->volume_music_in_menu);
+    fprintf(file, "fx=%d\n",settings->fx);
     fprintf(file, "fullscreen=%d\n",settings->fullscreen);
 
     fclose(file);
@@ -83,7 +84,9 @@ int LoadSettingsFromFile(Settings* settings) {
                 settings->volume_music_in_menu = atoi(value);
             }else if(strcmp(key, "fullscreen") == 0){
                 settings->fullscreen = atoi(value);
-            } else {
+            }else if(strcmp(key, "fx") == 0){
+                settings->fx = atoi(value);
+            }else {
                 SDL_Log("Unknown setting: %s\n", key);
                 break;
             }

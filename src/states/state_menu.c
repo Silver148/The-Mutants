@@ -22,6 +22,7 @@ State Menu :D
 #include "music.h"
 #include "update_system.h"
 #include "show_notifications.h"
+#include "fx.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <SDL2/SDL.h>
@@ -106,6 +107,10 @@ SDL_Rect Check_for_updates_rect;
 SDL_Texture* tex_fullscreen_on = NULL;
 SDL_Texture* tex_fullscreen_off = NULL;
 SDL_Rect fullscreen_rect;
+
+SDL_Texture* tex_fx_on = NULL;
+SDL_Texture* tex_fx_off = NULL;
+SDL_Rect fx_rect;
 
 extern Settings game_settings;
 extern STATES game_state;
@@ -286,7 +291,7 @@ int State_Config(){
     int save_settingsW = 0, save_settingsH = 0;
     SDL_QueryTexture(save_settings_texture, NULL, NULL, &save_settingsW, &save_settingsH);
     save_settings_rect.x = (640 - save_settingsW) / 2;
-    save_settings_rect.y = minus_rect.y + minus_rect.h + 60;
+    save_settings_rect.y = minus_rect.y + minus_rect.h + 80;
     save_settings_rect.w = save_settingsW;
     save_settings_rect.h = save_settingsH;
 
@@ -357,6 +362,22 @@ int State_Config(){
     fullscreen_rect.y = save_settings_rect.y - 40;
     fullscreen_rect.w = fullscreenW;
     fullscreen_rect.h = fullscreenH;
+
+    /*FX TEXT*/
+    SDL_Surface* s_fx_off = TTF_RenderText_Solid(font, "FX: Disabled", (SDL_Color){255, 255, 255, 255});
+    tex_fx_off = SDL_CreateTextureFromSurface(renderer, s_fx_off);
+    SDL_FreeSurface(s_fx_off);
+
+    SDL_Surface* s_fx_on = TTF_RenderText_Solid(font, "FX: Enabled", (SDL_Color){255, 255, 255, 255});
+    tex_fx_on = SDL_CreateTextureFromSurface(renderer, s_fx_on);
+    SDL_FreeSurface(s_fx_on);
+
+    int fxW = 0, fxH = 0;
+    SDL_QueryTexture(tex_fx_off, NULL, NULL, &fxW, &fxH);
+    fx_rect.x = (640 - fxW) / 2;
+    fx_rect.y = fullscreen_rect.y - fullscreen_rect.h - 5;
+    fx_rect.w = fxW;
+    fx_rect.h = fxH;
 
     while(1)
     {
@@ -496,6 +517,16 @@ int State_Config(){
                         
                 }
 
+                if(mx >= fx_rect.x && mx <= fx_rect.x + fx_rect.w &&
+                   my >= fx_rect.y && my <= fx_rect.y + fx_rect.h)
+                {
+                    if(game_settings.fx){
+                        game_settings.fx = false;
+                    }else {
+                        game_settings.fx = true;
+                    }    
+                }
+
                 if(mx >= save_settings_rect.x && mx <= save_settings_rect.x + save_settings_rect.w &&
                    my >= save_settings_rect.y && my <= save_settings_rect.y + save_settings_rect.h)
                 {
@@ -524,6 +555,12 @@ int State_Config(){
             SDL_RenderCopy(renderer, tex_fullscreen_on, NULL, &fullscreen_rect);
         }else {
             SDL_RenderCopy(renderer, tex_fullscreen_off, NULL, &fullscreen_rect);
+        }
+
+        if(game_settings.fx){
+            SDL_RenderCopy(renderer, tex_fx_on, NULL, &fx_rect);
+        }else {
+            SDL_RenderCopy(renderer, tex_fx_off, NULL, &fx_rect);
         }
 
         SDL_RenderCopy(renderer, plus_game_texture, NULL, &plus_game_rect); /*+ VOLUMEN GAME*/
@@ -1009,6 +1046,11 @@ int Update_State_Menu()
         if(Check_for_updates_outline_texture) SDL_RenderCopy(renderer, Check_for_updates_outline_texture, NULL, &Check_for_updates_outline_rect);
         if(quit_outline_texture) SDL_RenderCopy(renderer, quit_outline_texture, NULL, &quit_outline_rect);
         if(version_outline_texture) SDL_RenderCopy(renderer, version_outline_texture, NULL, &version_outline_rect);
+
+        if(game_settings.fx){
+            RenderFXInterference(renderer);
+            RenderFXNoise(renderer);
+        }
 
         SDL_RenderCopy(renderer, start_texture, NULL, &start_rect); //START TEXT
         SDL_RenderCopy(renderer, quit_texture, NULL, &quit_rect); //QUIT TEXT
