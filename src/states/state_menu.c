@@ -193,7 +193,7 @@ int Init_State_Menu()
     }
 
     char TEXT_VERSION[64];
-    snprintf(TEXT_VERSION, sizeof(TEXT_VERSION), "Version %d.%d.%d Beta 5", GAME_VERSION_MAJOR, GAME_VERSION_MINOR, GAME_VERSION_PATCH);
+    snprintf(TEXT_VERSION, sizeof(TEXT_VERSION), "Version %d.%d.%d Beta 6", GAME_VERSION_MAJOR, GAME_VERSION_MINOR, GAME_VERSION_PATCH);
 
     /*VERSION*/
     /* VERSION with outline (tighter letter spacing) */
