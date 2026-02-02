@@ -29,7 +29,7 @@ void EnsurePath() {
             char folderPath[MAX_PATH];
             snprintf(folderPath, sizeof(folderPath), "%s\\The Mutants", DocumentsPATH);
             _mkdir(folderPath);
-            snprintf(settingsPATH, sizeof(settingsPATH), "%s\\settings.cfg", folderPath);
+            snprintf(settingsPATH, sizeof(settingsPATH), "%s\\settings.data", folderPath);
         }
     }
 }
@@ -48,13 +48,10 @@ int SaveSettings(Settings* settings){
 
     EnsurePath();
 
-    FILE* file = fopen(settingsPATH, "w");
+    FILE* file = fopen(settingsPATH, "wb");
     if(!file) return -1;
 
-    fprintf(file, "volume_music_in_game=%d\n", settings->volume_music_in_game);
-    fprintf(file, "volume_music_in_menu=%d\n", settings->volume_music_in_menu);
-    fprintf(file, "fx=%d\n",settings->fx);
-    fprintf(file, "fullscreen=%d\n",settings->fullscreen);
+    fwrite(settings, sizeof(Settings), 1, file);
 
     fclose(file);
 
@@ -67,32 +64,13 @@ int LoadSettingsFromFile(Settings* settings) {
 
     FILE* file = fopen(settingsPATH, "r");
     if(!file) {
-        SDL_Log("Creating settings.cfg with default configurations\n");
+        SDL_Log("Creating settings.data with default configurations\n");
         LoadSettingsDefault(settings);
         SaveSettings(settings);
         return 0;
     }
-    
-    char line[128];
-    while(fgets(line, sizeof(line), file)) {
-        char key[64], value[64];
 
-        if(sscanf(line, "%63[^=]=%63[^\n]", key, value) == 2) {
-            if(strcmp(key, "volume_music_in_game") == 0) {
-                settings->volume_music_in_game = atoi(value);
-            } else if(strcmp(key, "volume_music_in_menu") == 0) {
-                settings->volume_music_in_menu = atoi(value);
-            }else if(strcmp(key, "fullscreen") == 0){
-                settings->fullscreen = atoi(value);
-            }else if(strcmp(key, "fx") == 0){
-                settings->fx = atoi(value);
-            }else {
-                SDL_Log("Unknown setting: %s\n", key);
-                break;
-            }
-        }
-
-    }
+    fread(settings, sizeof(Settings), 1, file);
 
     fclose(file);
 
