@@ -59,7 +59,7 @@ El acceso y distribución del juego por los momentos están estrictamente contro
 
 # ❌ PROHIBIDO ACTUALMENTE  
 - Distribuir ejecutables a personas externas al equipo
-- Compartir el juego con amigos, familiares u otros estudiantes(sin autorización previa)
+- Compartir el código del juego con amigos, familiares u otros estudiantes
 - Publicar en internet, redes sociales o cualquier plataformas
 
 # Este juego se liberará al público cuando se presente en la feria tecnológica
