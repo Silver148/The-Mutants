@@ -57,9 +57,9 @@ Hasta ahora el juego es de código cerrado para evitar que se roben nuestro cód
 - Testing interno y preparación para la feria
 
 # ❌ PROHIBIDO ACTUALMENTE  
-- Distribuir ejecutables a personas externas al equipo
+- Distribuir ejecutables a personas externas al equipo(sin autorización)
 - Compartir el código del juego con amigos, familiares u otros estudiantes
-- Publicar en internet, redes sociales o cualquier plataformas
+- Publicar en internet, redes sociales o cualquier plataformas antes de su presentación
 
 # Este juego se liberará al público cuando se presente en la feria tecnológica
 
