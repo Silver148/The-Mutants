@@ -44,10 +44,9 @@ make debug-windows-x64
 
 # POLÍTICAS DE CONFIDENCIALIDAD ⚠️
 
-Hasta ahora el juego es de código cerrado para evitar que se roben nuestra idea y nuestro código, así que queda terminántemente prohibido compartir el código del juego antes de que se presente el juego :), así que, el que filtre el código del juego, queda expulsado de este proyecto para siempre sin ninguna oportunidad de volver.
+Hasta ahora el juego es de código cerrado para evitar que se roben nuestro código, así que queda terminántemente prohibido compartir el código del juego antes de que se presente el juego :), así que, el que filtre el código del juego, queda expulsado de este proyecto para siempre sin ninguna oportunidad de volver.
 
-**Este es un proyecto desarrollado exclusivamente para la Feria Tecnológica del ETR Fermín Toro.
-El acceso y distribución del juego por los momentos están estrictamente controlados.**
+**Este es un proyecto desarrollado exclusivamente para la Feria Tecnológica del ETR Fermín Toro.**
 
 ## 🔐 POLÍTICAS ESTRICTAS DE DISTRIBUCIÓN
 
@@ -73,4 +72,4 @@ El acceso y distribución del juego por los momentos están estrictamente contro
 
 Desarrolladores: Juan Yaguaro(aka silverhacker) and Abel Ferrer(aka The_Light)
 
-PROYECTO EDUCATIVO CONFIDENCIAL ![CONFIDENTIAL LOGO](https://i.ibb.co/rK7JWn73/pngwing-com.png)
+PROYECTO EDUCATIVO CONFIDENCIAL(POR LOS MOMENTOS 😃) ![CONFIDENTIAL LOGO](https://i.ibb.co/rK7JWn73/pngwing-com.png)
