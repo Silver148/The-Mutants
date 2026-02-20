@@ -42,34 +42,8 @@ make debug-windows-x64
 
 * Sistema de vida en el jugador ✅
 
-# POLÍTICAS DE CONFIDENCIALIDAD ⚠️
-
-Hasta ahora el juego es de código cerrado para evitar que se roben nuestro código, así que queda terminántemente prohibido compartir el código del juego antes de que se presente el juego :), así que, el que filtre el código del juego, queda expulsado de este proyecto para siempre sin ninguna oportunidad de volver.
-
-**Este es un proyecto desarrollado exclusivamente para la Feria Tecnológica del ETR Fermín Toro.**
-
-## 🔐 POLÍTICAS ESTRICTAS DE DISTRIBUCIÓN
-
-### 📅 DISTRIBUCIÓN ACTUAL (PRE-FERIA)
-
-# ✅ PERMITIDO ACTUALMENTE
-- Compartir ejecutables SOLO entre miembros del equipo de desarrollo
-- Testing interno y preparación para la feria
-
-# ❌ PROHIBIDO ACTUALMENTE  
-- Distribuir ejecutables a personas externas al equipo(sin autorización)
-- Compartir el código del juego con amigos, familiares u otros estudiantes
-- Publicar en internet, redes sociales o cualquier plataformas antes de su presentación
-
-# Este juego se liberará al público cuando se presente en la feria tecnológica
-
-# ✅ LO QUE SE LIBERARÁ ESE DÍA:
-- 🔓 CÓDIGO FUENTE completo (repositorio público)
-- 🔓 EJECUTABLES finales para distribución
-- 🔓 DOCUMENTACIÓN técnica
+Por los momentos este proyecto está en fase beta :)
 
 # CREDITOS
 
 Desarrolladores: Juan Yaguaro(aka silverhacker) and Abel Ferrer(aka The_Light)
-
-PROYECTO EDUCATIVO CONFIDENCIAL(POR LOS MOMENTOS 😃) ![CONFIDENTIAL LOGO](https://i.ibb.co/rK7JWn73/pngwing-com.png)
