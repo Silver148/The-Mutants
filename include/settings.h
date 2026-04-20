@@ -1,6 +1,8 @@
 #ifndef SETTINGS_H
 #define SETTINGS_H
 
+#include <stdbool.h>
+
 typedef struct{
     int volume_music_in_game;
     int volume_music_in_menu;

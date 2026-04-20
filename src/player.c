@@ -33,7 +33,7 @@ extern int worldBarrierLeftX;
 
 /* track last flip to log direction changes for debugging */
 static SDL_RendererFlip last_player_flip = SDL_FLIP_NONE;
-#define POS_Y 350
+#define POS_Y 355
 #define POS_X 100
 
 /*IDLE PLAYER*/
@@ -146,7 +146,7 @@ float player_spawn_y = POS_Y;
 int last_position_x = 0;    
 int last_position_y = 0;
 
-int health = 170; 
+int health = MAX_HEALTH;
 
 /*STATES OF THE PLAYER*/
 StatesPlayer states_player;
@@ -532,7 +532,8 @@ void CleanupPlayer()
         jump_player.tex_jumpplayer = NULL;
     }
 
-    health = 170;
+    health = MAX_HEALTH;
+    SDL_Log("[player] CleanupPlayer: health reset to %d", health);
     
     extern float stamina;
     stamina = 25.0f;

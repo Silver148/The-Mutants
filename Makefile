@@ -77,7 +77,7 @@ Windows_NT-i686:
 	@echo "BUILD COMPLETE... Compiled from the $(OS)-$(ARCH)"
 
 debug-windows-x64:
-	make $(WIN_NAME) CC=$(WIN_CC) "WIN_CFLAGS=$(WIN_CFLAGS) -g -ggdb3 -Og -DDEBUG -DANIM_DEBUG"
+	make $(WIN_NAME) CC=$(WIN_CC) "WIN_CFLAGS=$(WIN_CFLAGS) -g -ggdb3 -Og -DDEBUG -DANIM_DEBUG" "WIN_LIBS=$(WIN_LIBS:-mwindows=)"
 	cp SDL2-Mingw/x86_64-w64-mingw32/bin/SDL2.dll SDL2.dll
 	cp SDL2-Mingw/x86_64-w64-mingw32/bin/libpng16-16.dll libpng16-16.dll
 	cp SDL2-Mingw/x86_64-w64-mingw32/bin/zlib1.dll zlib1.dll

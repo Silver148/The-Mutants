@@ -497,7 +497,6 @@ void RenderBarStamina()
 void RenderBarHealth()
 {
     /* Player health bar (top-left) */
-    const int MAX_HEALTH = 170; /* CORREGÍ: debe ser 170 para coincidir con player.c */
     const int HEALTH_BAR_WIDTH = 200;
     const int HEALTH_BAR_HEIGHT = 16;
     const int HEALTH_POS_X = 20;
@@ -528,7 +527,7 @@ void RenderBarHealth()
 void SpawnAmmunition() {
 
     int slot = -1;
-    if (counter_kills > 0 && (counter_kills % 9) == 0 && counter_kills != last_ammo_spawn_kill) {
+    if (counter_kills > 0 && (counter_kills % 10) == 0 && counter_kills != last_ammo_spawn_kill) {
         for (int i = 0; i < 128; i++) {
             if (ammunitions[i].dest_bullet.x == -1) {
                 slot = i;
@@ -793,6 +792,7 @@ int Update_State_Game()
                     PlayMusicStateMenu();
 
                     counter_kills = 0;
+                    last_ammo_spawn_kill = 0;
                     is_paused = false;
 
                     game_state = STATE_MENU;

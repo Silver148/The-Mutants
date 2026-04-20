@@ -5,6 +5,8 @@
 #include <SDL2/SDL_image.h>
 #include "anim_manager.h"
 #define FRAME_DURATION_PLAYER 150
+/* Maximum player health (shared across modules) */
+#define MAX_HEALTH 170
 
 typedef struct{
     /*IDLE PLAYER*/

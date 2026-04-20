@@ -13,62 +13,76 @@ Copyright 2025
 
 #include "zombie_waves.h"
 #include "delta_time.h"
+#include <stdbool.h>
 #include <SDL2/SDL.h>
+#include <stdlib.h>
+#include <stdio.h>
 extern int num_zombies;
 extern float deltaTime;
-static int zombies_spawned = 0;
 
-int InitWave(WAVE *w, int n_zombies, float spawn_cooldown, float delay_time_start){
+int InitWave(WAVE *w, int n_zombies, float min_cooldown, float max_cooldown, float delay_time_start){
 
     w->num_zombies = n_zombies;
-    w->spawn_timer = 0.0f;
-    w->spawn_cooldown = spawn_cooldown;
+    w->zombies_spawned = 0;
+    w->spawn_active = true;
+    w->spawn_timer = -delay_time_start;
+    w->min_cooldown = min_cooldown;
+    w->max_cooldown = max_cooldown;
     w->delay_time_start = delay_time_start;
     w->timer = 0.0f;
-
     return 1;
 }
 
 void DeinitWave(WAVE *w){
-    w->num_zombies = 0;
-    w->spawn_timer = 0.0f;
-    w->spawn_cooldown = 0;
-    w->delay_time_start = 0;
-    w->timer = 0.0f;
-    zombies_spawned = 0;
-
-    memset(&w, 0, sizeof(WAVE));
+    memset(w, 0, sizeof(WAVE));
 }
 
 int UpdateWave(WAVE* w, ZOMBIE *z){
 
-    static bool spawn = true;
     w->timer += deltaTime;
-    //SDL_Log("timer: %f\n", w->timer);
+    SDL_Log("UpdateWave: timer=%.2f, delay_start=%.2f, spawn_timer=%.2f, spawn_active=%d, zombies_spawned=%d/%d", w->timer, w->delay_time_start, w->spawn_timer, w->spawn_active, w->zombies_spawned, w->num_zombies);
 
     if(w->timer >= w->delay_time_start)
     {
-        w->spawn_timer += deltaTime;
-        //SDL_Log("spawn_timer %f\n", w->spawn_timer);
-
-        if(w->spawn_timer >= w->spawn_cooldown && zombies_spawned < w->num_zombies && spawn)
+        if(w->min_cooldown == 0.0f && w->max_cooldown == 0.0f && w->delay_time_start == 0.0f && w->spawn_active)
         {
-            SpawnZombieRandom();
-            zombies_spawned++;
-            w->spawn_timer = 0.0f;
-            SDL_Log("n_zombies:%d\n", num_zombies);
+            SDL_Log("LEVEL 4 instant wave: spawning all remaining zombies (%d)", w->num_zombies - w->zombies_spawned);
+            while(w->zombies_spawned < w->num_zombies)
+            {
+                SpawnZombieRandom();
+                w->zombies_spawned++;
+            }
+            w->spawn_active = false;
+            return -1;
+        }
+        else
+        {
+            w->spawn_timer += deltaTime;
+            SDL_Log("UpdateWave inner: spawn_timer=%.2f", w->spawn_timer);
+
+            if(w->spawn_timer >= 0 && w->zombies_spawned < w->num_zombies && w->spawn_active)
+            {
+                SDL_Log("SPAWNING ZOMBIE NOW");
+                SpawnZombieRandom();
+                w->zombies_spawned++;
+                float random_cooldown = ((float)rand() / RAND_MAX) * (w->max_cooldown - w->min_cooldown) + w->min_cooldown;
+                w->spawn_timer = -random_cooldown;
+                SDL_Log("Spawned zombie, next cooldown: %.2f, total zombies: %d", random_cooldown, w->zombies_spawned);
+            }
+
+            if(w->zombies_spawned >= w->num_zombies){
+                w->spawn_active = false;
+            }
         }
 
-        if(zombies_spawned >= w->num_zombies){
-            spawn = false;
-        }
-
-        if(!spawn && num_zombies == 0)
+        if(!w->spawn_active && num_zombies == 0)
         {
-            SDL_Log("num_zombies:%d\n", num_zombies);
-            SDL_Log("WAVE FINISHED\n");
-            spawn = true;
-            zombies_spawned = 0;
+            printf("num_zombies:%d\n", num_zombies);
+            fflush(stdout);
+            SDL_Log("num_zombies:%d", num_zombies);
+            SDL_Log("WAVE FINISHED");
+            w->spawn_active = true;
+            w->zombies_spawned = 0;
             return -1;
         }
     }

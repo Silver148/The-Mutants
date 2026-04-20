@@ -52,6 +52,10 @@ typedef struct {
     int id;
 } ZOMBIE;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void LoadSpritesZombies();
 void InitZombieSys();
 int SpawnZombie(float x, float y);
@@ -67,5 +71,10 @@ void DeleteZombies();
 
 /*HITBOX FUNC*/
 void ShowHitboxZombie(int zombie_index);
+void StartLevel4(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

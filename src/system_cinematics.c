@@ -14,6 +14,7 @@ Copyright 2025
 /*SISTEMA DE CINEMÁTICAS HECHO POR JUAN YAGUARO :D*/
 
 #include "system_cinematics.h"
+#include <stdbool.h>
 extern SDL_Window* window;
 
 void InitSystemCinematics()
@@ -26,17 +27,24 @@ int PlayCinematic(const char* filepath, SDL_Renderer* renderer)
 {
         AVFormatContext *fmt_ctx = NULL;
         int ret = 0;
-        if (avformat_open_input(&fmt_ctx, filepath, NULL, NULL) < 0) return -1;
-        if (avformat_find_stream_info(fmt_ctx, NULL) < 0) { avformat_close_input(&fmt_ctx); return -1; }
+        FILE *flog = fopen("play_cinematic_debug.log", "a");
+        if (flog) fprintf(flog, "PlayCinematic: opening %s\n", filepath);
+        SDL_Log("PlayCinematic: opening %s", filepath);
+    if (avformat_open_input(&fmt_ctx, filepath, NULL, NULL) < 0) {
+            SDL_Log("PlayCinematic: avformat_open_input failed for %s", filepath);
+            if (flog) { fprintf(flog, "PlayCinematic: avformat_open_input failed for %s\n", filepath); fclose(flog); }
+        return -1;
+    }
+        if (avformat_find_stream_info(fmt_ctx, NULL) < 0) { SDL_Log("PlayCinematic: avformat_find_stream_info failed"); if (flog) { fprintf(flog, "PlayCinematic: avformat_find_stream_info failed\n"); fclose(flog); } avformat_close_input(&fmt_ctx); return -1; }
 
         int video_stream = -1;
         for (unsigned i = 0; i < fmt_ctx->nb_streams; ++i)
             if (fmt_ctx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) { video_stream = i; break; }
-        if (video_stream == -1) { avformat_close_input(&fmt_ctx); return -1; }
+        if (video_stream == -1) { SDL_Log("PlayCinematic: video stream not found"); if (flog) { fprintf(flog, "PlayCinematic: video stream not found\n"); } avformat_close_input(&fmt_ctx); return -1; }
 
         AVCodecParameters *codecpar = fmt_ctx->streams[video_stream]->codecpar;
         const AVCodec *codec = avcodec_find_decoder(codecpar->codec_id);
-        if (!codec) { avformat_close_input(&fmt_ctx); return -1; }
+        if (!codec) { SDL_Log("PlayCinematic: codec not found for id %d", codecpar->codec_id); if (flog) { fprintf(flog, "PlayCinematic: codec not found for id %d\n", codecpar->codec_id); } avformat_close_input(&fmt_ctx); return -1; }
 
         AVCodecContext *codec_ctx = avcodec_alloc_context3(codec);
         if (!codec_ctx) { avformat_close_input(&fmt_ctx); return -1; }
@@ -49,7 +57,7 @@ int PlayCinematic(const char* filepath, SDL_Renderer* renderer)
         int height = codec_ctx->height;
 
         SDL_Texture *texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_IYUV, SDL_TEXTUREACCESS_STREAMING, width, height);
-        if (!texture) { ret = -1; goto cleanup; }
+        if (!texture) { SDL_Log("PlayCinematic: SDL_CreateTexture failed"); if (flog) { fprintf(flog, "PlayCinematic: SDL_CreateTexture failed\n"); } ret = -1; goto cleanup; }
 
         AVPacket *pkt = av_packet_alloc();
 
@@ -99,6 +107,8 @@ int PlayCinematic(const char* filepath, SDL_Renderer* renderer)
                         SDL_RenderClear(renderer);
                         SDL_RenderCopy(renderer, texture, NULL, NULL);
                         SDL_RenderPresent(renderer);
+                        SDL_Log("PlayCinematic: presented frame at pts %f", pts);
+                        if (flog) { fprintf(flog, "PlayCinematic: presented frame at pts %f\n", pts); }
                     }
                 }
             }
@@ -113,6 +123,7 @@ int PlayCinematic(const char* filepath, SDL_Renderer* renderer)
         if (codec_ctx) { avcodec_free_context(&codec_ctx); }
         if (fmt_ctx) avformat_close_input(&fmt_ctx);
         if (pkt) av_packet_free(&pkt);
+        if (flog) fclose(flog);
 
         return ret;
 }

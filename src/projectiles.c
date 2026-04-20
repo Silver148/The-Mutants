@@ -25,7 +25,10 @@ extern float deltaTime; /* from delta_time.c */
 extern ZOMBIE zombies[MAX_ZOMBIES];/*zombies instance (from zombies.c) */
 extern int num_zombies;
 extern int Ammunition;
+extern int current_level;
+extern void SetBackgroundImage(const char* path);
 int counter_kills = 0;
+extern int last_ammo_spawn_kill;
 int spawned_bullets = 0;
 
 #if 0
@@ -177,13 +180,17 @@ void UpdateProjectiles()
                       num_zombies--;
                       /* increment global kills counter and update texture */
                       counter_kills++;
+                      if (counter_kills >= 82 && current_level < 4) {
+                          SDL_Log("Reached 82 kills, switching level to 4 and initializing Level 4 waves");
+                          StartLevel4();
+                      }
                       #ifdef DEBUG
                       SDL_Log("counter_kills incremented -> %d", counter_kills);
                       #endif
                       UpdateKillsTexture(counter_kills);
                       /* spawn ammo pack every 9 kills (once per multiple) */
                       #if 0
-                      if (counter_kills > 0 && (counter_kills % 9) == 0 && counter_kills != last_ammo_spawn_kill) {
+                      if (counter_kills > 0 && (counter_kills % 10) == 0 && counter_kills != last_ammo_spawn_kill) {
                           /* spawn at player's initial spawn position (where player appears at game start) */
                           extern float player_spawn_x; /* from include/global_vars.h */
                           extern float player_spawn_y;

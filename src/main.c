@@ -103,16 +103,24 @@ int main(int argc, char* argv[])
         SDL_SetWindowFullscreen(window, 0);
     }
 
-    #if 0
-    /*SYSTEM CINEMATIC TESTING*/
-    InitSystemCinematics(); //Initialize cinematic system
-    PlayCinematic("cinematics/win1.mp4", renderer); //Play intro cinematic 1
-    ShutdownCinematicsSystem(); //Shutdown cinematic system
-
-    /* Clear the screen */
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-    SDL_RenderClear(renderer);
-    #endif
+    /* Allow forcing the level-passed cinematic at startup for debugging.
+       Create an empty file named 'force_play_level_passed' in the working
+       directory to trigger playing `cinematics/level_passed.mp4` once. */
+    {
+        FILE *f = fopen("force_play_level_passed", "r");
+        if (f) {
+            fclose(f);
+            InitSystemCinematics(); //Initialize cinematic system
+            /* Prefer the cinematics path */
+            PlayCinematic("cinematics/level_passed.mp4", renderer);
+            ShutdownCinematicsSystem(); //Shutdown cinematic system
+            /* remove the trigger so it doesn't replay next runs */
+            remove("force_play_level_passed");
+            /* Clear the screen */
+            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+            SDL_RenderClear(renderer);
+        }
+    }
 
     game_state = STATE_MENU;
 
