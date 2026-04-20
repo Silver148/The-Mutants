@@ -69,6 +69,7 @@ int PlayMusicStateMenu()
 
 int ChangeMusicVolume(int volume)
 {
-    Mix_VolumeMusic(volume);
+    int real_volume = (volume * MIX_MAX_VOLUME) / 100;
+    Mix_VolumeMusic(real_volume);
     return 0;
 }
