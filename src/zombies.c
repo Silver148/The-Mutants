@@ -103,6 +103,11 @@ static int find_free_zombie_slot() {
 
 void StartLevel4(void)
 {
+    if(wave_state == 9) {
+        SDL_Log("StartLevel4 called but wave_state is already 9, ignoring redundant call");
+        return;
+    }
+    
     SDL_Log("Transitioning to Level 4 - loading background sprites/airport2.png");
     current_level = 4;
     SetBackgroundImage("sprites/airport2.png");
@@ -111,8 +116,8 @@ void StartLevel4(void)
     for (int i = 0; i < MAX_ZOMBIES; i++) { zombies[i].id = 0; zombies[i].alive = 0; }
     num_zombies = 0;
     next_zombie_id = 0;
-    InitWave(&wave7, 20, 0.0f, 0.0f, 0);
-    InitWave(&wave8, 20, 0.0f, 0.0f, 0);
+    InitWave(&wave7, 20, 2.0f, 5.0f, 0);
+    InitWave(&wave8, 20, 2.0f, 5.0f, 0);
     wave7.timer = 0.0f;
     wave7.spawn_timer = 0.0f;
     wave7.spawn_active = true;
@@ -121,6 +126,7 @@ void StartLevel4(void)
     fflush(stdout);
     wave_state = 9;
 }
+
 
 void LoadSpritesZombies()
 {
@@ -486,6 +492,7 @@ void UpdateZombies() {
     /* Handle level 4 start if switched during level 3 waves */
     if (wave_state == 4 && current_level == 4) {
         StartLevel4();
+        wave_state = 9;
     }
 
     /* Additional waves logic (wave3 -> wave4 -> final) */
@@ -545,6 +552,7 @@ void UpdateZombies() {
         if (r == -1) {
             if (current_level == 4) {
                 StartLevel4();
+                return;
             } else {
                 SDL_Log("WAVE 6 FINISHED");
                 SDL_Log("ALL WAVES FINISHED!!!");
@@ -565,6 +573,7 @@ void UpdateZombies() {
             InitWave(&wave2, 12, 3.0f, 4.0f, 0);
             SDL_Log("STARTING LEVEL 3 - WAVE 1");
             wave_state = 1; /* start wave1 for level 3 */
+            }
         }
     }
 
@@ -596,7 +605,7 @@ void UpdateZombies() {
             SDL_Log("[zombies] Restored player health to %d at level 4 to 5 transition", health);
             /* Reset zombies and start two new waves for level 5 */
             for(int i = 0; i<MAX_ZOMBIES; i++) { zombies[i].id = 0; zombies[i].alive = 0; }
-            num_zombies = 20;
+            num_zombies = 0;
             next_zombie_id = 0;
             InitWave(&wave9, 18, 3.0f, 4.0f, 20.0f);
             InitWave(&wave10, 18, 3.0f, 4.0f, 22.0f);
@@ -829,7 +838,7 @@ void UpdateZombies() {
         Update_State_Menu();
     }
 }
-}
+
 
 void RenderZombies(void) 
 {
