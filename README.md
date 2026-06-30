@@ -40,6 +40,8 @@ make debug-windows-x64
 
 * Sistema de vida en el jugador
 
-# CREDITOS
+# CREDITOS(Y la verdad de todo esto)
 
-Desarrolladores: Juan Yaguaro(aka silverhacker), el otro solo contaminó esto con vibe coding :v, quedará este juego como parte de un aprendizaje algo amargo
+Desarrolladores: Juan Yaguaro(aka silverhacker), el otro solo contaminó esto con vibe coding :v(no menciono nombre real para evitar líos legales y porque merece anónimato total en este lugar), quedará este juego como parte de un aprendizaje algo amargo.
+
+Originalmente este juego era compatible con Linux(ya que me había movido a Ubuntu por un tiempo para probar), luego quité la compatibilidad porque cambié a Windows(sin dual boot), pero pensé en volverla a implementar, pero por el final que tuvo este proyecto no pude cumplir eso que me propuse. Aunque este fue de los mayores proyectos que hice en lenguaje C, la verdad fue muy difícil lidiar con el compañero con el que me puse a hacer este juego, ya que eramos amigos. Ocurrieron muchos choques creativos, algunas discuciones porque este es pésimo con la programación en C++ y C, así que muchas veces lo ayudé, lo cual fue un grave error que cometí, porque prácticamente hice el juego yo solo, y él contaminó todo con código hecho con IA que era propenso a buguearse. Fui paciente, pero por problemas personales con él decidí no seguir con este juego, así que comencé otro proyecto, el cual es el que sigo desarrollando y mejorando(es una asistente virtual hecha en C++ llamada [Ada](https://github.com/Silver148/Ada-Virtual-Assistant)). La verdad The Mutants fue parte de mi aprendizaje, y me enseñó que no puedo ser ingenuo y trabajar con cualquiera, ya que hay gente incompetente que fingen saber mucho y solo empeoran todo, pero bueno, al menos estoy tranquilo ahora sabiendo que estoy haciendo un proyecto que cualquiera puede aportar y con la licencia más permisiva que hay :D, algo que realmente no es efímero y que fue hecho para que sea util en tu vida ;).
