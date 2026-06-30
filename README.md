@@ -1,8 +1,6 @@
 # THE MUTANTS #
 
-## Próximo juego para la feria tecnológica del ETR Fermín Toro
-
-Este juego está hecho en C con la librería SDL2.
+Este fue un juego que había hecho con alguien de mi clase, está hecho en C con la librería SDL2
 
 # Como compilar el juego
 
@@ -26,24 +24,22 @@ make debug-windows-x64
 | **Almacenamiento** | 125 MB de espacio disponible | 150 MB de espacio disponible |
 | **Notas Adicionales** | Requiere soporte de instrucciones **SSE2** 
 
-## Cosas que se quieren agregar :D
+## Cosas que se llegaron a agregar
 
-* Menú ✅
+* Menú
 
-* IA de zombies ✅
+* IA de zombies
 
-* Niveles (En proceso 🚧)
+* Niveles (El compañero terminó siendo lo peor que le pudo suceder a mi 1er juego sin usar motor gráfico)
 
-* Oleadas de zombies ✅
+* Oleadas de zombies
 
 * Escena de créditos
 
-* Sistema de manejo de armas para el jugador (En proceso 🚧)
+* Sistema de manejo de armas para el jugador (algo básico)
 
-* Sistema de vida en el jugador ✅
-
-Por los momentos este proyecto está en fase beta :)
+* Sistema de vida en el jugador
 
 # CREDITOS
 
-Desarrolladores: Juan Yaguaro(aka silverhacker) and Abel Ferrer(aka The_Light)
+Desarrolladores: Juan Yaguaro(aka silverhacker), el otro solo contaminó esto con vibe coding :v, quedará este juego como parte de un aprendizaje algo amargo
