@@ -34,8 +34,6 @@ make debug-windows-x64
 
 * Oleadas de zombies
 
-* Escena de créditos
-
 * Sistema de manejo de armas para el jugador (algo básico)
 
 * Sistema de vida en el jugador
